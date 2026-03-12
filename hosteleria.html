@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SGAE — Hostelería y Restauración</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --gold: #C8A96E; --gold-light: #E8D5A8; --dark: #1A1A1A;
+    --surface: #F7F4EF; --border: #DDD5C4; --text: #3A3530; --muted: #8C8070;
+    --error: #c0392b; --error-bg: #fdf0ef; --warn-bg: #fff8ee;
+  }
+  body { font-family: 'DM Sans', sans-serif; background: var(--surface); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 40px 20px 60px; }
+  .header { text-align: center; margin-bottom: 28px; animation: fadeDown 0.6s ease both; }
+  h1 { font-family: 'Playfair Display', serif; font-size: clamp(24px, 4vw, 36px); font-weight: 400; color: var(--dark); line-height: 1.2; margin-bottom: 8px; }
+  .subtitle { font-size: 14px; color: var(--muted); font-weight: 300; margin-bottom: 14px; }
+  .sector-badge { display: inline-block; background: var(--gold); color: var(--dark); font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; padding: 6px 20px; border-radius: 20px; }
+  .contact-block { width: 100%; max-width: 840px; margin-bottom: 28px; animation: fadeUp 0.5s ease 0.05s both; }
+  .contact-inner { background: white; border-radius: 10px; border: 1.5px solid var(--border); padding: 16px 28px; display: flex; align-items: center; justify-content: center; gap: 28px; flex-wrap: wrap; }
+  .contact-intro { font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); font-weight: 500; padding-right: 16px; border-right: 1px solid var(--border); white-space: nowrap; }
+  .contact-item { display: flex; align-items: center; gap: 10px; }
+  .contact-icon { font-size: 18px; flex-shrink: 0; }
+  .contact-details { display: flex; flex-direction: column; }
+  .contact-label { font-size: 9.5px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); margin-bottom: 2px; }
+  .contact-value { font-family: 'Playfair Display', serif; font-size: 14px; color: var(--dark); display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .contact-divider { width: 1px; height: 36px; background: var(--border); flex-shrink: 0; }
+  .btn-copy { display: inline-flex; align-items: center; gap: 5px; background: var(--dark); color: var(--gold); border: none; border-radius: 5px; padding: 5px 12px; font-family: 'DM Sans', sans-serif; font-size: 10px; letter-spacing: 0.8px; text-transform: uppercase; cursor: pointer; transition: all 0.2s; font-weight: 500; }
+  .btn-copy:hover { background: #333; }
+  .btn-copy.copied { background: #2d7a2d; color: white; }
+  .selector-section { width: 100%; max-width: 840px; margin-bottom: 16px; animation: fadeUp 0.5s ease 0.1s both; }
+  .selector-label { font-size: 14px; letter-spacing: 1px; text-transform: uppercase; color: var(--dark); margin-bottom: 16px; font-weight: 700; }
+  .type-tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .type-tab { background: white; border: 2px solid var(--border); border-radius: 10px; padding: 24px 18px; cursor: pointer; text-align: center; transition: all 0.25s ease; position: relative; overflow: hidden; box-shadow: 0 3px 12px rgba(26,26,26,0.07); }
+  .type-tab::before { content: ''; position: absolute; inset: 0; background: var(--dark); transform: scaleY(0); transform-origin: bottom; transition: transform 0.3s ease; z-index: 0; }
+  .type-tab.active::before { transform: scaleY(1); }
+  .type-tab .tab-icon { font-size: 34px; margin-bottom: 12px; position: relative; z-index: 1; transition: transform 0.3s ease; display: block; }
+  .type-tab.active .tab-icon { transform: scale(1.15); }
+  .type-tab .tab-title { font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 600; color: var(--dark); display: block; position: relative; z-index: 1; transition: color 0.3s ease; line-height: 1.3; }
+  .type-tab .tab-sub { font-size: 12px; color: var(--muted); display: block; margin-top: 6px; position: relative; z-index: 1; transition: color 0.3s ease; }
+  .type-tab.active .tab-title, .type-tab.active .tab-sub { color: var(--gold-light); }
+  .type-tab:not(.active):hover { border-color: var(--gold); box-shadow: 0 8px 28px rgba(200,169,110,0.25); transform: translateY(-4px); }
+  .click-hint { text-align: center; margin-bottom: 24px; animation: fadeUp 0.5s ease 0.15s both; }
+  .click-hint span { font-size: 11px; color: var(--muted); letter-spacing: 1px; }
+  .card-container { width: 100%; max-width: 840px; animation: fadeUp 0.5s ease 0.2s both; }
+  .form-card { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 8px 40px rgba(26,26,26,0.08); display: none; }
+  .form-card.visible { display: block; animation: cardIn 0.4s cubic-bezier(0.22,1,0.36,1) both; }
+  @keyframes cardIn { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+  .card-header { background: var(--dark); padding: 24px 36px; display: flex; align-items: center; gap: 18px; }
+  .card-header-icon { font-size: 32px; flex-shrink: 0; }
+  .card-header-title { font-family: 'Playfair Display', serif; font-size: 20px; color: white; font-weight: 400; }
+  .card-header-sub { font-size: 12px; color: var(--gold); margin-top: 3px; letter-spacing: 1px; text-transform: uppercase; }
+  .gold-bar { height: 3px; background: linear-gradient(90deg, var(--gold), var(--gold-light), var(--gold)); }
+  .section-title { font-size: 10px; letter-spacing: 2.5px; text-transform: uppercase; color: var(--gold); font-weight: 600; padding: 16px 36px 8px; border-bottom: 1px solid var(--border); background: #FDFAF5; }
+  .legend { font-size: 11px; color: var(--muted); padding: 10px 36px 2px; display: flex; gap: 20px; flex-wrap: wrap; }
+  .leg-block { color: var(--error); font-weight: 700; font-size: 15px; line-height: 1; }
+  .leg-soft  { color: #e67e22; font-weight: 700; font-size: 15px; line-height: 1; }
+  .field-row       { display: grid; grid-template-columns: 240px 1fr;     border-bottom: 1px solid var(--border); min-height: 54px; transition: background 0.2s; }
+  .field-row-split { display: grid; grid-template-columns: 240px 1fr 1fr; border-bottom: 1px solid var(--border); min-height: 54px; transition: background 0.2s; }
+  .field-row:last-child, .field-row-split:last-child { border-bottom: none; }
+  .field-row:hover, .field-row-split:hover { background: #FDFAF5; }
+  .field-row.err-block, .field-row-split.err-block { background: var(--error-bg) !important; }
+  .field-row.warn-block, .field-row-split.warn-block { background: var(--warn-bg) !important; }
+  .field-row-split .field-value + .field-value { border-left: 1px dashed var(--border); }
+  .field-label { display: flex; align-items: center; padding: 12px 14px 12px 36px; font-size: 11px; font-weight: 500; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); border-right: 2px solid var(--gold-light); gap: 8px; flex-wrap: wrap; }
+  .field-label .dot { width: 5px; height: 5px; border-radius: 50%; background: var(--gold); flex-shrink: 0; }
+  .field-label.lbl-block::after { content: ' *'; color: var(--error); font-size: 14px; line-height: 1; }
+  .field-label.lbl-soft::after  { content: ' °'; color: #e67e22; font-size: 14px; line-height: 1; }
+  .field-value { display: flex; flex-direction: column; justify-content: center; padding: 10px 20px 10px 18px; gap: 4px; }
+  .field-value input[type="text"], .field-value input[type="email"], .field-value input[type="tel"] { width: 100%; border: none; border-bottom: 1.5px solid transparent; outline: none; background: transparent; font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--dark); transition: border-color 0.2s; padding-bottom: 2px; }
+  .field-value input:focus { border-bottom-color: var(--gold); }
+  .field-value input.inp-err { border-bottom-color: var(--error) !important; }
+  .field-value input::placeholder { color: #C8BFB0; font-style: italic; font-size: 13px; }
+  .inline-err  { font-size: 11px; color: var(--error); display: none; }
+  .inline-warn { font-size: 11px; color: #e67e22;   display: none; }
+  .inline-err.show, .inline-warn.show { display: block; }
+  .radio-group { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .radio-opt { display: flex; align-items: center; gap: 6px; cursor: pointer; padding: 3px 2px; }
+  .radio-opt input { display: none; }
+  .radio-btn { width: 18px; height: 18px; border: 2px solid var(--border); border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: all 0.2s; flex-shrink: 0; }
+  .radio-opt input:checked ~ .radio-btn { border-color: var(--gold); background: var(--gold); }
+  .radio-opt input:checked ~ .radio-btn::after { content: ''; width: 6px; height: 6px; background: white; border-radius: 50%; display: block; }
+  .radio-label { font-size: 13px; color: var(--dark); white-space: nowrap; display: flex; align-items: center; gap: 5px; }
+  .desc-tag { display: inline-block; background: #e8f5e8; color: #2d7a2d; font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 10px; }
+  .card-footer { background: #F2EEE7; border-top: 1px solid var(--border); padding: 14px 36px; display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+  .footer-left { display: flex; flex-direction: column; gap: 5px; flex: 1; }
+  .footer-note { font-size: 11px; color: var(--muted); font-style: italic; }
+  .footer-err-list  { font-size: 11px; color: var(--error); display: none; line-height: 1.5; }
+  .footer-warn-list { font-size: 11px; color: #b7600a;   display: none; line-height: 1.5; }
+  .footer-err-list.show, .footer-warn-list.show { display: block; }
+  .btn-send { display: inline-flex; align-items: center; gap: 8px; background: var(--gold); color: var(--dark); border: none; border-radius: 6px; padding: 12px 28px; font-family: 'DM Sans', sans-serif; font-size: 13px; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; transition: all 0.2s; font-weight: 700; flex-shrink: 0; margin-top: 3px; }
+  .btn-send:hover { background: var(--gold-light); transform: translateY(-1px); box-shadow: 0 4px 16px rgba(200,169,110,0.4); }
+  .btn-send:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+  .notice-card { width: 100%; max-width: 840px; background: white; border: 1.5px solid var(--gold-light); border-radius: 12px; padding: 24px 28px; margin-top: 8px; display: none; }
+  .notice-card.visible { display: block; animation: fadeUp 0.4s ease both; }
+  .notice-header { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+  .notice-icon { width: 34px; height: 34px; background: var(--gold); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 15px; flex-shrink: 0; color: white; font-weight: bold; }
+  .notice-title { font-family: 'Playfair Display', serif; font-size: 15px; color: var(--dark); }
+  .notice-body { font-size: 13px; color: var(--text); line-height: 1.8; }
+  .notice-body strong { color: var(--dark); }
+  .notice-tabs { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
+  .notice-pill { background: var(--dark); color: var(--gold-light); font-size: 11px; padding: 5px 14px; border-radius: 20px; cursor: pointer; border: none; font-family: 'DM Sans', sans-serif; transition: background 0.2s; }
+  .notice-pill:hover { background: #333; }
+  .success-banner { display: none; background: #e8f5e8; border: 1.5px solid #a0d4a0; border-radius: 10px; padding: 20px 28px; margin-top: 16px; text-align: center; animation: fadeUp 0.4s ease both; width: 100%; max-width: 840px; }
+  .success-banner.visible { display: block; }
+  .sb-icon { font-size: 36px; margin-bottom: 8px; }
+  .sb-title { font-family: 'Playfair Display', serif; font-size: 18px; color: #1a5c1a; margin-bottom: 6px; }
+  .sb-sub { font-size: 13px; color: #2d7a2d; }
+  .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--dark); color: var(--gold-light); padding: 14px 28px; border-radius: 8px; font-size: 13px; opacity: 0; transition: all 0.4s cubic-bezier(0.22,1,0.36,1); pointer-events: none; z-index: 999; border-left: 3px solid var(--gold); }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .toast.terror { border-left-color: var(--error); }
+  .local-block { width: 100%; max-width: 840px; margin-bottom: 20px; animation: fadeUp 0.5s ease 0.08s both; }
+  .local-inner { background: white; border-radius: 10px; border: 2px solid var(--gold); overflow: hidden; }
+  .local-header { background: var(--dark); padding: 10px 28px; display: flex; align-items: center; gap: 10px; }
+  .local-header span { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--gold); font-weight: 600; }
+  .local-field { display: flex; align-items: center; padding: 14px 28px; gap: 14px; }
+  .local-field input { flex: 1; border: none; border-bottom: 2px solid var(--border); outline: none; background: transparent; font-family: 'Playfair Display', serif; font-size: 20px; color: var(--dark); padding-bottom: 4px; transition: border-color 0.2s; }
+  .local-field input:focus { border-bottom-color: var(--gold); }
+  .local-field input.inp-err { border-bottom-color: var(--error) !important; }
+  .local-field input::placeholder { color: #C8BFB0; font-style: italic; font-size: 16px; font-family: 'DM Sans', sans-serif; }
+  .local-err { font-size: 11px; color: var(--error); padding: 0 28px 10px; display: none; }
+  .local-err.show { display: block; }
+  @keyframes fadeDown { from { opacity:0; transform:translateY(-16px); } to { opacity:1; transform:translateY(0); } }
+  @keyframes fadeUp   { from { opacity:0; transform:translateY(14px);  } to { opacity:1; transform:translateY(0); } }
+  @media (max-width: 640px) {
+    .type-tabs { grid-template-columns: 1fr; }
+    .field-row, .field-row-split { grid-template-columns: 1fr; }
+    .field-label { border-right: none; padding: 12px 20px 6px; }
+    .field-value { padding: 6px 20px 12px; }
+    .field-row-split .field-value + .field-value { border-left: none; border-top: 1px dashed var(--border); }
+    .section-title, .legend { padding-left: 20px; padding-right: 20px; }
+    .card-header, .card-footer { padding-left: 20px; padding-right: 20px; }
+    .card-footer { flex-direction: column; }
+    .contact-intro { border-right: none; padding-right: 0; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <img src="data:image/jpeg;base64,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" alt="SGAE" style="height:120px;margin-bottom:18px;">
+  <h1>Ficha de Datos del Titular</h1>
+  <p class="subtitle">Escoger el tipo de empresa para facilitar los datos</p>
+  <p class="sector-badge">&#127829; Hostelería y Restauración</p>
+</div>
+
+<div class="contact-block">
+  <div class="contact-inner">
+    <span class="contact-intro">Para cualquier comunicación dirigirse al siguiente email</span>
+    <div class="contact-item">
+      <span class="contact-icon">&#128231;</span>
+      <div class="contact-details">
+        <span class="contact-label">Email</span>
+        <span class="contact-value">
+          <span id="email-display"></span>
+          <button class="btn-copy" onclick="copiarEmail(this)">&#128203; Copiar</button>
+        </span>
+      </div>
+    </div>
+    <div class="contact-divider"></div>
+    <div class="contact-item">
+      <span class="contact-icon">&#128241;</span>
+      <div class="contact-details">
+        <span class="contact-label">WhatsApp / Móvil</span>
+        <span class="contact-value">629 847 923</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="local-block">
+  <div class="local-inner">
+    <div class="local-header">
+      <span>&#127978; Nombre del local <span style="color:#e87070;font-size:15px"> *</span></span>
+    </div>
+    <div class="local-field">
+      <input type="text" id="nombre_local" placeholder="Nombre del establecimiento — obligatorio" autocomplete="off">
+    </div>
+    <span class="local-err" id="local-err">El nombre del local es obligatorio</span>
+  </div>
+</div>
+
+<div class="selector-section">
+  <div class="selector-label">Tipo de empresa</div>
+  <div class="type-tabs">
+    <div class="type-tab" onclick="showForm('fisica')" id="tab-fisica">
+      <span class="tab-icon">&#128100;</span>
+      <span class="tab-title">Persona Física</span>
+      <span class="tab-sub">Autónomo</span>
+    </div>
+    <div class="type-tab" onclick="showForm('sociedad')" id="tab-sociedad">
+      <span class="tab-icon">&#127970;</span>
+      <span class="tab-title">S.A. o S.L.</span>
+      <span class="tab-sub">Sociedad mercantil</span>
+    </div>
+    <div class="type-tab" onclick="showForm('comunidad')" id="tab-comunidad">
+      <span class="tab-icon">&#129309;</span>
+      <span class="tab-title">C.B., S.C. o E.S.P.J.</span>
+      <span class="tab-sub">Comunidad de Bienes</span>
+    </div>
+  </div>
+</div>
+
+<div class="click-hint">
+  <span>&#9660; &nbsp;Toca o haz clic en el que corresponde&nbsp; &#9660;</span>
+</div>
+
+<div class="notice-card" id="notice-unknown">
+  <div class="notice-header">
+    <div class="notice-icon">?</div>
+    <div class="notice-title">&#191;El cliente no sabe qué tipo de empresa tiene?</div>
+  </div>
+  <div class="notice-body">
+    <strong>Persona Física:</strong> actúa en su propio nombre, sin empresa constituida.<br>
+    <strong>S.A. / S.L.:</strong> dispone de escritura de constitución y CIF propio de la sociedad.<br>
+    <strong>C.B. / S.C. / E.S.P.J.:</strong> dos o más personas explotan el negocio conjuntamente sin constituir sociedad.
+  </div>
+  <div class="notice-tabs">
+    <button class="notice-pill" onclick="showForm('fisica')">&#128100; Persona Física</button>
+    <button class="notice-pill" onclick="showForm('sociedad')">&#127970; S.A. o S.L.</button>
+    <button class="notice-pill" onclick="showForm('comunidad')">&#129309; C.B. / S.C. / E.S.P.J.</button>
+  </div>
+</div>
+
+<div class="card-container">
+
+<!-- PERSONA FÍSICA -->
+<div class="form-card" id="card-fisica">
+  <div class="card-header">
+    <div class="card-header-icon">&#128100;</div>
+    <div>
+      <div class="card-header-title">Persona Física</div>
+      <div class="card-header-sub">Autónomo</div>
+    </div>
+  </div>
+  <div class="gold-bar"></div>
+  <div class="legend">
+    <span><span class="leg-block">*</span> Obligatorio</span>
+    <span><span class="leg-soft">°</span> Recomendado</span>
+  </div>
+  <div class="section-title">Datos de identificación</div>
+  <div class="field-row-split" id="frow-f_nombre">
+    <div class="field-label lbl-block"><span class="dot"></span>Nombre y D.N.I.</div>
+    <div class="field-value">
+      <input type="text" id="f_nombre" placeholder="Nombre completo">
+      <span class="inline-err" id="ierr-f_nombre">Obligatorio</span>
+    </div>
+    <div class="field-value">
+      <input type="text" id="f_dni" placeholder="D.N.I. · 00000000A">
+      <span class="inline-err" id="ierr-f_dni">Obligatorio</span>
+    </div>
+  </div>
+  <div class="field-row" id="frow-f_movil">
+    <div class="field-label lbl-block"><span class="dot"></span>Móvil de contacto</div>
+    <div class="field-value">
+      <input type="tel" id="f_movil" placeholder="6XX XXX XXX">
+      <span class="inline-err" id="ierr-f_movil">Obligatorio</span>
+    </div>
+  </div>
+  <div class="field-row" id="frow-f_email">
+    <div class="field-label lbl-block"><span class="dot"></span>Email de contacto</div>
+    <div class="field-value">
+      <input type="email" id="f_email" placeholder="correo@ejemplo.com">
+      <span class="inline-err" id="ierr-f_email">Obligatorio</span>
+    </div>
+  </div>
+  <div class="field-row" id="frow-f_rep">
+    <div class="field-label lbl-block"><span class="dot"></span>Uso del repertorio</div>
+    <div class="field-value">
+      <div class="radio-group">
+        <label class="radio-opt"><input type="radio" name="f_rep" value="Amenización musical"><span class="radio-btn"></span><span class="radio-label">Amenización musical</span></label>
+        <label class="radio-opt"><input type="radio" name="f_rep" value="Televisión"><span class="radio-btn"></span><span class="radio-label">Televisión</span></label>
+      </div>
+      <span class="inline-err" id="ierr-f_rep">Obligatorio — selecciona una opción</span>
+    </div>
+  </div>
+  <div class="field-row" id="frow-f_m2">
+    <div class="field-label lbl-block"><span class="dot"></span>M² superficie al público</div>
+    <div class="field-value">
+      <input type="text" id="f_m2" placeholder="Ej: 120 m²">
+      <span class="inline-err" id="ierr-f_m2">Obligatorio</span>
+    </div>
+  </div>
+  <div class="section-title">Asociación y condiciones</div>
+  <div class="field-row" id="frow-f_asoc">
+    <div class="field-label lbl-soft"><span class="dot"></span>Pertenece a la Asoc. Hostelería de Salamanca</div>
+    <div class="field-value">
+      <div class="radio-group">
+        <label class="radio-opt"><input type="radio" name="f_asoc" value="Sí"><span class="radio-btn"></span><span class="radio-label">Sí <span class="desc-tag">descuento -5%</span></span></label>
+        <label class="radio-opt"><input type="radio" name="f_asoc" value="No"><span class="radio-btn"></span><span class="radio-label">No</span></label>
+      </div>
+      <span class="inline-warn" id="iwarn-f_asoc">Recomendado — selecciona una opción</span>
+    </div>
+  </div>
+  <div class="field-row" id="frow-f_pago">
+    <div class="field-label lbl-soft"><span class="dot"></span>Forma de pago</div>
+    <div class="field-value">
+      <div class="radio-group">
+        <label class="radio-opt"><input type="radio" name="f_pago" value="Trimestral"><span class="radio-btn"></span><span class="radio-label">Trimestral</span></label>
+        <label class="radio-opt"><input type="radio" name="f_pago" value="Semestral"><span class="radio-btn"></span><span class="radio-label">Semestral <span class="desc-tag">descuento -2,5%</span></span></label>
+        <label class="radio-opt"><input type="radio" name="f_pago" value="Anual"><span class="radio-btn"></span><span class="radio-label">Anual <span class="desc-tag">descuento -5%</span></span></label>
+      </div>
+      <span class="inline-warn" id="iwarn-f_pago">Recomendado — selecciona una opción</span>
+    </div>
+  </div>
+  <div class="field-row">
+    <div class="field-label"><span class="dot"></span>IBAN domiciliación <span class="desc-tag" style="margin-left:4px">descuento -5%</span></div>
+    <div class="field-value">
+      <input type="text" id="f_iban" placeholder="ES00 0000 0000 0000 0000 0000">
+    </div>
+  </div>
+  <div class="card-footer">
+    <div class="footer-left">
+      <span class="footer-note">Ficha SGAE · Hostelería y Restauración</span>
+      <span class="footer-err-list" id="ferr-fisica"></span>
+      <span class="footer-warn-list" id="fwarn-fisica"></span>
+    </div>
+    <button class="btn-send" onclick="enviarFormulario('fisica')">&#128228; Enviar ficha</button>
+  </div>
+</div>
+
+<!-- S.A. / S.L. -->
+<div class="form-card" id="card-sociedad">
+  <div class="card-header">
+    <div class="card-header-icon">&#127970;</div>
+    <div>
+      <div class="card-header-title">Sociedad Anónima o de Responsabilidad Limitada</div>
+      <div class="card-header-sub">S.A. · S.L.</div>
+    </div>
+  </div>
+  <div class="gold-bar"></div>
+  <div class="legend">
+    <span><span class="leg-block">*</span> Obligatorio</span>
+    <span><span class="leg-soft">°</span> Recomendado</span>
+  </div>
+  <div class="section-title">Datos de identificación</div>
+  <div class="field-row-split" id="frow-s_soc">
+    <div class="field-label lbl-block"><span class="dot"></span>Nombre sociedad y C.I.F.</div>
+    <div class="field-value">
+      <input type="text" id="s_nombre" placeholder="Razón social">
+      <span class="inline-err" id="ierr-s_nombre">Obligatorio</span>
+    </div>
+    <div class="field-value">
+      <input type="text" id="s_cif" placeholder="C.I.F. · B00000000">
+      <span class="inline-err" id="ierr-s_cif">Obligatorio</span>
+    </div>
+  </div>
+  <div class="field-row-split" id="frow-s_admin">
+    <div class="field-label lbl-block"><span class="dot"></span>Administrador y D.N.I.</div>
+    <div class="field-value">
+      <input type="text" id="s_admin" placeholder="Nombre completo">
+      <span class="inline-err" id="ierr-s_admin">Obligatorio</span>
+    </div>
+    <div class="field-value">
+      <input type="text" id="s_adni" placeholder="D.N.I. · 00000000A">
+      <span class="inline-err" id="ierr-s_adni">Obligatorio</span>
+    </div>
+  </div>
+  <div class="field-row" id="frow-s_movil">
+    <div class="field-label lbl-block"><span class="dot"></span>Móvil de contacto</div>
+    <div class="field-value">
+      <input type="tel" id="s_movil" placeholder="6XX XXX XXX">
+      <span class="inline-err" id="ierr-s_movil">Obligatorio</span>
+    </div>
+  </div>
+  <div class="field-row" id="frow-s_email">
+    <div class="field-label lbl-block"><span class="dot"></span>Email de contacto</div>
+    <div class="field-value">
+      <input type="email" id="s_email" placeholder="correo@empresa.com">
+      <span class="inline-err" id="ierr-s_email">Obligatorio</span>
+    </div>
+  </div>
+  <div class="field-row" id="frow-s_rep">
+    <div class="field-label lbl-block"><span class="dot"></span>Uso del repertorio</div>
+    <div class="field-value">
+      <div class="radio-group">
+        <label class="radio-opt"><input type="radio" name="s_rep" value="Amenización musical"><span class="radio-btn"></span><span class="radio-label">Amenización musical</span></label>
+        <label class="radio-opt"><input type="radio" name="s_rep" value="Televisión"><span class="radio-btn"></span><span class="radio-label">Televisión</span></label>
+      </div>
+      <span class="inline-err" id="ierr-s_rep">Obligatorio — selecciona una opción</span>
+    </div>
+  </div>
+  <div class="field-row" id="frow-s_m2">
+    <div class="field-label lbl-block"><span class="dot"></span>M² superficie al público</div>
+    <div class="field-value">
+      <input type="text" id="s_m2" placeholder="Ej: 250 m²">
+      <span class="inline-err" id="ierr-s_m2">Obligatorio</span>
+    </div>
+  </div>
+  <div class="section-title">Asociación y condiciones</div>
+  <div class="field-row" id="frow-s_asoc">
+    <div class="field-label lbl-soft"><span class="dot"></span>Pertenece a la Asoc. Hostelería de Salamanca</div>
+    <div class="field-value">
+      <div class="radio-group">
+        <label class="radio-opt"><input type="radio" name="s_asoc" value="Sí"><span class="radio-btn"></span><span class="radio-label">Sí <span class="desc-tag">descuento -5%</span></span></label>
+        <label class="radio-opt"><input type="radio" name="s_asoc" value="No"><span class="radio-btn"></span><span class="radio-label">No</span></label>
+      </div>
+      <span class="inline-warn" id="iwarn-s_asoc">Recomendado — selecciona una opción</span>
+    </div>
+  </div>
+  <div class="field-row" id="frow-s_pago">
+    <div class="field-label lbl-soft"><span class="dot"></span>Forma de pago</div>
+    <div class="field-value">
+      <div class="radio-group">
+        <label class="radio-opt"><input type="radio" name="s_pago" value="Trimestral"><span class="radio-btn"></span><span class="radio-label">Trimestral</span></label>
+        <label class="radio-opt"><input type="radio" name="s_pago" value="Semestral"><span class="radio-btn"></span><span class="radio-label">Semestral <span class="desc-tag">descuento -2,5%</span></span></label>
+        <label class="radio-opt"><input type="radio" name="s_pago" value="Anual"><span class="radio-btn"></span><span class="radio-label">Anual <span class="desc-tag">descuento -5%</span></span></label>
+      </div>
+      <span class="inline-warn" id="iwarn-s_pago">Recomendado — selecciona una opción</span>
+    </div>
+  </div>
+  <div class="field-row">
+    <div class="field-label"><span class="dot"></span>IBAN domiciliación <span class="desc-tag" style="margin-left:4px">descuento -5%</span></div>
+    <div class="field-value">
+      <input type="text" id="s_iban" placeholder="ES00 0000 0000 0000 0000 0000">
+    </div>
+  </div>
+  <div class="card-footer">
+    <div class="footer-left">
+      <span class="footer-note">Ficha SGAE · Hostelería y Restauración</span>
+      <span class="footer-err-list" id="ferr-sociedad"></span>
+      <span class="footer-warn-list" id="fwarn-sociedad"></span>
+    </div>
+    <button class="btn-send" onclick="enviarFormulario('sociedad')">&#128228; Enviar ficha</button>
+  </div>
+</div>
+
+<!-- C.B. / S.C. / E.S.P.J. -->
+<div class="form-card" id="card-comunidad">
+  <div class="card-header">
+    <div class="card-header-icon">&#129309;</div>
+    <div>
+      <div class="card-header-title">Comunidad de Bienes, Sociedad Civil o E.S.P.J.</div>
+      <div class="card-header-sub">C.B. · S.C. · E.S.P.J.</div>
+    </div>
+  </div>
+  <div class="gold-bar"></div>
+  <div class="legend">
+    <span><span class="leg-block">*</span> Obligatorio</span>
+    <span><span class="leg-soft">°</span> Recomendado</span>
+  </div>
+  <div class="section-title">Datos de identificación</div>
+  <div class="field-row-split" id="frow-c_int1">
+    <div class="field-label lbl-block"><span class="dot"></span>Integrante 1</div>
+    <div class="field-value">
+      <input type="text" id="c_nombre1" placeholder="Nombre completo">
+      <span class="inline-err" id="ierr-c_nombre1">Obligatorio</span>
+    </div>
+    <div class="field-value">
+      <input type="text" id="c_dni1" placeholder="D.N.I. · 00000000A">
+      <span class="inline-err" id="ierr-c_dni1">Obligatorio</span>
+    </div>
+  </div>
+  <div class="field-row-split" id="frow-c_int2">
+    <div class="field-label lbl-block"><span class="dot"></span>Integrante 2</div>
+    <div class="field-value">
+      <input type="text" id="c_nombre2" placeholder="Nombre completo">
+      <span class="inline-err" id="ierr-c_nombre2">Obligatorio</span>
+    </div>
+    <div class="field-value">
+      <input type="text" id="c_dni2" placeholder="D.N.I. · 00000000A">
+      <span class="inline-err" id="ierr-c_dni2">Obligatorio</span>
+    </div>
+  </div>
+  <div class="field-row" id="frow-c_movil">
+    <div class="field-label lbl-block"><span class="dot"></span>Móvil de contacto</div>
+    <div class="field-value">
+      <input type="tel" id="c_movil" placeholder="6XX XXX XXX">
+      <span class="inline-err" id="ierr-c_movil">Obligatorio</span>
+    </div>
+  </div>
+  <div class="field-row" id="frow-c_email">
+    <div class="field-label lbl-block"><span class="dot"></span>Email de contacto</div>
+    <div class="field-value">
+      <input type="email" id="c_email" placeholder="correo@ejemplo.com">
+      <span class="inline-err" id="ierr-c_email">Obligatorio</span>
+    </div>
+  </div>
+  <div class="field-row" id="frow-c_rep">
+    <div class="field-label lbl-block"><span class="dot"></span>Uso del repertorio</div>
+    <div class="field-value">
+      <div class="radio-group">
+        <label class="radio-opt"><input type="radio" name="c_rep" value="Amenización musical"><span class="radio-btn"></span><span class="radio-label">Amenización musical</span></label>
+        <label class="radio-opt"><input type="radio" name="c_rep" value="Televisión"><span class="radio-btn"></span><span class="radio-label">Televisión</span></label>
+      </div>
+      <span class="inline-err" id="ierr-c_rep">Obligatorio — selecciona una opción</span>
+    </div>
+  </div>
+  <div class="field-row" id="frow-c_m2">
+    <div class="field-label lbl-block"><span class="dot"></span>M² superficie al público</div>
+    <div class="field-value">
+      <input type="text" id="c_m2" placeholder="Ej: 80 m²">
+      <span class="inline-err" id="ierr-c_m2">Obligatorio</span>
+    </div>
+  </div>
+  <div class="section-title">Asociación y condiciones</div>
+  <div class="field-row" id="frow-c_asoc">
+    <div class="field-label lbl-soft"><span class="dot"></span>Pertenece a la Asoc. Hostelería de Salamanca</div>
+    <div class="field-value">
+      <div class="radio-group">
+        <label class="radio-opt"><input type="radio" name="c_asoc" value="Sí"><span class="radio-btn"></span><span class="radio-label">Sí <span class="desc-tag">descuento -5%</span></span></label>
+        <label class="radio-opt"><input type="radio" name="c_asoc" value="No"><span class="radio-btn"></span><span class="radio-label">No</span></label>
+      </div>
+      <span class="inline-warn" id="iwarn-c_asoc">Recomendado — selecciona una opción</span>
+    </div>
+  </div>
+  <div class="field-row" id="frow-c_pago">
+    <div class="field-label lbl-soft"><span class="dot"></span>Forma de pago</div>
+    <div class="field-value">
+      <div class="radio-group">
+        <label class="radio-opt"><input type="radio" name="c_pago" value="Trimestral"><span class="radio-btn"></span><span class="radio-label">Trimestral</span></label>
+        <label class="radio-opt"><input type="radio" name="c_pago" value="Semestral"><span class="radio-btn"></span><span class="radio-label">Semestral <span class="desc-tag">descuento -2,5%</span></span></label>
+        <label class="radio-opt"><input type="radio" name="c_pago" value="Anual"><span class="radio-btn"></span><span class="radio-label">Anual <span class="desc-tag">descuento -5%</span></span></label>
+      </div>
+      <span class="inline-warn" id="iwarn-c_pago">Recomendado — selecciona una opción</span>
+    </div>
+  </div>
+  <div class="field-row">
+    <div class="field-label"><span class="dot"></span>IBAN domiciliación <span class="desc-tag" style="margin-left:4px">descuento -5%</span></div>
+    <div class="field-value">
+      <input type="text" id="c_iban" placeholder="ES00 0000 0000 0000 0000 0000">
+    </div>
+  </div>
+  <div class="card-footer">
+    <div class="footer-left">
+      <span class="footer-note">Ficha SGAE · Hostelería y Restauración</span>
+      <span class="footer-err-list" id="ferr-comunidad"></span>
+      <span class="footer-warn-list" id="fwarn-comunidad"></span>
+    </div>
+    <button class="btn-send" onclick="enviarFormulario('comunidad')">&#128228; Enviar ficha</button>
+  </div>
+</div>
+
+</div>
+
+<div class="success-banner" id="success-banner">
+  <div class="sb-icon">&#9989;</div>
+  <div class="sb-title">&#161;Ficha enviada correctamente!</div>
+  <div class="sb-sub" id="success-email-msg"></div>
+</div>
+
+<div style="margin-top:18px;text-align:center;animation:fadeUp 0.5s ease 0.35s both">
+  <button onclick="toggleNotice()" style="background:none;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:12px;color:var(--muted);text-decoration:underline;text-underline-offset:3px;">
+    &#191;El cliente no sabe qué tipo de empresa tiene?
+  </button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  // Email construido por JS para evitar filtros anti-spam
+  var em = ['zonaf23','representante.sgae.es'].join('@');
+  document.getElementById('email-display').textContent = em;
+  document.getElementById('success-email-msg').innerHTML = 'Los datos han llegado a <strong>' + em + '</strong>';
+
+  function showForm(t) {
+    ['fisica','sociedad','comunidad'].forEach(function(x) {
+      document.getElementById('card-'+x).classList.remove('visible');
+      document.getElementById('tab-'+x).classList.remove('active');
+    });
+    document.getElementById('card-'+t).classList.add('visible');
+    document.getElementById('tab-'+t).classList.add('active');
+    document.getElementById('notice-unknown').classList.remove('visible');
+    document.getElementById('card-'+t).scrollIntoView({behavior:'smooth', block:'start'});
+  }
+
+  function toggleNotice() { document.getElementById('notice-unknown').classList.toggle('visible'); }
+  function getRadio(name) { var s = document.querySelector('input[name="'+name+'"]:checked'); return s ? s.value : ''; }
+  function val(id) { var e = document.getElementById(id); return e ? e.value.trim() : ''; }
+
+  function showToast(msg, type) {
+    var t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'toast show' + (type ? ' '+type : '');
+    setTimeout(function() { t.className = 'toast'; }, 5000);
+  }
+
+  function copiarEmail(btn) {
+    var orig = btn.innerHTML;
+    var done = function() {
+      btn.innerHTML = '&#10003; Copiado'; btn.classList.add('copied');
+      setTimeout(function() { btn.innerHTML = orig; btn.classList.remove('copied'); }, 2000);
+    };
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(em).then(done).catch(done);
+    } else {
+      var ta = document.createElement('textarea');
+      ta.value = em; ta.style.cssText = 'position:fixed;opacity:0';
+      document.body.appendChild(ta); ta.select();
+      document.execCommand('copy'); document.body.removeChild(ta); done();
+    }
+  }
+
+  function getChecks(tipo) {
+    var B = true, S = false;
+    if (tipo === 'fisica') return [
+      {id:'f_nombre', label:'Nombre',            kind:'input', blocking:B},
+      {id:'f_dni',    label:'D.N.I.',             kind:'input', blocking:B},
+      {id:'f_movil',  label:'Móvil',              kind:'input', blocking:B},
+      {id:'f_email',  label:'Email',              kind:'input', blocking:B},
+      {id:'f_rep',    label:'Uso del repertorio', kind:'radio', blocking:B},
+      {id:'f_m2',     label:'M² superficie',      kind:'input', blocking:B},
+      {id:'f_asoc',   label:'Asoc. Hostelería',   kind:'radio', blocking:S},
+      {id:'f_pago',   label:'Forma de pago',      kind:'radio', blocking:S}
+    ];
+    if (tipo === 'sociedad') return [
+      {id:'s_nombre', label:'Nombre sociedad',    kind:'input', blocking:B},
+      {id:'s_cif',    label:'C.I.F.',             kind:'input', blocking:B},
+      {id:'s_admin',  label:'Administrador',      kind:'input', blocking:B},
+      {id:'s_adni',   label:'D.N.I. admin.',      kind:'input', blocking:B},
+      {id:'s_movil',  label:'Móvil',              kind:'input', blocking:B},
+      {id:'s_email',  label:'Email',              kind:'input', blocking:B},
+      {id:'s_rep',    label:'Uso del repertorio', kind:'radio', blocking:B},
+      {id:'s_m2',     label:'M² superficie',      kind:'input', blocking:B},
+      {id:'s_asoc',   label:'Asoc. Hostelería',   kind:'radio', blocking:S},
+      {id:'s_pago',   label:'Forma de pago',      kind:'radio', blocking:S}
+    ];
+    return [
+      {id:'c_nombre1', label:'Nombre integrante 1', kind:'input', blocking:B},
+      {id:'c_dni1',    label:'D.N.I. integrante 1', kind:'input', blocking:B},
+      {id:'c_nombre2', label:'Nombre integrante 2', kind:'input', blocking:B},
+      {id:'c_dni2',    label:'D.N.I. integrante 2', kind:'input', blocking:B},
+      {id:'c_movil',   label:'Móvil',               kind:'input', blocking:B},
+      {id:'c_email',   label:'Email',               kind:'input', blocking:B},
+      {id:'c_rep',     label:'Uso del repertorio',  kind:'radio', blocking:B},
+      {id:'c_m2',      label:'M² superficie',       kind:'input', blocking:B},
+      {id:'c_asoc',    label:'Asoc. Hostelería',    kind:'radio', blocking:S},
+      {id:'c_pago',    label:'Forma de pago',       kind:'radio', blocking:S}
+    ];
+  }
+
+  function clearValidation(tipo) {
+    document.querySelectorAll('#card-'+tipo+' .inline-err, #card-'+tipo+' .inline-warn').forEach(function(e){ e.classList.remove('show'); });
+    document.querySelectorAll('#card-'+tipo+' .inp-err').forEach(function(e){ e.classList.remove('inp-err'); });
+    document.querySelectorAll('#card-'+tipo+' .err-block, #card-'+tipo+' .warn-block').forEach(function(e){ e.classList.remove('err-block'); e.classList.remove('warn-block'); });
+    ['ferr-'+tipo,'fwarn-'+tipo].forEach(function(id){ var e=document.getElementById(id); if(e){ e.textContent=''; e.classList.remove('show'); } });
+    document.getElementById('nombre_local').classList.remove('inp-err');
+    document.getElementById('local-err').classList.remove('show');
+  }
+
+  function runValidation(tipo) {
+    var bFails=[], sFails=[];
+    getChecks(tipo).forEach(function(c) {
+      var empty = c.kind==='input' ? !val(c.id) : !getRadio(c.id);
+      if (!empty) return;
+      (c.blocking ? bFails : sFails).push(c);
+      if (c.kind==='input') {
+        var inp=document.getElementById(c.id);
+        if(inp) inp.classList.add('inp-err');
+        var msg=document.getElementById('ierr-'+c.id);
+        if(msg) msg.classList.add('show');
+      } else {
+        var mid=c.blocking?'ierr-':'iwarn-';
+        var msg2=document.getElementById(mid+c.id);
+        if(msg2) msg2.classList.add('show');
+      }
+      var ref=c.kind==='input'?document.getElementById(c.id):document.querySelector('input[name="'+c.id+'"]');
+      if(ref){ var row=ref.closest('.field-row,.field-row-split'); if(row) row.classList.add(c.blocking?'err-block':'warn-block'); }
+    });
+    return {bFails:bFails, sFails:sFails};
+  }
+
+  function enviarFormulario(tipo) {
+    clearValidation(tipo);
+    var localVal = val('nombre_local');
+    if (!localVal) {
+      document.getElementById('nombre_local').classList.add('inp-err');
+      document.getElementById('local-err').classList.add('show');
+      document.getElementById('nombre_local').scrollIntoView({behavior:'smooth', block:'center'});
+      showToast('Introduce el nombre del local', 'terror');
+      return;
+    }
+    var v = runValidation(tipo);
+    var ferrEl = document.getElementById('ferr-'+tipo);
+    var fwarnEl = document.getElementById('fwarn-'+tipo);
+    if (v.bFails.length > 0) {
+      ferrEl.innerHTML = '&#9940; Faltan campos obligatorios: <strong>' + v.bFails.map(function(c){return c.label;}).join(', ') + '</strong>';
+      ferrEl.classList.add('show');
+      var first = document.querySelector('#card-'+tipo+' .err-block');
+      if (first) first.scrollIntoView({behavior:'smooth', block:'center'});
+      showToast('Completa los campos obligatorios (*) antes de enviar', 'terror');
+      return;
+    }
+    if (v.sFails.length > 0) {
+      fwarnEl.innerHTML = '&#9888; Sin rellenar (no bloquea): <strong>' + v.sFails.map(function(c){return c.label;}).join(', ') + '</strong>';
+      fwarnEl.classList.add('show');
+    }
+    var datos = {'Nombre del local': localVal, 'Tipo de empresa': tipo==='fisica'?'Persona Física':tipo==='sociedad'?'S.A. / S.L.':'C.B. / S.C. / E.S.P.J.'};
+    if (tipo === 'fisica') {
+      datos['Nombre'] = val('f_nombre'); datos['D.N.I.'] = val('f_dni');
+      datos['Movil'] = val('f_movil'); datos['Email'] = val('f_email');
+      datos['Uso del repertorio'] = getRadio('f_rep'); datos['M2 superficie'] = val('f_m2');
+      datos['Asoc. Hosteleria Salamanca'] = getRadio('f_asoc') || 'No indicado';
+      datos['Forma de pago'] = getRadio('f_pago') || 'No indicado';
+      datos['IBAN domiciliacion'] = val('f_iban') || 'No facilitado';
+    } else if (tipo === 'sociedad') {
+      datos['Nombre sociedad'] = val('s_nombre'); datos['C.I.F.'] = val('s_cif');
+      datos['Administrador'] = val('s_admin'); datos['D.N.I. administrador'] = val('s_adni');
+      datos['Movil'] = val('s_movil'); datos['Email'] = val('s_email');
+      datos['Uso del repertorio'] = getRadio('s_rep'); datos['M2 superficie'] = val('s_m2');
+      datos['Asoc. Hosteleria Salamanca'] = getRadio('s_asoc') || 'No indicado';
+      datos['Forma de pago'] = getRadio('s_pago') || 'No indicado';
+      datos['IBAN domiciliacion'] = val('s_iban') || 'No facilitado';
+    } else {
+      datos['Integrante 1 nombre'] = val('c_nombre1'); datos['Integrante 1 D.N.I.'] = val('c_dni1');
+      datos['Integrante 2 nombre'] = val('c_nombre2'); datos['Integrante 2 D.N.I.'] = val('c_dni2');
+      datos['Movil'] = val('c_movil'); datos['Email'] = val('c_email');
+      datos['Uso del repertorio'] = getRadio('c_rep'); datos['M2 superficie'] = val('c_m2');
+      datos['Asoc. Hosteleria Salamanca'] = getRadio('c_asoc') || 'No indicado';
+      datos['Forma de pago'] = getRadio('c_pago') || 'No indicado';
+      datos['IBAN domiciliacion'] = val('c_iban') || 'No facilitado';
+    }
+    var btn = document.querySelector('#card-'+tipo+' .btn-send');
+    btn.disabled = true;
+    btn.textContent = 'Enviando...';
+    fetch('https://formspree.io/f/xjgaweyb', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json', 'Accept': 'application/json'},
+      body: JSON.stringify(datos)
+    }).then(function(resp) {
+      if (resp.ok) {
+        document.getElementById('card-'+tipo).classList.remove('visible');
+        document.getElementById('success-banner').classList.add('visible');
+        document.getElementById('success-banner').scrollIntoView({behavior:'smooth', block:'center'});
+      } else { throw new Error('error'); }
+    }).catch(function() {
+      btn.disabled = false;
+      btn.innerHTML = '&#128228; Enviar ficha';
+      showToast('Error al enviar. Comprueba la conexión e inténtalo de nuevo.', 'terror');
+    });
+  }
+</script>
+</body>
+</html>
