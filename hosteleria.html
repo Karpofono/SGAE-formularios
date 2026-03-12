@@ -200,7 +200,7 @@
       <div class="contact-details">
         <span class="contact-label">Email</span>
         <span class="contact-value">
-          zonaf23@representante.sgae.es
+          <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="c0baafaea1a6f2f380b2a5b0b2a5b3a5aeb4a1aeb4a5eeb3a7a1a5eea5b3">[email&#160;protected]</a>
           <button class="btn-copy" onclick="copiarEmail(this)">📋 Copiar</button>
         </span>
       </div>
@@ -586,7 +586,7 @@
 <div class="success-banner" id="success-banner">
   <div class="sb-icon">✅</div>
   <div class="sb-title">¡Ficha enviada correctamente!</div>
-  <div class="sb-sub">Los datos han llegado a <strong>zonaf23@representante.sgae.es</strong></div>
+  <div class="sb-sub">Los datos han llegado a <strong><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="42382d2c2324707102302732302731272c36232c36276c312523276c2731">[email&#160;protected]</a></strong></div>
 </div>
 
 <div style="margin-top:18px;text-align:center;animation:fadeUp 0.5s ease 0.35s both">
@@ -597,7 +597,7 @@
 
 <div class="toast" id="toast"></div>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
   // ── UI helpers ──────────────────────────────────────────────────────────
   function showForm(t) {
     ['fisica','sociedad','comunidad'].forEach(x => {
@@ -789,4 +789,16 @@
       if (resp.ok) {
         document.getElementById('card-'+tipo).classList.remove('visible');
         document.getElementById('success-banner').classList.add('visible');
-        docum
+        document.getElementById('success-banner').scrollIntoView({behavior:'smooth', block:'center'});
+      } else {
+        throw new Error('Error servidor');
+      }
+    } catch(e) {
+      btn.disabled = false;
+      btn.innerHTML = '📤 Enviar ficha';
+      showToast('Error al enviar. Comprueba la conexión e inténtalo de nuevo.', 'terror');
+    }
+  }
+</script>
+</body>
+</html>
