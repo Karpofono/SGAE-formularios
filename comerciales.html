@@ -421,6 +421,17 @@
     <span><span class="leg-soft">°</span> Recomendado</span>
   </div>
   <div class="section-title">Datos de identificación</div>
+  <div class="field-row-split" id="frow-c_empresa">
+    <div class="field-label lbl-block"><span class="dot"></span>Nombre de la empresa</div>
+    <div class="field-value">
+      <input type="text" id="c_empresa" placeholder="Razón social de la C.B. / S.C. / E.S.P.J.">
+      <span class="inline-err" id="ierr-c_empresa">Obligatorio</span>
+    </div>
+    <div class="field-value">
+      <input type="text" id="c_cif" placeholder="C.I.F. · X0000000X">
+      <span class="inline-err" id="ierr-c_cif">Obligatorio</span>
+    </div>
+  </div>
   <div class="field-row-split" id="frow-c_int1">
     <div class="field-label lbl-block"><span class="dot"></span>Integrante 1</div>
     <div class="field-value">
@@ -585,6 +596,8 @@
       {id:'s_pago',   label:'Forma de pago',      kind:'radio', blocking:S}
     ];
     return [
+      {id:'c_empresa', label:'Nombre de la empresa', kind:'input', blocking:B},
+      {id:'c_cif',     label:'C.I.F.',               kind:'input', blocking:B},
       {id:'c_nombre1', label:'Nombre integrante 1', kind:'input', blocking:B},
       {id:'c_dni1',    label:'D.N.I. integrante 1', kind:'input', blocking:B},
       {id:'c_nombre2', label:'Nombre integrante 2', kind:'input', blocking:B},
@@ -668,6 +681,7 @@
       datos['Forma de pago'] = getRadio('s_pago') || 'No indicado';
       datos['IBAN domiciliacion'] = val('s_iban') || 'No facilitado';
     } else {
+      datos['Nombre de la empresa'] = val('c_empresa'); datos['C.I.F.'] = val('c_cif');
       datos['Integrante 1 nombre'] = val('c_nombre1'); datos['Integrante 1 D.N.I.'] = val('c_dni1');
       datos['Integrante 2 nombre'] = val('c_nombre2'); datos['Integrante 2 D.N.I.'] = val('c_dni2');
       datos['Movil'] = val('c_movil'); datos['Email'] = val('c_email');
@@ -678,7 +692,7 @@
     var btn = document.querySelector('#card-'+tipo+' .btn-send');
     btn.disabled = true;
     btn.textContent = 'Enviando...';
-    fetch('https://formspree.io/f/xqeybprg', {
+    fetch('https://formspree.io/f/xjgaweyb', {
       method: 'POST',
       headers: {'Content-Type': 'application/json', 'Accept': 'application/json'},
       body: JSON.stringify(datos)
