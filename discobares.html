@@ -972,6 +972,40 @@
       datos['Forma de pago'] = getRadio('c_pago') || 'No indicado';
       datos['IBAN domiciliacion'] = val('c_iban') || 'No facilitado';
     }
+    // Añadir estimación de tarifa al envío
+    var prefix = tipo === 'fisica' ? 'f' : tipo === 'sociedad' ? 's' : 'c';
+    var repValE  = getRadio(prefix + '_rep');
+    var m2El     = document.getElementById(prefix + '_m2');
+    var diasValE = getRadio(prefix + '_dias');
+    var asocValE = getRadio(prefix + '_asoc');
+    var pagoValE = getRadio(prefix + '_pago');
+    var ibanElE  = document.getElementById(prefix + '_iban');
+    var m2E      = m2El ? parsearM2(m2El.value) : null;
+    var ibanOkE  = ibanElE ? ibanElE.value.trim().length > 10 : false;
+    var repKeyE  = repValE === 'Amenización musical'              ? 'musical'
+                 : repValE === 'Amenización musical y audiovisual' ? 'musical_audiovisual' : null;
+    var diasKeyE = diasValE === 'Superior a 3 días' ? 'mas3dias'
+                 : diasValE === 'Hasta 3 días'       ? 'hasta3dias' : null;
+    if (repKeyE && m2E && diasKeyE) {
+      var baseE     = tarifaBase(m2E, repKeyE, diasKeyE);
+      var dAsocE    = asocValE === 'Sí'        ? 0.05  : 0;
+      var dPagoE    = pagoValE === 'Anual'     ? 0.05  : pagoValE === 'Semestral' ? 0.025 : 0;
+      var dIbanE    = ibanOkE                  ? 0.05  : 0;
+      var totalDescE = dAsocE + dPagoE + dIbanE;
+      var mensualE  = baseE * (1 - totalDescE);
+      datos['-- ESTIMACION TARIFA SGAE 2026 --'] = '(sin IVA)';
+      datos['Tarifa base mensual'] = baseE.toFixed(2).replace('.', ',') + ' €';
+      datos['Descuentos aplicados'] = (totalDescE * 100).toFixed(1).replace('.', ',') + ' %'
+        + (dAsocE   > 0 ? ' | Asoc. Hostelería -5%'    : '')
+        + (dPagoE   > 0 ? ' | Pago ' + pagoValE + ' -' + (dPagoE*100) + '%' : '')
+        + (dIbanE   > 0 ? ' | Domiciliación -5%'        : '');
+      datos['Cuota estimada mensual'] = mensualE.toFixed(2).replace('.', ',') + ' €/mes';
+      datos['Cuota estimada semestral'] = (mensualE * 6).toFixed(2).replace('.', ',') + ' €/6 meses';
+      datos['Cuota estimada anual'] = (mensualE * 12).toFixed(2).replace('.', ',') + ' €/año';
+    } else {
+      datos['-- ESTIMACION TARIFA SGAE 2026 --'] = 'No calculada (faltan datos)';
+    }
+
     var btn = document.querySelector('#card-'+tipo+' .btn-send');
     btn.disabled = true;
     btn.textContent = 'Enviando...';
