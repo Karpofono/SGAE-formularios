@@ -134,6 +134,40 @@
     .card-footer { flex-direction: column; }
     .contact-intro { border-right: none; padding-right: 0; }
   }
+
+  /* ===== CALCULADORA DE TARIFA ===== */
+  .tarifa-panel { margin: 16px 36px 4px; border: 2px solid var(--gold); border-radius: 10px; overflow: hidden; transition: all 0.4s ease; }
+  .tarifa-panel.inactive { border-color: var(--border); opacity: 0.6; }
+  .tarifa-header { background: var(--dark); padding: 11px 20px; display: flex; align-items: center; gap: 10px; }
+  .tarifa-header-icon { font-size: 16px; }
+  .tarifa-header-title { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--gold); font-weight: 600; }
+  .tarifa-body { background: white; padding: 14px 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .tarifa-item { display: flex; flex-direction: column; gap: 3px; }
+  .tarifa-item-label { font-size: 9px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); }
+  .tarifa-item-value { font-family: 'Playfair Display', serif; font-size: 14px; color: var(--dark); }
+  .tarifa-descuentos { background: #F7F4EF; border-top: 1px solid var(--border); padding: 10px 20px; display: flex; gap: 7px; flex-wrap: wrap; align-items: center; }
+  .tarifa-desc-label { font-size: 9px; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); margin-right: 2px; white-space: nowrap; }
+  .tarifa-desc-tag { font-size: 10px; font-weight: 600; padding: 3px 9px; border-radius: 10px; transition: all 0.3s; }
+  .tarifa-desc-tag.on  { background: #e8f5e8; color: #2d7a2d; border: 1px solid #a0d4a0; }
+  .tarifa-desc-tag.off { background: #eee; color: #aaa; border: 1px solid #ddd; text-decoration: line-through; }
+  .tarifa-result { background: var(--dark); padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+  .tarifa-result-label { display: flex; flex-direction: column; gap: 3px; }
+  .tarifa-result-label span:first-child { font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--gold); }
+  .tarifa-result-label span:last-child { font-size: 9px; color: #6C6060; }
+  .tarifa-result-amounts { display: flex; gap: 18px; flex-wrap: wrap; align-items: flex-end; }
+  .tarifa-amount-block { display: flex; flex-direction: column; align-items: flex-end; gap: 1px; }
+  .tarifa-amount-type { font-size: 8.5px; letter-spacing: 1px; text-transform: uppercase; color: #6C6060; }
+  .tarifa-amount-value { font-family: 'Playfair Display', serif; font-size: 20px; color: #9a8060; line-height: 1; }
+  .tarifa-amount-value.highlight { font-size: 26px; color: var(--gold); }
+  .tarifa-amount-period { font-size: 8px; color: #504040; }
+  .tarifa-pending { background: white; padding: 14px 20px; text-align: center; font-size: 12px; color: var(--muted); font-style: italic; }
+  .tarifa-nota { background: #F2EEE7; border-top: 1px solid var(--border); padding: 8px 20px; font-size: 10px; color: var(--muted); line-height: 1.6; }
+  .tarifa-nota strong { color: var(--text); }
+  @media (max-width: 640px) {
+    .tarifa-panel { margin: 12px 0 4px; border-radius: 0; border-left: none; border-right: none; }
+    .tarifa-body { grid-template-columns: 1fr; }
+    .tarifa-result { flex-direction: column; align-items: flex-start; }
+  }
 </style>
 </head>
 <body>
@@ -270,7 +304,7 @@
     <div class="field-value">
       <div class="radio-group">
         <label class="radio-opt"><input type="radio" name="f_rep" value="Amenización musical"><span class="radio-btn"></span><span class="radio-label">Amenización musical</span></label>
-        <label class="radio-opt"><input type="radio" name="f_rep" value="Televisión"><span class="radio-btn"></span><span class="radio-label">Televisión</span></label>
+        <label class="radio-opt"><input type="radio" name="f_rep" value="Televisión"><span class="radio-btn"></span><span class="radio-label">Televisión <span style="font-size:10px;color:var(--muted)">(musical y audiovisual)</span></span></label>
       </div>
       <span class="inline-err" id="ierr-f_rep">Obligatorio — selecciona una opción</span>
     </div>
@@ -309,6 +343,66 @@
     <div class="field-value">
       <input type="text" id="f_iban" placeholder="ES00 0000 0000 0000 0000 0000">
     </div>
+  </div>
+
+  <!-- CALCULADORA TARIFA -->
+  <div id="tarifa-f" class="tarifa-panel inactive">
+    <div class="tarifa-header">
+      <span class="tarifa-header-icon">🧮</span>
+      <span class="tarifa-header-title">Estimación tarifa SGAE 2026 · Hostelería y Restauración</span>
+    </div>
+    <div id="tarifa-f-pending" class="tarifa-pending">Completa el uso del repertorio, m² y forma de pago para ver la estimación</div>
+    <div id="tarifa-f-content" style="display:none">
+      <div class="tarifa-body">
+        <div class="tarifa-item">
+          <span class="tarifa-item-label">Uso del repertorio</span>
+          <span class="tarifa-item-value" id="tf-f-rep">—</span>
+        </div>
+        <div class="tarifa-item">
+          <span class="tarifa-item-label">Superficie</span>
+          <span class="tarifa-item-value" id="tf-f-m2">—</span>
+        </div>
+        <div class="tarifa-item">
+          <span class="tarifa-item-label">Tramo tarifario</span>
+          <span class="tarifa-item-value" id="tf-f-tramo">—</span>
+        </div>
+        <div class="tarifa-item">
+          <span class="tarifa-item-label">Tarifa base mensual</span>
+          <span class="tarifa-item-value" id="tf-f-base">—</span>
+        </div>
+      </div>
+      <div class="tarifa-descuentos">
+        <span class="tarifa-desc-label">Descuentos:</span>
+        <span class="tarifa-desc-tag off" id="tf-f-d-asoc">Asoc. Hostelería −5%</span>
+        <span class="tarifa-desc-tag off" id="tf-f-d-pago">Pago —</span>
+        <span class="tarifa-desc-tag off" id="tf-f-d-iban">Domiciliación −5%</span>
+      </div>
+      <div class="tarifa-result">
+        <div class="tarifa-result-label">
+          <span>Cuota estimada</span>
+          <span>Primer año · 2026 (sin IVA)</span>
+        </div>
+        <div class="tarifa-result-amounts" id="tf-f-amounts">
+          <div class="tarifa-amount-block" id="tf-f-bloque-trimestral" style="display:none">
+            <span class="tarifa-amount-type">Trimestral</span>
+            <span class="tarifa-amount-value highlight" id="tf-f-trimestral">—</span>
+            <span class="tarifa-amount-period">€ / trimestre</span>
+          </div>
+          <div class="tarifa-amount-block" id="tf-f-bloque-semestral" style="display:none">
+            <span class="tarifa-amount-type">Semestral</span>
+            <span class="tarifa-amount-value highlight" id="tf-f-semestral">—</span>
+            <span class="tarifa-amount-period">€ / 6 meses</span>
+          </div>
+          <div class="tarifa-amount-block" id="tf-f-bloque-anual" style="display:none">
+            <span class="tarifa-amount-type">Anual</span>
+            <span class="tarifa-amount-value highlight" id="tf-f-anual">—</span>
+            <span class="tarifa-amount-period">€ / año</span>
+          </div>
+          <span id="tf-f-pago-pending" style="font-size:11px;color:#8C8070;font-style:italic">Selecciona forma de pago</span>
+        </div>
+      </div>
+    </div>
+    <div class="tarifa-nota">⚠️ <strong>Estimación orientativa.</strong> Tarifa SGAE 2026 · 1er año de contrato para Hostelería y Restauración. El importe definitivo lo confirma SGAE. <strong>No incluye IVA (21%).</strong></div>
   </div>
   <div class="card-footer">
     <div class="footer-left">
@@ -376,7 +470,7 @@
     <div class="field-value">
       <div class="radio-group">
         <label class="radio-opt"><input type="radio" name="s_rep" value="Amenización musical"><span class="radio-btn"></span><span class="radio-label">Amenización musical</span></label>
-        <label class="radio-opt"><input type="radio" name="s_rep" value="Televisión"><span class="radio-btn"></span><span class="radio-label">Televisión</span></label>
+        <label class="radio-opt"><input type="radio" name="s_rep" value="Televisión"><span class="radio-btn"></span><span class="radio-label">Televisión <span style="font-size:10px;color:var(--muted)">(musical y audiovisual)</span></span></label>
       </div>
       <span class="inline-err" id="ierr-s_rep">Obligatorio — selecciona una opción</span>
     </div>
@@ -415,6 +509,66 @@
     <div class="field-value">
       <input type="text" id="s_iban" placeholder="ES00 0000 0000 0000 0000 0000">
     </div>
+  </div>
+
+  <!-- CALCULADORA TARIFA -->
+  <div id="tarifa-s" class="tarifa-panel inactive">
+    <div class="tarifa-header">
+      <span class="tarifa-header-icon">🧮</span>
+      <span class="tarifa-header-title">Estimación tarifa SGAE 2026 · Hostelería y Restauración</span>
+    </div>
+    <div id="tarifa-s-pending" class="tarifa-pending">Completa el uso del repertorio, m² y forma de pago para ver la estimación</div>
+    <div id="tarifa-s-content" style="display:none">
+      <div class="tarifa-body">
+        <div class="tarifa-item">
+          <span class="tarifa-item-label">Uso del repertorio</span>
+          <span class="tarifa-item-value" id="tf-s-rep">—</span>
+        </div>
+        <div class="tarifa-item">
+          <span class="tarifa-item-label">Superficie</span>
+          <span class="tarifa-item-value" id="tf-s-m2">—</span>
+        </div>
+        <div class="tarifa-item">
+          <span class="tarifa-item-label">Tramo tarifario</span>
+          <span class="tarifa-item-value" id="tf-s-tramo">—</span>
+        </div>
+        <div class="tarifa-item">
+          <span class="tarifa-item-label">Tarifa base mensual</span>
+          <span class="tarifa-item-value" id="tf-s-base">—</span>
+        </div>
+      </div>
+      <div class="tarifa-descuentos">
+        <span class="tarifa-desc-label">Descuentos:</span>
+        <span class="tarifa-desc-tag off" id="tf-s-d-asoc">Asoc. Hostelería −5%</span>
+        <span class="tarifa-desc-tag off" id="tf-s-d-pago">Pago —</span>
+        <span class="tarifa-desc-tag off" id="tf-s-d-iban">Domiciliación −5%</span>
+      </div>
+      <div class="tarifa-result">
+        <div class="tarifa-result-label">
+          <span>Cuota estimada</span>
+          <span>Primer año · 2026 (sin IVA)</span>
+        </div>
+        <div class="tarifa-result-amounts" id="tf-s-amounts">
+          <div class="tarifa-amount-block" id="tf-s-bloque-trimestral" style="display:none">
+            <span class="tarifa-amount-type">Trimestral</span>
+            <span class="tarifa-amount-value highlight" id="tf-s-trimestral">—</span>
+            <span class="tarifa-amount-period">€ / trimestre</span>
+          </div>
+          <div class="tarifa-amount-block" id="tf-s-bloque-semestral" style="display:none">
+            <span class="tarifa-amount-type">Semestral</span>
+            <span class="tarifa-amount-value highlight" id="tf-s-semestral">—</span>
+            <span class="tarifa-amount-period">€ / 6 meses</span>
+          </div>
+          <div class="tarifa-amount-block" id="tf-s-bloque-anual" style="display:none">
+            <span class="tarifa-amount-type">Anual</span>
+            <span class="tarifa-amount-value highlight" id="tf-s-anual">—</span>
+            <span class="tarifa-amount-period">€ / año</span>
+          </div>
+          <span id="tf-s-pago-pending" style="font-size:11px;color:#8C8070;font-style:italic">Selecciona forma de pago</span>
+        </div>
+      </div>
+    </div>
+    <div class="tarifa-nota">⚠️ <strong>Estimación orientativa.</strong> Tarifa SGAE 2026 · 1er año de contrato para Hostelería y Restauración. El importe definitivo lo confirma SGAE. <strong>No incluye IVA (21%).</strong></div>
   </div>
   <div class="card-footer">
     <div class="footer-left">
@@ -493,7 +647,7 @@
     <div class="field-value">
       <div class="radio-group">
         <label class="radio-opt"><input type="radio" name="c_rep" value="Amenización musical"><span class="radio-btn"></span><span class="radio-label">Amenización musical</span></label>
-        <label class="radio-opt"><input type="radio" name="c_rep" value="Televisión"><span class="radio-btn"></span><span class="radio-label">Televisión</span></label>
+        <label class="radio-opt"><input type="radio" name="c_rep" value="Televisión"><span class="radio-btn"></span><span class="radio-label">Televisión <span style="font-size:10px;color:var(--muted)">(musical y audiovisual)</span></span></label>
       </div>
       <span class="inline-err" id="ierr-c_rep">Obligatorio — selecciona una opción</span>
     </div>
@@ -532,6 +686,66 @@
     <div class="field-value">
       <input type="text" id="c_iban" placeholder="ES00 0000 0000 0000 0000 0000">
     </div>
+  </div>
+
+  <!-- CALCULADORA TARIFA -->
+  <div id="tarifa-c" class="tarifa-panel inactive">
+    <div class="tarifa-header">
+      <span class="tarifa-header-icon">🧮</span>
+      <span class="tarifa-header-title">Estimación tarifa SGAE 2026 · Hostelería y Restauración</span>
+    </div>
+    <div id="tarifa-c-pending" class="tarifa-pending">Completa el uso del repertorio, m² y forma de pago para ver la estimación</div>
+    <div id="tarifa-c-content" style="display:none">
+      <div class="tarifa-body">
+        <div class="tarifa-item">
+          <span class="tarifa-item-label">Uso del repertorio</span>
+          <span class="tarifa-item-value" id="tf-c-rep">—</span>
+        </div>
+        <div class="tarifa-item">
+          <span class="tarifa-item-label">Superficie</span>
+          <span class="tarifa-item-value" id="tf-c-m2">—</span>
+        </div>
+        <div class="tarifa-item">
+          <span class="tarifa-item-label">Tramo tarifario</span>
+          <span class="tarifa-item-value" id="tf-c-tramo">—</span>
+        </div>
+        <div class="tarifa-item">
+          <span class="tarifa-item-label">Tarifa base mensual</span>
+          <span class="tarifa-item-value" id="tf-c-base">—</span>
+        </div>
+      </div>
+      <div class="tarifa-descuentos">
+        <span class="tarifa-desc-label">Descuentos:</span>
+        <span class="tarifa-desc-tag off" id="tf-c-d-asoc">Asoc. Hostelería −5%</span>
+        <span class="tarifa-desc-tag off" id="tf-c-d-pago">Pago —</span>
+        <span class="tarifa-desc-tag off" id="tf-c-d-iban">Domiciliación −5%</span>
+      </div>
+      <div class="tarifa-result">
+        <div class="tarifa-result-label">
+          <span>Cuota estimada</span>
+          <span>Primer año · 2026 (sin IVA)</span>
+        </div>
+        <div class="tarifa-result-amounts" id="tf-c-amounts">
+          <div class="tarifa-amount-block" id="tf-c-bloque-trimestral" style="display:none">
+            <span class="tarifa-amount-type">Trimestral</span>
+            <span class="tarifa-amount-value highlight" id="tf-c-trimestral">—</span>
+            <span class="tarifa-amount-period">€ / trimestre</span>
+          </div>
+          <div class="tarifa-amount-block" id="tf-c-bloque-semestral" style="display:none">
+            <span class="tarifa-amount-type">Semestral</span>
+            <span class="tarifa-amount-value highlight" id="tf-c-semestral">—</span>
+            <span class="tarifa-amount-period">€ / 6 meses</span>
+          </div>
+          <div class="tarifa-amount-block" id="tf-c-bloque-anual" style="display:none">
+            <span class="tarifa-amount-type">Anual</span>
+            <span class="tarifa-amount-value highlight" id="tf-c-anual">—</span>
+            <span class="tarifa-amount-period">€ / año</span>
+          </div>
+          <span id="tf-c-pago-pending" style="font-size:11px;color:#8C8070;font-style:italic">Selecciona forma de pago</span>
+        </div>
+      </div>
+    </div>
+    <div class="tarifa-nota">⚠️ <strong>Estimación orientativa.</strong> Tarifa SGAE 2026 · 1er año de contrato para Hostelería y Restauración. El importe definitivo lo confirma SGAE. <strong>No incluye IVA (21%).</strong></div>
   </div>
   <div class="card-footer">
     <div class="footer-left">
@@ -725,6 +939,37 @@
       datos['Forma de pago'] = getRadio('c_pago') || 'No indicado';
       datos['IBAN domiciliacion'] = val('c_iban') || 'No facilitado';
     }
+    // Añadir estimación de tarifa al envío
+    var prefix = tipo === 'fisica' ? 'f' : tipo === 'sociedad' ? 's' : 'c';
+    var repValE  = getRadio(prefix + '_rep');
+    var m2ElE    = document.getElementById(prefix + '_m2');
+    var pagoValE = getRadio(prefix + '_pago');
+    var asocValE = getRadio(prefix + '_asoc');
+    var ibanElE  = document.getElementById(prefix + '_iban');
+    var m2E      = m2ElE   ? parsearM2Host(m2ElE.value)          : null;
+    var ibanOkE  = ibanElE ? ibanElE.value.trim().length > 10    : false;
+    var repKeyE  = repValE === 'Amenización musical' ? 'musical'
+                 : repValE === 'Televisión'          ? 'tv' : null;
+    if (repKeyE && m2E) {
+      var resE     = tarifaBaseHost(m2E, repKeyE);
+      var dAE      = asocValE === 'Sí'        ? 0.05  : 0;
+      var dPE      = pagoValE === 'Anual'     ? 0.05  : pagoValE === 'Semestral' ? 0.025 : 0;
+      var dIE      = ibanOkE                  ? 0.05  : 0;
+      var mensualE = resE.base * (1 - dAE - dPE - dIE);
+      datos['-- ESTIMACION TARIFA SGAE 2026 --'] = '(sin IVA)';
+      datos['Tramo tarifario']     = resE.tramo;
+      datos['Tarifa base mensual'] = fmtHost(resE.base);
+      datos['Descuentos']          = ((dAE+dPE+dIE)*100).toFixed(1).replace('.',',') + ' %'
+        + (dAE>0 ? ' | Asoc. Hostelería -5%' : '')
+        + (dPE>0 ? ' | Pago '+pagoValE       : '')
+        + (dIE>0 ? ' | Domiciliación -5%'    : '');
+      if (pagoValE === 'Trimestral') datos['Cuota estimada trimestral'] = fmtHost(mensualE * 3);
+      if (pagoValE === 'Semestral')  datos['Cuota estimada semestral']  = fmtHost(mensualE * 6);
+      if (pagoValE === 'Anual')      datos['Cuota estimada anual']      = fmtHost(mensualE * 12);
+    } else {
+      datos['-- ESTIMACION TARIFA SGAE 2026 --'] = 'No calculada (faltan datos)';
+    }
+
     var btn = document.querySelector('#card-'+tipo+' .btn-send');
     btn.disabled = true;
     btn.textContent = 'Enviando...';
@@ -744,6 +989,137 @@
       showToast('Error al enviar. Comprueba la conexión e inténtalo de nuevo.', 'terror');
     });
   }
+
+  // ===== CALCULADORA DE TARIFA SGAE 2026 · HOSTELERÍA Y RESTAURACIÓN =========
+  // M0420300 = solo musical | M1300300 = musical + audiovisual (TV)
+  // Tramos: hasta 50 | 51-100 | 101-200 | extra +8,90€ (musical+TV) o +5,80€ (musical) por cada 50m² o fracción > 200m²
+
+  var TARIFAS_HOST_2026 = {
+    'musical': {
+      t50: 20.67, t100: 22.53, t200: 28.67, extra50: 5.80
+    },
+    'tv': {
+      t50: 25.84, t100: 28.70, t200: 36.20, extra50: 8.90
+    }
+  };
+
+  function parsearM2Host(str) {
+    var n = parseFloat(String(str).replace(',','.').replace(/[^0-9.]/g,''));
+    return isNaN(n) || n <= 0 ? null : n;
+  }
+
+  function tarifaBaseHost(m2, repKey) {
+    var t = TARIFAS_HOST_2026[repKey];
+    var tramo, base;
+    if (m2 <= 50)  { base = t.t50;  tramo = 'Hasta 50 m²'; }
+    else if (m2 <= 100) { base = t.t100; tramo = 'De 51 a 100 m²'; }
+    else if (m2 <= 200) { base = t.t200; tramo = 'De 101 a 200 m²'; }
+    else {
+      var fracciones = Math.ceil((m2 - 200) / 50);
+      base  = t.t200 + fracciones * t.extra50;
+      tramo = 'Más de 200 m² (' + fracciones + ' tramo' + (fracciones > 1 ? 's' : '') + ' extra)';
+    }
+    return { base: base, tramo: tramo };
+  }
+
+  function fmtHost(n) { return n.toFixed(2).replace('.', ',') + ' €'; }
+
+  function calcularTarifaHost(prefix) {
+    var repVal  = getRadio(prefix + '_rep');
+    var m2El    = document.getElementById(prefix + '_m2');
+    var pagoVal = getRadio(prefix + '_pago');
+    var asocVal = getRadio(prefix + '_asoc');
+    var ibanEl  = document.getElementById(prefix + '_iban');
+
+    var panel      = document.getElementById('tarifa-' + prefix);
+    var pending    = document.getElementById('tarifa-' + prefix + '-pending');
+    var contentDiv = document.getElementById('tarifa-' + prefix + '-content');
+    if (!panel) return;
+
+    var m2     = m2El   ? parsearM2Host(m2El.value) : null;
+    var ibanOk = ibanEl ? ibanEl.value.trim().length > 10 : false;
+
+    var repKey = repVal === 'Amenización musical' ? 'musical'
+               : repVal === 'Televisión'          ? 'tv' : null;
+
+    if (!repKey || !m2) {
+      panel.classList.add('inactive');
+      pending.style.display = '';
+      contentDiv.style.display = 'none';
+      return;
+    }
+
+    panel.classList.remove('inactive');
+    pending.style.display = 'none';
+    contentDiv.style.display = 'block';
+
+    var result = tarifaBaseHost(m2, repKey);
+    var base   = result.base;
+
+    // Descuentos
+    var dAsoc = asocVal === 'Sí' ? 0.05 : 0;
+    var dPago = pagoVal === 'Anual' ? 0.05 : pagoVal === 'Semestral' ? 0.025 : 0;
+    var dIban = ibanOk ? 0.05 : 0;
+    var mensual = base * (1 - dAsoc - dPago - dIban);
+
+    var p = 'tf-' + prefix + '-';
+    document.getElementById(p + 'rep').textContent   = repVal;
+    document.getElementById(p + 'm2').textContent    = m2 + ' m²';
+    document.getElementById(p + 'tramo').textContent = result.tramo;
+    document.getElementById(p + 'base').textContent  = fmtHost(base);
+
+    // Descuentos tags
+    document.getElementById(p + 'd-asoc').className = 'tarifa-desc-tag ' + (dAsoc > 0 ? 'on' : 'off');
+    var dp = document.getElementById(p + 'd-pago');
+    if (!pagoVal || pagoVal === 'Trimestral') {
+      dp.textContent = pagoVal ? 'Pago trimestral' : 'Pago —';
+      dp.className   = 'tarifa-desc-tag off';
+    } else if (pagoVal === 'Semestral') {
+      dp.textContent = 'Pago semestral −2,5%';
+      dp.className   = 'tarifa-desc-tag on';
+    } else {
+      dp.textContent = 'Pago anual −5%';
+      dp.className   = 'tarifa-desc-tag on';
+    }
+    document.getElementById(p + 'd-iban').className = 'tarifa-desc-tag ' + (dIban > 0 ? 'on' : 'off');
+
+    // Mostrar solo el importe de la forma de pago elegida
+    ['trimestral','semestral','anual'].forEach(function(b) {
+      var el = document.getElementById(p + 'bloque-' + b);
+      if (el) el.style.display = 'none';
+    });
+    var pendingPago = document.getElementById(p + 'pago-pending');
+    if (pagoVal === 'Trimestral') {
+      document.getElementById(p + 'trimestral').textContent = fmtHost(mensual * 3);
+      document.getElementById(p + 'bloque-trimestral').style.display = '';
+      if (pendingPago) pendingPago.style.display = 'none';
+    } else if (pagoVal === 'Semestral') {
+      document.getElementById(p + 'semestral').textContent = fmtHost(mensual * 6);
+      document.getElementById(p + 'bloque-semestral').style.display = '';
+      if (pendingPago) pendingPago.style.display = 'none';
+    } else if (pagoVal === 'Anual') {
+      document.getElementById(p + 'anual').textContent = fmtHost(mensual * 12);
+      document.getElementById(p + 'bloque-anual').style.display = '';
+      if (pendingPago) pendingPago.style.display = 'none';
+    } else {
+      if (pendingPago) pendingPago.style.display = '';
+    }
+  }
+
+  // Event listeners
+  ['f', 's', 'c'].forEach(function(prefix) {
+    var m2El = document.getElementById(prefix + '_m2');
+    if (m2El) m2El.addEventListener('input', function() { calcularTarifaHost(prefix); });
+    var ibanEl = document.getElementById(prefix + '_iban');
+    if (ibanEl) ibanEl.addEventListener('input', function() { calcularTarifaHost(prefix); });
+    ['rep', 'asoc', 'pago'].forEach(function(nombre) {
+      document.querySelectorAll('input[name="' + prefix + '_' + nombre + '"]').forEach(function(r) {
+        r.addEventListener('change', function() { calcularTarifaHost(prefix); });
+      });
+    });
+  });
+  // ===== FIN CALCULADORA =====
+
 </script>
 </body>
 </html>

@@ -134,6 +134,50 @@
     .card-footer { flex-direction: column; }
     .contact-intro { border-right: none; padding-right: 0; }
   }
+
+
+  .check-opt { display: flex; align-items: center; gap: 6px; cursor: pointer; padding: 3px 2px; }
+  .check-opt input { display: none; }
+  .check-btn { width: 18px; height: 18px; border: 2px solid var(--border); border-radius: 4px; display: flex; align-items: center; justify-content: center; transition: all 0.2s; flex-shrink: 0; }
+  .check-opt input:checked ~ .check-btn { border-color: var(--gold); background: var(--gold); }
+  .check-opt input:checked ~ .check-btn::after { content: ''; width: 9px; height: 6px; border-left: 2px solid white; border-bottom: 2px solid white; display: block; transform: rotate(-45deg) translate(1px, -1px); }
+  .check-label { font-size: 13px; color: var(--dark); white-space: nowrap; }
+  /* ===== CALCULADORA DE TARIFA ===== */
+  .tarifa-panel { margin: 16px 36px 4px; border: 2px solid var(--gold); border-radius: 10px; overflow: hidden; transition: all 0.4s ease; }
+  .tarifa-panel.inactive { border-color: var(--border); opacity: 0.6; }
+  .tarifa-header { background: var(--dark); padding: 11px 20px; display: flex; align-items: center; gap: 10px; }
+  .tarifa-header-icon { font-size: 16px; }
+  .tarifa-header-title { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--gold); font-weight: 600; }
+  .tarifa-body { background: white; padding: 14px 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .tarifa-section-title { grid-column: 1/-1; font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--gold); font-weight: 600; padding-top: 6px; border-top: 1px solid var(--border); margin-top: 2px; }
+  .tarifa-section-title:first-child { border-top: none; padding-top: 0; margin-top: 0; }
+  .tarifa-item { display: flex; flex-direction: column; gap: 3px; }
+  .tarifa-item-label { font-size: 9px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); }
+  .tarifa-item-value { font-family: 'Playfair Display', serif; font-size: 14px; color: var(--dark); }
+  .tarifa-item-value.muted { color: var(--muted); font-style: italic; font-size: 12px; font-family: 'DM Sans', sans-serif; }
+  .tarifa-descuentos { background: #F7F4EF; border-top: 1px solid var(--border); padding: 10px 20px; display: flex; gap: 7px; flex-wrap: wrap; align-items: center; }
+  .tarifa-desc-label { font-size: 9px; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); margin-right: 2px; white-space: nowrap; }
+  .tarifa-desc-tag { font-size: 10px; font-weight: 600; padding: 3px 9px; border-radius: 10px; transition: all 0.3s; }
+  .tarifa-desc-tag.on  { background: #e8f5e8; color: #2d7a2d; border: 1px solid #a0d4a0; }
+  .tarifa-desc-tag.off { background: #eee; color: #aaa; border: 1px solid #ddd; text-decoration: line-through; }
+  .tarifa-result { background: var(--dark); padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+  .tarifa-result-label { display: flex; flex-direction: column; gap: 3px; }
+  .tarifa-result-label span:first-child { font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--gold); }
+  .tarifa-result-label span:last-child { font-size: 9px; color: #6C6060; }
+  .tarifa-result-amounts { display: flex; gap: 18px; flex-wrap: wrap; align-items: flex-end; }
+  .tarifa-amount-block { display: flex; flex-direction: column; align-items: flex-end; gap: 1px; }
+  .tarifa-amount-type { font-size: 8.5px; letter-spacing: 1px; text-transform: uppercase; color: #6C6060; }
+  .tarifa-amount-value { font-family: 'Playfair Display', serif; font-size: 20px; color: #9a8060; line-height: 1; }
+  .tarifa-amount-value.highlight { font-size: 26px; color: var(--gold); }
+  .tarifa-amount-period { font-size: 8px; color: #504040; }
+  .tarifa-pending { background: white; padding: 14px 20px; text-align: center; font-size: 12px; color: var(--muted); font-style: italic; }
+  .tarifa-nota { background: #F2EEE7; border-top: 1px solid var(--border); padding: 8px 20px; font-size: 10px; color: var(--muted); line-height: 1.6; }
+  .tarifa-nota strong { color: var(--text); }
+  @media (max-width: 640px) {
+    .tarifa-panel { margin: 12px 0 4px; border-radius: 0; border-left: none; border-right: none; }
+    .tarifa-body { grid-template-columns: 1fr; }
+    .tarifa-result { flex-direction: column; align-items: flex-start; }
+  }
 </style>
 </head>
 <body>
@@ -266,21 +310,23 @@
     </div>
   </div>
   <div class="field-row" id="frow-f_rep_clases">
-    <div class="field-label lbl-block"><span class="dot"></span>Uso del repertorio en clases dirigidas</div>
+    <div class="field-label lbl-block"><span class="dot"></span>Uso del repertorio en clases dirigidas <span style="font-weight:400;text-transform:none;letter-spacing:0">(Uso significativo)</span></div>
     <div class="field-value">
       <div class="radio-group">
-        <label class="radio-opt"><input type="radio" name="f_rep_clases" value="Amenización musical"><span class="radio-btn"></span><span class="radio-label">Amenización musical</span></label>
-        <label class="radio-opt"><input type="radio" name="f_rep_clases" value="Nada"><span class="radio-btn"></span><span class="radio-label">Nada</span></label>
+        <label class="check-opt"><input type="checkbox" id="f_clases_musical"><span class="check-btn"></span><span class="check-label">Amenización musical</span></label>
+        <label class="check-opt"><input type="checkbox" id="f_clases_video"><span class="check-btn"></span><span class="check-label">Vídeo</span></label>
+        <label class="check-opt"><input type="checkbox" id="f_clases_tv"><span class="check-btn"></span><span class="check-label">TV</span></label>
+        <span style="font-size:11px;color:var(--muted);font-style:italic;padding-left:4px">Si no aplica ninguno, dejar sin marcar</span>
       </div>
-      <span class="inline-err" id="ierr-f_rep_clases">Obligatorio — selecciona una opción</span>
+      <span style="font-size:10px;color:var(--muted);margin-top:2px;display:block">Marca todos los que apliquen · Si no hay ninguno, dejar en blanco</span>
     </div>
   </div>
   <div class="field-row" id="frow-f_rep_maquinas">
-    <div class="field-label lbl-block"><span class="dot"></span>Uso del repertorio en máquinas / resto</div>
+    <div class="field-label lbl-block"><span class="dot"></span>Uso del repertorio en máquinas / resto <span style="font-weight:400;text-transform:none;letter-spacing:0">(Uso secundario)</span></div>
     <div class="field-value">
       <div class="radio-group">
         <label class="radio-opt"><input type="radio" name="f_rep_maquinas" value="Amenización musical"><span class="radio-btn"></span><span class="radio-label">Amenización musical</span></label>
-        <label class="radio-opt"><input type="radio" name="f_rep_maquinas" value="Televisión"><span class="radio-btn"></span><span class="radio-label">Televisión</span></label>
+        <label class="radio-opt"><input type="radio" name="f_rep_maquinas" value="Amenización musical y TV"><span class="radio-btn"></span><span class="radio-label">Amenización musical y TV</span></label>
         <label class="radio-opt"><input type="radio" name="f_rep_maquinas" value="Nada"><span class="radio-btn"></span><span class="radio-label">Nada</span></label>
       </div>
       <span class="inline-err" id="ierr-f_rep_maquinas">Obligatorio — selecciona una opción</span>
@@ -302,7 +348,7 @@
   </div>
   <div class="section-title">Asociación y condiciones</div>
   <div class="field-row" id="frow-f_asoc">
-    <div class="field-label lbl-soft"><span class="dot"></span>Pertenece a FNEID</div>
+    <div class="field-label lbl-soft"><span class="dot"></span>Pertenece a FNEID <span style="font-weight:400;text-transform:none;letter-spacing:0">(Federación Nacional de Empresarios de Instalaciones Deportivas)</span></div>
     <div class="field-value">
       <div class="radio-group">
         <label class="radio-opt"><input type="radio" name="f_asoc" value="Sí"><span class="radio-btn"></span><span class="radio-label">Sí <span class="desc-tag">descuento -5%</span></span></label>
@@ -327,6 +373,68 @@
     <div class="field-value">
       <input type="text" id="f_iban" placeholder="ES00 0000 0000 0000 0000 0000">
     </div>
+  </div>
+
+  <!-- CALCULADORA TARIFA -->
+  <div id="tarifa-f" class="tarifa-panel inactive">
+    <div class="tarifa-header">
+      <span class="tarifa-header-icon">🧮</span>
+      <span class="tarifa-header-title">Estimación tarifa SGAE 2026 · Gimnasios / Academias de Baile</span>
+    </div>
+    <div id="tarifa-f-pending" class="tarifa-pending">Completa el repertorio, m² de ambas zonas y forma de pago para ver la estimación</div>
+    <div id="tarifa-f-content" style="display:none">
+      <div class="tarifa-body">
+        <div class="tarifa-section-title">Clases dirigidas (uso significativo)</div>
+        <div class="tarifa-item">
+          <span class="tarifa-item-label">Repertorio</span>
+          <span class="tarifa-item-value" id="tf-f-rep-clases">—</span>
+        </div>
+        <div class="tarifa-item">
+          <span class="tarifa-item-label">Superficie · tarifa base</span>
+          <span class="tarifa-item-value" id="tf-f-base-clases">—</span>
+        </div>
+        <div class="tarifa-section-title">Máquinas / resto (uso secundario)</div>
+        <div class="tarifa-item">
+          <span class="tarifa-item-label">Repertorio</span>
+          <span class="tarifa-item-value" id="tf-f-rep-maquinas">—</span>
+        </div>
+        <div class="tarifa-item">
+          <span class="tarifa-item-label">Superficie · tarifa base</span>
+          <span class="tarifa-item-value" id="tf-f-base-maquinas">—</span>
+        </div>
+      </div>
+      <div class="tarifa-descuentos">
+        <span class="tarifa-desc-label">Descuentos:</span>
+        <span class="tarifa-desc-tag off" id="tf-f-d-fneid">FNEID −5%</span>
+        <span class="tarifa-desc-tag off" id="tf-f-d-pago">Pago —</span>
+        <span class="tarifa-desc-tag off" id="tf-f-d-iban">Domiciliación −5%</span>
+      </div>
+      <div class="tarifa-result">
+        <div class="tarifa-result-label">
+          <span>Cuota estimada total</span>
+          <span>Primer año · 2026 (sin IVA)</span>
+        </div>
+        <div class="tarifa-result-amounts" id="tf-f-amounts">
+          <div class="tarifa-amount-block" id="tf-f-bloque-trimestral" style="display:none">
+            <span class="tarifa-amount-type">Trimestral</span>
+            <span class="tarifa-amount-value highlight" id="tf-f-trimestral">—</span>
+            <span class="tarifa-amount-period">€ / trimestre</span>
+          </div>
+          <div class="tarifa-amount-block" id="tf-f-bloque-semestral" style="display:none">
+            <span class="tarifa-amount-type">Semestral</span>
+            <span class="tarifa-amount-value highlight" id="tf-f-semestral">—</span>
+            <span class="tarifa-amount-period">€ / 6 meses</span>
+          </div>
+          <div class="tarifa-amount-block" id="tf-f-bloque-anual" style="display:none">
+            <span class="tarifa-amount-type">Anual</span>
+            <span class="tarifa-amount-value highlight" id="tf-f-anual">—</span>
+            <span class="tarifa-amount-period">€ / año</span>
+          </div>
+          <span id="tf-f-pago-pending" style="font-size:11px;color:#8C8070;font-style:italic">Selecciona forma de pago</span>
+        </div>
+      </div>
+    </div>
+    <div class="tarifa-nota">⚠️ <strong>Estimación orientativa.</strong> Tarifa SGAE 2026 · 1er año de contrato. El importe definitivo lo confirma SGAE. <strong>No incluye IVA (21%).</strong></div>
   </div>
   <div class="card-footer">
     <div class="footer-left">
@@ -390,21 +498,23 @@
     </div>
   </div>
   <div class="field-row" id="frow-s_rep_clases">
-    <div class="field-label lbl-block"><span class="dot"></span>Uso del repertorio en clases dirigidas</div>
+    <div class="field-label lbl-block"><span class="dot"></span>Uso del repertorio en clases dirigidas <span style="font-weight:400;text-transform:none;letter-spacing:0">(Uso significativo)</span></div>
     <div class="field-value">
       <div class="radio-group">
-        <label class="radio-opt"><input type="radio" name="s_rep_clases" value="Amenización musical"><span class="radio-btn"></span><span class="radio-label">Amenización musical</span></label>
-        <label class="radio-opt"><input type="radio" name="s_rep_clases" value="Nada"><span class="radio-btn"></span><span class="radio-label">Nada</span></label>
+        <label class="check-opt"><input type="checkbox" id="s_clases_musical"><span class="check-btn"></span><span class="check-label">Amenización musical</span></label>
+        <label class="check-opt"><input type="checkbox" id="s_clases_video"><span class="check-btn"></span><span class="check-label">Vídeo</span></label>
+        <label class="check-opt"><input type="checkbox" id="s_clases_tv"><span class="check-btn"></span><span class="check-label">TV</span></label>
+        <span style="font-size:11px;color:var(--muted);font-style:italic;padding-left:4px">Si no aplica ninguno, dejar sin marcar</span>
       </div>
-      <span class="inline-err" id="ierr-s_rep_clases">Obligatorio — selecciona una opción</span>
+      <span style="font-size:10px;color:var(--muted);margin-top:2px;display:block">Marca todos los que apliquen · Si no hay ninguno, dejar en blanco</span>
     </div>
   </div>
   <div class="field-row" id="frow-s_rep_maquinas">
-    <div class="field-label lbl-block"><span class="dot"></span>Uso del repertorio en máquinas / resto</div>
+    <div class="field-label lbl-block"><span class="dot"></span>Uso del repertorio en máquinas / resto <span style="font-weight:400;text-transform:none;letter-spacing:0">(Uso secundario)</span></div>
     <div class="field-value">
       <div class="radio-group">
         <label class="radio-opt"><input type="radio" name="s_rep_maquinas" value="Amenización musical"><span class="radio-btn"></span><span class="radio-label">Amenización musical</span></label>
-        <label class="radio-opt"><input type="radio" name="s_rep_maquinas" value="Televisión"><span class="radio-btn"></span><span class="radio-label">Televisión</span></label>
+        <label class="radio-opt"><input type="radio" name="s_rep_maquinas" value="Amenización musical y TV"><span class="radio-btn"></span><span class="radio-label">Amenización musical y TV</span></label>
         <label class="radio-opt"><input type="radio" name="s_rep_maquinas" value="Nada"><span class="radio-btn"></span><span class="radio-label">Nada</span></label>
       </div>
       <span class="inline-err" id="ierr-s_rep_maquinas">Obligatorio — selecciona una opción</span>
@@ -426,7 +536,7 @@
   </div>
   <div class="section-title">Asociación y condiciones</div>
   <div class="field-row" id="frow-s_asoc">
-    <div class="field-label lbl-soft"><span class="dot"></span>Pertenece a FNEID</div>
+    <div class="field-label lbl-soft"><span class="dot"></span>Pertenece a FNEID <span style="font-weight:400;text-transform:none;letter-spacing:0">(Federación Nacional de Empresarios de Instalaciones Deportivas)</span></div>
     <div class="field-value">
       <div class="radio-group">
         <label class="radio-opt"><input type="radio" name="s_asoc" value="Sí"><span class="radio-btn"></span><span class="radio-label">Sí <span class="desc-tag">descuento -5%</span></span></label>
@@ -451,6 +561,68 @@
     <div class="field-value">
       <input type="text" id="s_iban" placeholder="ES00 0000 0000 0000 0000 0000">
     </div>
+  </div>
+
+  <!-- CALCULADORA TARIFA -->
+  <div id="tarifa-s" class="tarifa-panel inactive">
+    <div class="tarifa-header">
+      <span class="tarifa-header-icon">🧮</span>
+      <span class="tarifa-header-title">Estimación tarifa SGAE 2026 · Gimnasios / Academias de Baile</span>
+    </div>
+    <div id="tarifa-s-pending" class="tarifa-pending">Completa el repertorio, m² de ambas zonas y forma de pago para ver la estimación</div>
+    <div id="tarifa-s-content" style="display:none">
+      <div class="tarifa-body">
+        <div class="tarifa-section-title">Clases dirigidas (uso significativo)</div>
+        <div class="tarifa-item">
+          <span class="tarifa-item-label">Repertorio</span>
+          <span class="tarifa-item-value" id="tf-s-rep-clases">—</span>
+        </div>
+        <div class="tarifa-item">
+          <span class="tarifa-item-label">Superficie · tarifa base</span>
+          <span class="tarifa-item-value" id="tf-s-base-clases">—</span>
+        </div>
+        <div class="tarifa-section-title">Máquinas / resto (uso secundario)</div>
+        <div class="tarifa-item">
+          <span class="tarifa-item-label">Repertorio</span>
+          <span class="tarifa-item-value" id="tf-s-rep-maquinas">—</span>
+        </div>
+        <div class="tarifa-item">
+          <span class="tarifa-item-label">Superficie · tarifa base</span>
+          <span class="tarifa-item-value" id="tf-s-base-maquinas">—</span>
+        </div>
+      </div>
+      <div class="tarifa-descuentos">
+        <span class="tarifa-desc-label">Descuentos:</span>
+        <span class="tarifa-desc-tag off" id="tf-s-d-fneid">FNEID −5%</span>
+        <span class="tarifa-desc-tag off" id="tf-s-d-pago">Pago —</span>
+        <span class="tarifa-desc-tag off" id="tf-s-d-iban">Domiciliación −5%</span>
+      </div>
+      <div class="tarifa-result">
+        <div class="tarifa-result-label">
+          <span>Cuota estimada total</span>
+          <span>Primer año · 2026 (sin IVA)</span>
+        </div>
+        <div class="tarifa-result-amounts" id="tf-s-amounts">
+          <div class="tarifa-amount-block" id="tf-s-bloque-trimestral" style="display:none">
+            <span class="tarifa-amount-type">Trimestral</span>
+            <span class="tarifa-amount-value highlight" id="tf-s-trimestral">—</span>
+            <span class="tarifa-amount-period">€ / trimestre</span>
+          </div>
+          <div class="tarifa-amount-block" id="tf-s-bloque-semestral" style="display:none">
+            <span class="tarifa-amount-type">Semestral</span>
+            <span class="tarifa-amount-value highlight" id="tf-s-semestral">—</span>
+            <span class="tarifa-amount-period">€ / 6 meses</span>
+          </div>
+          <div class="tarifa-amount-block" id="tf-s-bloque-anual" style="display:none">
+            <span class="tarifa-amount-type">Anual</span>
+            <span class="tarifa-amount-value highlight" id="tf-s-anual">—</span>
+            <span class="tarifa-amount-period">€ / año</span>
+          </div>
+          <span id="tf-s-pago-pending" style="font-size:11px;color:#8C8070;font-style:italic">Selecciona forma de pago</span>
+        </div>
+      </div>
+    </div>
+    <div class="tarifa-nota">⚠️ <strong>Estimación orientativa.</strong> Tarifa SGAE 2026 · 1er año de contrato. El importe definitivo lo confirma SGAE. <strong>No incluye IVA (21%).</strong></div>
   </div>
   <div class="card-footer">
     <div class="footer-left">
@@ -525,21 +697,23 @@
     </div>
   </div>
   <div class="field-row" id="frow-c_rep_clases">
-    <div class="field-label lbl-block"><span class="dot"></span>Uso del repertorio en clases dirigidas</div>
+    <div class="field-label lbl-block"><span class="dot"></span>Uso del repertorio en clases dirigidas <span style="font-weight:400;text-transform:none;letter-spacing:0">(Uso significativo)</span></div>
     <div class="field-value">
       <div class="radio-group">
-        <label class="radio-opt"><input type="radio" name="c_rep_clases" value="Amenización musical"><span class="radio-btn"></span><span class="radio-label">Amenización musical</span></label>
-        <label class="radio-opt"><input type="radio" name="c_rep_clases" value="Nada"><span class="radio-btn"></span><span class="radio-label">Nada</span></label>
+        <label class="check-opt"><input type="checkbox" id="c_clases_musical"><span class="check-btn"></span><span class="check-label">Amenización musical</span></label>
+        <label class="check-opt"><input type="checkbox" id="c_clases_video"><span class="check-btn"></span><span class="check-label">Vídeo</span></label>
+        <label class="check-opt"><input type="checkbox" id="c_clases_tv"><span class="check-btn"></span><span class="check-label">TV</span></label>
+        <span style="font-size:11px;color:var(--muted);font-style:italic;padding-left:4px">Si no aplica ninguno, dejar sin marcar</span>
       </div>
-      <span class="inline-err" id="ierr-c_rep_clases">Obligatorio — selecciona una opción</span>
+      <span style="font-size:10px;color:var(--muted);margin-top:2px;display:block">Marca todos los que apliquen · Si no hay ninguno, dejar en blanco</span>
     </div>
   </div>
   <div class="field-row" id="frow-c_rep_maquinas">
-    <div class="field-label lbl-block"><span class="dot"></span>Uso del repertorio en máquinas / resto</div>
+    <div class="field-label lbl-block"><span class="dot"></span>Uso del repertorio en máquinas / resto <span style="font-weight:400;text-transform:none;letter-spacing:0">(Uso secundario)</span></div>
     <div class="field-value">
       <div class="radio-group">
         <label class="radio-opt"><input type="radio" name="c_rep_maquinas" value="Amenización musical"><span class="radio-btn"></span><span class="radio-label">Amenización musical</span></label>
-        <label class="radio-opt"><input type="radio" name="c_rep_maquinas" value="Televisión"><span class="radio-btn"></span><span class="radio-label">Televisión</span></label>
+        <label class="radio-opt"><input type="radio" name="c_rep_maquinas" value="Amenización musical y TV"><span class="radio-btn"></span><span class="radio-label">Amenización musical y TV</span></label>
         <label class="radio-opt"><input type="radio" name="c_rep_maquinas" value="Nada"><span class="radio-btn"></span><span class="radio-label">Nada</span></label>
       </div>
       <span class="inline-err" id="ierr-c_rep_maquinas">Obligatorio — selecciona una opción</span>
@@ -561,7 +735,7 @@
   </div>
   <div class="section-title">Asociación y condiciones</div>
   <div class="field-row" id="frow-c_asoc">
-    <div class="field-label lbl-soft"><span class="dot"></span>Pertenece a FNEID</div>
+    <div class="field-label lbl-soft"><span class="dot"></span>Pertenece a FNEID <span style="font-weight:400;text-transform:none;letter-spacing:0">(Federación Nacional de Empresarios de Instalaciones Deportivas)</span></div>
     <div class="field-value">
       <div class="radio-group">
         <label class="radio-opt"><input type="radio" name="c_asoc" value="Sí"><span class="radio-btn"></span><span class="radio-label">Sí <span class="desc-tag">descuento -5%</span></span></label>
@@ -586,6 +760,68 @@
     <div class="field-value">
       <input type="text" id="c_iban" placeholder="ES00 0000 0000 0000 0000 0000">
     </div>
+  </div>
+
+  <!-- CALCULADORA TARIFA -->
+  <div id="tarifa-c" class="tarifa-panel inactive">
+    <div class="tarifa-header">
+      <span class="tarifa-header-icon">🧮</span>
+      <span class="tarifa-header-title">Estimación tarifa SGAE 2026 · Gimnasios / Academias de Baile</span>
+    </div>
+    <div id="tarifa-c-pending" class="tarifa-pending">Completa el repertorio, m² de ambas zonas y forma de pago para ver la estimación</div>
+    <div id="tarifa-c-content" style="display:none">
+      <div class="tarifa-body">
+        <div class="tarifa-section-title">Clases dirigidas (uso significativo)</div>
+        <div class="tarifa-item">
+          <span class="tarifa-item-label">Repertorio</span>
+          <span class="tarifa-item-value" id="tf-c-rep-clases">—</span>
+        </div>
+        <div class="tarifa-item">
+          <span class="tarifa-item-label">Superficie · tarifa base</span>
+          <span class="tarifa-item-value" id="tf-c-base-clases">—</span>
+        </div>
+        <div class="tarifa-section-title">Máquinas / resto (uso secundario)</div>
+        <div class="tarifa-item">
+          <span class="tarifa-item-label">Repertorio</span>
+          <span class="tarifa-item-value" id="tf-c-rep-maquinas">—</span>
+        </div>
+        <div class="tarifa-item">
+          <span class="tarifa-item-label">Superficie · tarifa base</span>
+          <span class="tarifa-item-value" id="tf-c-base-maquinas">—</span>
+        </div>
+      </div>
+      <div class="tarifa-descuentos">
+        <span class="tarifa-desc-label">Descuentos:</span>
+        <span class="tarifa-desc-tag off" id="tf-c-d-fneid">FNEID −5%</span>
+        <span class="tarifa-desc-tag off" id="tf-c-d-pago">Pago —</span>
+        <span class="tarifa-desc-tag off" id="tf-c-d-iban">Domiciliación −5%</span>
+      </div>
+      <div class="tarifa-result">
+        <div class="tarifa-result-label">
+          <span>Cuota estimada total</span>
+          <span>Primer año · 2026 (sin IVA)</span>
+        </div>
+        <div class="tarifa-result-amounts" id="tf-c-amounts">
+          <div class="tarifa-amount-block" id="tf-c-bloque-trimestral" style="display:none">
+            <span class="tarifa-amount-type">Trimestral</span>
+            <span class="tarifa-amount-value highlight" id="tf-c-trimestral">—</span>
+            <span class="tarifa-amount-period">€ / trimestre</span>
+          </div>
+          <div class="tarifa-amount-block" id="tf-c-bloque-semestral" style="display:none">
+            <span class="tarifa-amount-type">Semestral</span>
+            <span class="tarifa-amount-value highlight" id="tf-c-semestral">—</span>
+            <span class="tarifa-amount-period">€ / 6 meses</span>
+          </div>
+          <div class="tarifa-amount-block" id="tf-c-bloque-anual" style="display:none">
+            <span class="tarifa-amount-type">Anual</span>
+            <span class="tarifa-amount-value highlight" id="tf-c-anual">—</span>
+            <span class="tarifa-amount-period">€ / año</span>
+          </div>
+          <span id="tf-c-pago-pending" style="font-size:11px;color:#8C8070;font-style:italic">Selecciona forma de pago</span>
+        </div>
+      </div>
+    </div>
+    <div class="tarifa-nota">⚠️ <strong>Estimación orientativa.</strong> Tarifa SGAE 2026 · 1er año de contrato. El importe definitivo lo confirma SGAE. <strong>No incluye IVA (21%).</strong></div>
   </div>
   <div class="card-footer">
     <div class="footer-left">
@@ -664,7 +900,6 @@
       {id:'f_dni',    label:'D.N.I.',             kind:'input', blocking:B},
       {id:'f_movil',  label:'Móvil',              kind:'input', blocking:B},
       {id:'f_email',  label:'Email',              kind:'input', blocking:B},
-      {id:'f_rep_clases',    label:'Repertorio clases dirigidas', kind:'radio', blocking:B},
       {id:'f_rep_maquinas',  label:'Repertorio máquinas/resto',   kind:'radio', blocking:B},
       {id:'f_m2_clases',     label:'M² clases dirigidas',          kind:'input', blocking:B},
       {id:'f_m2_maquinas',   label:'M² máquinas/resto',            kind:'input', blocking:B},
@@ -678,7 +913,6 @@
       {id:'s_adni',   label:'D.N.I. admin.',      kind:'input', blocking:B},
       {id:'s_movil',  label:'Móvil',              kind:'input', blocking:B},
       {id:'s_email',  label:'Email',              kind:'input', blocking:B},
-      {id:'s_rep_clases',    label:'Repertorio clases dirigidas', kind:'radio', blocking:B},
       {id:'s_rep_maquinas',  label:'Repertorio máquinas/resto',   kind:'radio', blocking:B},
       {id:'s_m2_clases',     label:'M² clases dirigidas',          kind:'input', blocking:B},
       {id:'s_m2_maquinas',   label:'M² máquinas/resto',            kind:'input', blocking:B},
@@ -694,7 +928,6 @@
       {id:'c_dni2',    label:'D.N.I. integrante 2', kind:'input', blocking:B},
       {id:'c_movil',   label:'Móvil',               kind:'input', blocking:B},
       {id:'c_email',   label:'Email',               kind:'input', blocking:B},
-      {id:'c_rep_clases',     label:'Repertorio clases dirigidas', kind:'radio', blocking:B},
       {id:'c_rep_maquinas',   label:'Repertorio máquinas/resto',   kind:'radio', blocking:B},
       {id:'c_m2_clases',      label:'M² clases dirigidas',          kind:'input', blocking:B},
       {id:'c_m2_maquinas',    label:'M² máquinas/resto',            kind:'input', blocking:B},
@@ -794,6 +1027,46 @@
       datos['Forma de pago'] = getRadio('c_pago') || 'No indicado';
       datos['IBAN domiciliacion'] = val('c_iban') || 'No facilitado';
     }
+    // Añadir estimación de tarifa al envío
+    var prefix = tipo === 'fisica' ? 'f' : tipo === 'sociedad' ? 's' : 'c';
+    var chkME = document.getElementById(prefix + '_clases_musical');
+    var chkVE = document.getElementById(prefix + '_clases_video');
+    var chkTE = document.getElementById(prefix + '_clases_tv');
+    var rcMusical = chkME && chkME.checked;
+    var rcVideo   = chkVE && chkVE.checked;
+    var rcTV      = chkTE && chkTE.checked;
+    var rcE = true; // checkboxes siempre válidos
+    var rmE  = getRadio(prefix + '_rep_maquinas');
+    var m2cE = parsearM2Gim(document.getElementById(prefix + '_m2_clases')  ? document.getElementById(prefix + '_m2_clases').value  : '');
+    var m2mE = parsearM2Gim(document.getElementById(prefix + '_m2_maquinas') ? document.getElementById(prefix + '_m2_maquinas').value : '');
+    var pvE  = getRadio(prefix + '_pago');
+    var avE  = getRadio(prefix + '_asoc');
+    var ibE  = document.getElementById(prefix + '_iban') ? document.getElementById(prefix + '_iban').value.trim() : '';
+    if (rcE && rmE && m2cE !== null && m2mE !== null) {
+      var baseClasesE = 0, labelClasesE = [];
+      if (rcMusical && m2cE > 0) { var rCm = tarifaClases(m2cE,'Amenización musical'); baseClasesE += rCm.base; labelClasesE.push('Musical'); }
+      if (rcVideo)               { var rCv = tarifaClases(m2cE,'Vídeo');               baseClasesE += rCv.base; labelClasesE.push('Vídeo'); }
+      if (rcTV && m2cE > 0)      { var rCt = tarifaClases(m2cE,'TV');                  baseClasesE += rCt.base; labelClasesE.push('TV'); }
+      var rCE = { base: baseClasesE, label: labelClasesE.join('+') || 'Sin uso' };
+      var rME = tarifaMaquinas(m2mE, rmE);
+      var baseE = rCE.base + rME.base;
+      var dFE = avE === 'Sí' ? 0.05 : 0;
+      var dPE = pvE === 'Anual' ? 0.05 : pvE === 'Semestral' ? 0.025 : 0;
+      var dIE = ibE.length > 10 ? 0.05 : 0;
+      var mensualE = baseE * (1 - dFE - dPE - dIE);
+      datos['-- ESTIMACION TARIFA SGAE 2026 --'] = '(sin IVA)';
+      datos['Base clases dirigidas']  = fmtGim(rCE.base) + '/mes (' + rCE.label + ')';
+      datos['Base máquinas/resto']    = fmtGim(rME.base) + '/mes (' + rME.label + ')';
+      datos['Base total mensual']     = fmtGim(baseE) + '/mes';
+      datos['Descuentos']             = ((dFE+dPE+dIE)*100).toFixed(1).replace('.',',') + ' %'
+        + (dFE>0 ? ' | FNEID -5%' : '') + (dPE>0 ? ' | Pago '+pvE : '') + (dIE>0 ? ' | Domiciliación -5%' : '');
+      if (pvE === 'Trimestral') datos['Cuota estimada trimestral'] = fmtGim(mensualE * 3);
+      if (pvE === 'Semestral')  datos['Cuota estimada semestral']  = fmtGim(mensualE * 6);
+      if (pvE === 'Anual')      datos['Cuota estimada anual']      = fmtGim(mensualE * 12);
+    } else {
+      datos['-- ESTIMACION TARIFA SGAE 2026 --'] = 'No calculada (faltan datos)';
+    }
+
     var btn = document.querySelector('#card-'+tipo+' .btn-send');
     btn.disabled = true;
     btn.textContent = 'Enviando...';
@@ -813,6 +1086,237 @@
       showToast('Error al enviar. Comprueba la conexión e inténtalo de nuevo.', 'terror');
     });
   }
+
+  // ===== CALCULADORA DE TARIFA SGAE 2026 · GIMNASIOS / ACADEMIAS ============
+  //
+  // ZONA CLASES DIRIGIDAS (uso significativo) — M0400488/M0400489
+  //   Tramos irregulares (ver tabla): hasta 100, 101-125, 126-150... 1901-2000
+  //   + extra por cada 100m2 > 2000: 75,26€
+  //   Opciones: "Amenización musical" → tabla clases
+  //             "Vídeo"               → tarifa fija 49,33€ (M0700388, independiente de m2)
+  //             "TV"                  → tabla TV por m2 (M0500388/M0500389)
+  //             "Nada"                → 0
+  //
+  // ZONA MÁQUINAS/RESTO (uso secundario) — M0400388/M1300388
+  //   Tramos de 50m2, hasta 2000m2
+  //   Opciones: "Amenización musical"    → M0400388 (solo música secundaria)
+  //             "Amenización musical y TV" → M1300388 (música+TV secundaria)
+  //             "Nada"                    → 0
+
+  // — Tabla clases dirigidas M0400488 (tramos irregulares) —
+  // [límite_superior, tarifa_1er_año]
+  var T_CLASES = [
+    [100,36.88],[125,53.56],[150,73.22],[175,95.69],[200,121.01],
+    [225,149.20],[250,180.22],[275,214.17],[300,250.95],
+    [325,266.99],[350,283.08],[375,299.27],[400,315.56],
+    [425,331.87],[450,348.31],[475,364.83],[500,381.44],
+    [550,413.16],[600,444.86],[650,476.59],[700,508.37],
+    [750,540.15],[800,571.87],[850,603.70],[900,635.45],
+    [950,667.21],[1000,701.57],[1100,765.59],[1200,829.69],
+    [1300,893.76],[1400,957.90],[1500,1022.07],[1600,1086.26],
+    [1700,1150.42],[1800,1214.58],[1900,1278.77],[2000,1347.88]
+  ];
+  var T_CLASES_EXTRA = 75.26; // por cada 100m2 o fracción > 2000m2
+
+  // — Tabla TV en clases M0500388 (tramos de 50m2 hasta 2000m2) —
+  var T_TV_CLASES = [
+     5.86, 8.42,10.99,13.55,16.08,18.65,19.48,20.34,21.19,22.05,
+    22.86,23.72,24.00,24.28,24.58,24.85,25.14,25.42,25.69,25.96,
+    26.18,26.42,26.65,26.88,27.11,27.32,27.57,27.76,27.97,28.19,
+    28.34,28.54,28.71,28.88,29.05,29.22,29.38,29.54,29.70,29.84
+  ];
+
+  // — Tabla máquinas solo música M0400388 (tramos 50m2) —
+  var T_MAQ_MUSICAL = [
+    10.28,18.17,26.04,33.91,41.81,49.68,52.33,54.95,57.56,60.16,
+    62.76,65.33,66.22,67.12,67.99,68.87,69.73,70.59,71.44,72.27,
+    73.00,73.72,74.43,75.12,75.81,76.50,77.17,77.81,78.48,79.11,
+    79.66,80.21,80.77,81.29,81.81,82.31,82.82,83.30,83.78,84.26
+  ];
+
+  // — Tabla máquinas música+TV M1300388 (tramos 50m2) —
+  var T_MAQ_MUSICAL_TV = [
+    14.00,24.59,35.15,45.72,56.32,66.88,70.41,73.93,77.46,80.92,
+    84.40,87.86,89.08,90.26,91.45,92.63,93.79,94.94,96.07,97.20,
+    98.19,99.13,100.09,101.02,101.95,102.85,103.75,104.64,105.49,106.38,
+    107.12,107.85,108.58,109.28,109.98,110.67,111.34,111.99,112.63,113.25
+  ];
+
+  function parsearM2Gim(str) {
+    var n = parseFloat(String(str).replace(',','.').replace(/[^0-9.]/g,''));
+    return isNaN(n) || n < 0 ? null : n;
+  }
+
+  function tarifaClases(m2, rep) {
+    if (rep === 'Nada' || m2 === 0) return { base: 0, label: 'Sin uso' };
+    if (rep === 'Vídeo') return { base: 49.33, label: 'Vídeo · tarifa fija' };
+    if (rep === 'TV') {
+      var idx = Math.min(Math.ceil(m2 / 50) - 1, 39);
+      if (idx < 0) idx = 0;
+      var low = idx*50+1, high = (idx+1)*50;
+      return { base: T_TV_CLASES[idx], label: (idx===0?'Hasta 50':'De '+low+' a '+high)+' m²' };
+    }
+    // Amenización musical — tramos irregulares
+    if (m2 > 2000) {
+      var extra = Math.ceil((m2 - 2000) / 100);
+      return { base: 1347.88 + extra * T_CLASES_EXTRA, label: 'Más de 2.000 m²' };
+    }
+    for (var i = 0; i < T_CLASES.length; i++) {
+      if (m2 <= T_CLASES[i][0]) {
+        var low2 = i === 0 ? 0 : T_CLASES[i-1][0]+1;
+        var lbl  = i === 0 ? 'Hasta 100 m²' : 'De '+low2+' a '+T_CLASES[i][0]+' m²';
+        return { base: T_CLASES[i][1], label: lbl };
+      }
+    }
+    return { base: 0, label: '—' };
+  }
+
+  function tarifaMaquinas(m2, rep) {
+    if (rep === 'Nada' || m2 === 0) return { base: 0, label: 'Sin uso' };
+    var tabla = (rep === 'Amenización musical y TV') ? T_MAQ_MUSICAL_TV : T_MAQ_MUSICAL;
+    var idx = Math.min(Math.ceil(m2 / 50) - 1, 39);
+    if (idx < 0) idx = 0;
+    var low = idx*50+1, high = (idx+1)*50;
+    return { base: tabla[idx], label: (idx===0?'Hasta 50':'De '+low+' a '+high)+' m²' };
+  }
+
+  function fmtGim(n) { return n.toFixed(2).replace('.', ',') + ' €'; }
+
+  function calcularTarifaGim(prefix) {
+    // Leer checkboxes de clases dirigidas
+    var chkMusical = document.getElementById(prefix + '_clases_musical');
+    var chkVideo   = document.getElementById(prefix + '_clases_video');
+    var chkTV      = document.getElementById(prefix + '_clases_tv');
+    var tieneMusical = chkMusical && chkMusical.checked;
+    var tieneVideo   = chkVideo   && chkVideo.checked;
+    var tieneTV      = chkTV      && chkTV.checked;
+    var repClases = (tieneMusical || tieneVideo || tieneTV) ? 'checked' : 'nada';
+    var repMaquinas = getRadio(prefix + '_rep_maquinas');
+    var m2ClasesEl  = document.getElementById(prefix + '_m2_clases');
+    var m2MaqEl     = document.getElementById(prefix + '_m2_maquinas');
+    var pagoVal     = getRadio(prefix + '_pago');
+    var asocVal     = getRadio(prefix + '_asoc');
+    var ibanEl      = document.getElementById(prefix + '_iban');
+
+    var panel      = document.getElementById('tarifa-' + prefix);
+    var pending    = document.getElementById('tarifa-' + prefix + '-pending');
+    var contentDiv = document.getElementById('tarifa-' + prefix + '-content');
+    if (!panel) return;
+
+    var m2Clases  = m2ClasesEl  ? parsearM2Gim(m2ClasesEl.value)  : null;
+    var m2Maquinas = m2MaqEl    ? parsearM2Gim(m2MaqEl.value)     : null;
+    var ibanOk    = ibanEl ? ibanEl.value.trim().length > 10 : false;
+
+    // Necesitamos al menos uno de los dos repertorios elegido (no null) y sus m2
+    var clasesOk   = m2Clases !== null; // checkboxes: siempre válido si hay m2
+    var maquinasOk = repMaquinas !== '' && repMaquinas !== null && m2Maquinas !== null;
+
+    if (!clasesOk || !maquinasOk) {
+      panel.classList.add('inactive');
+      pending.style.display = '';
+      contentDiv.style.display = 'none';
+      return;
+    }
+
+    panel.classList.remove('inactive');
+    pending.style.display = 'none';
+    contentDiv.style.display = 'block';
+
+    // Sumar tarifa de cada uso marcado en clases dirigidas
+    var baseClases = 0, labelClasesParts = [];
+    if (tieneMusical && m2Clases > 0) {
+      var rM = tarifaClases(m2Clases, 'Amenización musical');
+      baseClases += rM.base; labelClasesParts.push('Musical ' + rM.label);
+    }
+    if (tieneVideo) {
+      var rV = tarifaClases(m2Clases, 'Vídeo');
+      baseClases += rV.base; labelClasesParts.push('Vídeo ' + rV.label);
+    }
+    if (tieneTV && m2Clases > 0) {
+      var rT = tarifaClases(m2Clases, 'TV');
+      baseClases += rT.base; labelClasesParts.push('TV ' + rT.label);
+    }
+    var rClases = { base: baseClases, label: labelClasesParts.join(' + ') || 'Sin uso' };
+    var rMaquinas = tarifaMaquinas(m2Maquinas, repMaquinas);
+    var baseTotal = rClases.base + rMaquinas.base;
+
+    // Descuentos
+    var dFneid = asocVal === 'Sí' ? 0.05 : 0;
+    var dPago  = pagoVal === 'Anual' ? 0.05 : pagoVal === 'Semestral' ? 0.025 : 0;
+    var dIban  = ibanOk ? 0.05 : 0;
+    var totalDesc = dFneid + dPago + dIban;
+    var mensual   = baseTotal * (1 - totalDesc);
+
+    var p = 'tf-' + prefix + '-';
+
+    // Zona clases
+    var labelClases = rClases.label || 'Sin uso';
+    document.getElementById(p + 'rep-clases').textContent  = labelClases;
+    document.getElementById(p + 'base-clases').textContent = rClases.base > 0 ? fmtGim(rClases.base) + '/mes' : '—';
+
+    // Zona máquinas
+    var labelMaq = repMaquinas === 'Nada' ? 'Sin uso'
+      : repMaquinas + (m2Maquinas > 0 ? ' · ' + rMaquinas.label : '');
+    document.getElementById(p + 'rep-maquinas').textContent  = labelMaq;
+    document.getElementById(p + 'base-maquinas').textContent = rMaquinas.base > 0 ? fmtGim(rMaquinas.base) + '/mes' : '—';
+
+    // Descuentos tags
+    document.getElementById(p + 'd-fneid').className = 'tarifa-desc-tag ' + (dFneid > 0 ? 'on' : 'off');
+    var dp = document.getElementById(p + 'd-pago');
+    if (!pagoVal || pagoVal === 'Trimestral') {
+      dp.textContent = pagoVal ? 'Pago trimestral' : 'Pago —';
+      dp.className   = 'tarifa-desc-tag off';
+    } else if (pagoVal === 'Semestral') {
+      dp.textContent = 'Pago semestral −2,5%';
+      dp.className   = 'tarifa-desc-tag on';
+    } else {
+      dp.textContent = 'Pago anual −5%';
+      dp.className   = 'tarifa-desc-tag on';
+    }
+    document.getElementById(p + 'd-iban').className = 'tarifa-desc-tag ' + (dIban > 0 ? 'on' : 'off');
+
+    // Importes — solo el que corresponde a la forma de pago
+    ['trimestral','semestral','anual'].forEach(function(b) {
+      var el = document.getElementById(p + 'bloque-' + b);
+      if (el) el.style.display = 'none';
+    });
+    var pendingPago = document.getElementById(p + 'pago-pending');
+    if (pagoVal === 'Trimestral') {
+      document.getElementById(p + 'trimestral').textContent = fmtGim(mensual * 3);
+      document.getElementById(p + 'bloque-trimestral').style.display = '';
+      if (pendingPago) pendingPago.style.display = 'none';
+    } else if (pagoVal === 'Semestral') {
+      document.getElementById(p + 'semestral').textContent = fmtGim(mensual * 6);
+      document.getElementById(p + 'bloque-semestral').style.display = '';
+      if (pendingPago) pendingPago.style.display = 'none';
+    } else if (pagoVal === 'Anual') {
+      document.getElementById(p + 'anual').textContent = fmtGim(mensual * 12);
+      document.getElementById(p + 'bloque-anual').style.display = '';
+      if (pendingPago) pendingPago.style.display = 'none';
+    } else {
+      if (pendingPago) pendingPago.style.display = '';
+    }
+  }
+
+  // Event listeners
+  ['f', 's', 'c'].forEach(function(prefix) {
+    ['_m2_clases','_m2_maquinas','_iban'].forEach(function(campo) {
+      var el = document.getElementById(prefix + campo);
+      if (el) el.addEventListener('input', function() { calcularTarifaGim(prefix); });
+    });
+    // Checkboxes clases dirigidas
+    ['_clases_musical','_clases_video','_clases_tv'].forEach(function(chk) {
+      var el = document.getElementById(prefix + chk);
+      if (el) el.addEventListener('change', function() { calcularTarifaGim(prefix); });
+    });
+    ['rep_maquinas','asoc','pago'].forEach(function(nombre) {
+      document.querySelectorAll('input[name="' + prefix + '_' + nombre + '"]').forEach(function(r) {
+        r.addEventListener('change', function() { calcularTarifaGim(prefix); });
+      });
+    });
+  });
+  // ===== FIN CALCULADORA =====
+
 </script>
 </body>
 </html>
