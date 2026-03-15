@@ -320,12 +320,10 @@
     <div class="field-label lbl-block"><span class="dot"></span>Uso del repertorio en clases dirigidas <span style="font-weight:400;text-transform:none;letter-spacing:0">(Uso significativo)</span></div>
     <div class="field-value">
       <div class="radio-group">
-        <label class="check-opt"><input type="checkbox" id="f_clases_musical"><span class="check-btn"></span><span class="check-label">Amenización musical</span></label>
-        <label class="check-opt"><input type="checkbox" id="f_clases_video"><span class="check-btn"></span><span class="check-label">Vídeo</span></label>
-        <label class="check-opt"><input type="checkbox" id="f_clases_tv"><span class="check-btn"></span><span class="check-label">TV</span></label>
-        <span style="font-size:11px;color:var(--muted);font-style:italic;padding-left:4px">Si no aplica ninguno, dejar sin marcar</span>
+        <label class="radio-opt"><input type="radio" name="f_rep_clases" value="Amenización musical"><span class="radio-btn"></span><span class="radio-label">Amenización musical</span></label>
+        <label class="radio-opt"><input type="radio" name="f_rep_clases" value="Nada"><span class="radio-btn"></span><span class="radio-label">Nada</span></label>
       </div>
-      <span style="font-size:10px;color:var(--muted);margin-top:2px;display:block">Marca todos los que apliquen · Si no hay ninguno, dejar en blanco</span>
+      <span class="inline-err" id="ierr-f_rep_clases">Obligatorio — selecciona una opción</span>
     </div>
   </div>
   <div class="field-row" id="frow-f_rep_maquinas">
@@ -508,12 +506,10 @@
     <div class="field-label lbl-block"><span class="dot"></span>Uso del repertorio en clases dirigidas <span style="font-weight:400;text-transform:none;letter-spacing:0">(Uso significativo)</span></div>
     <div class="field-value">
       <div class="radio-group">
-        <label class="check-opt"><input type="checkbox" id="s_clases_musical"><span class="check-btn"></span><span class="check-label">Amenización musical</span></label>
-        <label class="check-opt"><input type="checkbox" id="s_clases_video"><span class="check-btn"></span><span class="check-label">Vídeo</span></label>
-        <label class="check-opt"><input type="checkbox" id="s_clases_tv"><span class="check-btn"></span><span class="check-label">TV</span></label>
-        <span style="font-size:11px;color:var(--muted);font-style:italic;padding-left:4px">Si no aplica ninguno, dejar sin marcar</span>
+        <label class="radio-opt"><input type="radio" name="s_rep_clases" value="Amenización musical"><span class="radio-btn"></span><span class="radio-label">Amenización musical</span></label>
+        <label class="radio-opt"><input type="radio" name="s_rep_clases" value="Nada"><span class="radio-btn"></span><span class="radio-label">Nada</span></label>
       </div>
-      <span style="font-size:10px;color:var(--muted);margin-top:2px;display:block">Marca todos los que apliquen · Si no hay ninguno, dejar en blanco</span>
+      <span class="inline-err" id="ierr-s_rep_clases">Obligatorio — selecciona una opción</span>
     </div>
   </div>
   <div class="field-row" id="frow-s_rep_maquinas">
@@ -707,12 +703,10 @@
     <div class="field-label lbl-block"><span class="dot"></span>Uso del repertorio en clases dirigidas <span style="font-weight:400;text-transform:none;letter-spacing:0">(Uso significativo)</span></div>
     <div class="field-value">
       <div class="radio-group">
-        <label class="check-opt"><input type="checkbox" id="c_clases_musical"><span class="check-btn"></span><span class="check-label">Amenización musical</span></label>
-        <label class="check-opt"><input type="checkbox" id="c_clases_video"><span class="check-btn"></span><span class="check-label">Vídeo</span></label>
-        <label class="check-opt"><input type="checkbox" id="c_clases_tv"><span class="check-btn"></span><span class="check-label">TV</span></label>
-        <span style="font-size:11px;color:var(--muted);font-style:italic;padding-left:4px">Si no aplica ninguno, dejar sin marcar</span>
+        <label class="radio-opt"><input type="radio" name="c_rep_clases" value="Amenización musical"><span class="radio-btn"></span><span class="radio-label">Amenización musical</span></label>
+        <label class="radio-opt"><input type="radio" name="c_rep_clases" value="Nada"><span class="radio-btn"></span><span class="radio-label">Nada</span></label>
       </div>
-      <span style="font-size:10px;color:var(--muted);margin-top:2px;display:block">Marca todos los que apliquen · Si no hay ninguno, dejar en blanco</span>
+      <span class="inline-err" id="ierr-c_rep_clases">Obligatorio — selecciona una opción</span>
     </div>
   </div>
   <div class="field-row" id="frow-c_rep_maquinas">
@@ -907,9 +901,10 @@
       {id:'f_dni',    label:'D.N.I.',             kind:'input', blocking:B},
       {id:'f_movil',  label:'Móvil',              kind:'input', blocking:B},
       {id:'f_email',  label:'Email',              kind:'input', blocking:B},
-      {id:'f_rep_maquinas',  label:'Repertorio máquinas/resto',   kind:'radio', blocking:B},
-      {id:'f_m2_clases',     label:'M² clases dirigidas',          kind:'input', blocking:B},
-      {id:'f_m2_maquinas',   label:'M² máquinas/resto',            kind:'input', blocking:B},
+      {id:'f_rep_clases',    label:'Repertorio clases dirigidas',   kind:'radio', blocking:B},
+      {id:'f_rep_maquinas',  label:'Repertorio máquinas/resto',     kind:'radio', blocking:B},
+      {id:'f_m2_clases',     label:'M² clases dirigidas',           kind:'input', blocking:B},
+      {id:'f_m2_maquinas',   label:'M² máquinas/resto',             kind:'input', blocking:B},
       {id:'f_asoc',   label:'FNEID',              kind:'radio', blocking:S},
       {id:'f_pago',   label:'Forma de pago',      kind:'radio', blocking:S}
     ];
@@ -920,9 +915,10 @@
       {id:'s_adni',   label:'D.N.I. admin.',      kind:'input', blocking:B},
       {id:'s_movil',  label:'Móvil',              kind:'input', blocking:B},
       {id:'s_email',  label:'Email',              kind:'input', blocking:B},
-      {id:'s_rep_maquinas',  label:'Repertorio máquinas/resto',   kind:'radio', blocking:B},
-      {id:'s_m2_clases',     label:'M² clases dirigidas',          kind:'input', blocking:B},
-      {id:'s_m2_maquinas',   label:'M² máquinas/resto',            kind:'input', blocking:B},
+      {id:'s_rep_clases',    label:'Repertorio clases dirigidas',   kind:'radio', blocking:B},
+      {id:'s_rep_maquinas',  label:'Repertorio máquinas/resto',     kind:'radio', blocking:B},
+      {id:'s_m2_clases',     label:'M² clases dirigidas',           kind:'input', blocking:B},
+      {id:'s_m2_maquinas',   label:'M² máquinas/resto',             kind:'input', blocking:B},
       {id:'s_asoc',   label:'FNEID',              kind:'radio', blocking:S},
       {id:'s_pago',   label:'Forma de pago',      kind:'radio', blocking:S}
     ];
@@ -935,9 +931,10 @@
       {id:'c_dni2',    label:'D.N.I. integrante 2', kind:'input', blocking:B},
       {id:'c_movil',   label:'Móvil',               kind:'input', blocking:B},
       {id:'c_email',   label:'Email',               kind:'input', blocking:B},
-      {id:'c_rep_maquinas',   label:'Repertorio máquinas/resto',   kind:'radio', blocking:B},
-      {id:'c_m2_clases',      label:'M² clases dirigidas',          kind:'input', blocking:B},
-      {id:'c_m2_maquinas',    label:'M² máquinas/resto',            kind:'input', blocking:B},
+      {id:'c_rep_clases',     label:'Repertorio clases dirigidas',   kind:'radio', blocking:B},
+      {id:'c_rep_maquinas',   label:'Repertorio máquinas/resto',     kind:'radio', blocking:B},
+      {id:'c_m2_clases',      label:'M² clases dirigidas',           kind:'input', blocking:B},
+      {id:'c_m2_maquinas',    label:'M² máquinas/resto',             kind:'input', blocking:B},
       {id:'c_asoc',    label:'FNEID',               kind:'radio', blocking:S},
       {id:'c_pago',    label:'Forma de pago',       kind:'radio', blocking:S}
     ];
@@ -1036,25 +1033,15 @@
     }
     // Añadir estimación de tarifa al envío
     var prefix = tipo === 'fisica' ? 'f' : tipo === 'sociedad' ? 's' : 'c';
-    var chkME = document.getElementById(prefix + '_clases_musical');
-    var chkVE = document.getElementById(prefix + '_clases_video');
-    var chkTE = document.getElementById(prefix + '_clases_tv');
-    var rcMusical = chkME && chkME.checked;
-    var rcVideo   = chkVE && chkVE.checked;
-    var rcTV      = chkTE && chkTE.checked;
-    var rcE = true; // checkboxes siempre válidos
-    var rmE  = getRadio(prefix + '_rep_maquinas');
-    var m2cE = parsearM2Gim(document.getElementById(prefix + '_m2_clases')  ? document.getElementById(prefix + '_m2_clases').value  : '');
-    var m2mE = parsearM2Gim(document.getElementById(prefix + '_m2_maquinas') ? document.getElementById(prefix + '_m2_maquinas').value : '');
-    var pvE  = getRadio(prefix + '_pago');
-    var avE  = getRadio(prefix + '_asoc');
-    var ibE  = document.getElementById(prefix + '_iban') ? document.getElementById(prefix + '_iban').value.trim() : '';
+    var rcE   = getRadio(prefix + '_rep_clases');
+    var rmE   = getRadio(prefix + '_rep_maquinas');
+    var m2cE  = parsearM2Gim(document.getElementById(prefix + '_m2_clases')  ? document.getElementById(prefix + '_m2_clases').value  : '');
+    var m2mE  = parsearM2Gim(document.getElementById(prefix + '_m2_maquinas') ? document.getElementById(prefix + '_m2_maquinas').value : '');
+    var pvE   = getRadio(prefix + '_pago');
+    var avE   = getRadio(prefix + '_asoc');
+    var ibE   = document.getElementById(prefix + '_iban') ? document.getElementById(prefix + '_iban').value.trim() : '';
     if (rcE && rmE && m2cE !== null && m2mE !== null) {
-      var baseClasesE = 0, labelClasesE = [];
-      if (rcMusical && m2cE > 0) { var rCm = tarifaClases(m2cE,'Amenización musical'); baseClasesE += rCm.base; labelClasesE.push('Musical'); }
-      if (rcVideo)               { var rCv = tarifaClases(m2cE,'Vídeo');               baseClasesE += rCv.base; labelClasesE.push('Vídeo'); }
-      if (rcTV && m2cE > 0)      { var rCt = tarifaClases(m2cE,'TV');                  baseClasesE += rCt.base; labelClasesE.push('TV'); }
-      var rCE = { base: baseClasesE, label: labelClasesE.join('+') || 'Sin uso' };
+      var rCE = tarifaClases(m2cE, rcE === 'Amenización musical' ? 'Amenización musical' : 'Nada');
       var rME = tarifaMaquinas(m2mE, rmE);
       var baseE = rCE.base + rME.base;
       var dFE = avE === 'Sí' ? 0.05 : 0;
@@ -1062,7 +1049,7 @@
       var dIE = ibE.length > 10 ? 0.05 : 0;
       var mensualE = baseE * (1 - dFE - dPE - dIE);
       datos['-- ESTIMACION TARIFA SGAE 2026 --'] = '(sin IVA)';
-      datos['Base clases dirigidas']  = fmtGim(rCE.base) + '/mes (' + rCE.label + ')';
+      datos['Base clases dirigidas']  = fmtGim(rCE.base) + '/mes (' + (rcE === 'Amenización musical' ? 'Amenización musical · ' + rCE.label : 'Sin uso') + ')';
       datos['Base máquinas/resto']    = fmtGim(rME.base) + '/mes (' + rME.label + ')';
       datos['Base total mensual']     = fmtGim(baseE) + '/mes';
       datos['Descuentos']             = ((dFE+dPE+dIE)*100).toFixed(1).replace('.',',') + ' %'
@@ -1190,33 +1177,26 @@
   function fmtGim(n) { return n.toFixed(2).replace('.', ',') + ' €'; }
 
   function calcularTarifaGim(prefix) {
-    // Leer checkboxes de clases dirigidas
-    var chkMusical = document.getElementById(prefix + '_clases_musical');
-    var chkVideo   = document.getElementById(prefix + '_clases_video');
-    var chkTV      = document.getElementById(prefix + '_clases_tv');
-    var tieneMusical = chkMusical && chkMusical.checked;
-    var tieneVideo   = chkVideo   && chkVideo.checked;
-    var tieneTV      = chkTV      && chkTV.checked;
-    var repClases = (tieneMusical || tieneVideo || tieneTV) ? 'checked' : 'nada';
-    var repMaquinas = getRadio(prefix + '_rep_maquinas');
-    var m2ClasesEl  = document.getElementById(prefix + '_m2_clases');
-    var m2MaqEl     = document.getElementById(prefix + '_m2_maquinas');
-    var pagoVal     = getRadio(prefix + '_pago');
-    var asocVal     = getRadio(prefix + '_asoc');
-    var ibanEl      = document.getElementById(prefix + '_iban');
+    // Leer radio de clases dirigidas
+    var repClasesVal = getRadio(prefix + '_rep_clases');
+    var repMaquinas  = getRadio(prefix + '_rep_maquinas');
+    var m2ClasesEl   = document.getElementById(prefix + '_m2_clases');
+    var m2MaqEl      = document.getElementById(prefix + '_m2_maquinas');
+    var pagoVal      = getRadio(prefix + '_pago');
+    var asocVal      = getRadio(prefix + '_asoc');
+    var ibanEl       = document.getElementById(prefix + '_iban');
 
     var panel      = document.getElementById('tarifa-' + prefix);
     var pending    = document.getElementById('tarifa-' + prefix + '-pending');
     var contentDiv = document.getElementById('tarifa-' + prefix + '-content');
     if (!panel) return;
 
-    var m2Clases  = m2ClasesEl  ? parsearM2Gim(m2ClasesEl.value)  : null;
-    var m2Maquinas = m2MaqEl    ? parsearM2Gim(m2MaqEl.value)     : null;
-    var ibanOk    = ibanEl ? ibanEl.value.trim().length > 10 : false;
+    var m2Clases   = m2ClasesEl  ? parsearM2Gim(m2ClasesEl.value)  : null;
+    var m2Maquinas = m2MaqEl     ? parsearM2Gim(m2MaqEl.value)     : null;
+    var ibanOk     = ibanEl ? ibanEl.value.trim().length > 10 : false;
 
-    // Necesitamos al menos uno de los dos repertorios elegido (no null) y sus m2
-    var clasesOk   = m2Clases !== null; // checkboxes: siempre válido si hay m2
-    var maquinasOk = repMaquinas !== '' && repMaquinas !== null && m2Maquinas !== null;
+    var clasesOk   = repClasesVal !== '' && repClasesVal !== null && m2Clases !== null;
+    var maquinasOk = repMaquinas  !== '' && repMaquinas  !== null && m2Maquinas !== null;
 
     if (!clasesOk || !maquinasOk) {
       panel.classList.add('inactive');
@@ -1229,21 +1209,8 @@
     pending.style.display = 'none';
     contentDiv.style.display = 'block';
 
-    // Sumar tarifa de cada uso marcado en clases dirigidas
-    var baseClases = 0, labelClasesParts = [];
-    if (tieneMusical && m2Clases > 0) {
-      var rM = tarifaClases(m2Clases, 'Amenización musical');
-      baseClases += rM.base; labelClasesParts.push('Musical ' + rM.label);
-    }
-    if (tieneVideo) {
-      var rV = tarifaClases(m2Clases, 'Vídeo');
-      baseClases += rV.base; labelClasesParts.push('Vídeo ' + rV.label);
-    }
-    if (tieneTV && m2Clases > 0) {
-      var rT = tarifaClases(m2Clases, 'TV');
-      baseClases += rT.base; labelClasesParts.push('TV ' + rT.label);
-    }
-    var rClases = { base: baseClases, label: labelClasesParts.join(' + ') || 'Sin uso' };
+    // Tarifa clases dirigidas: solo Amenización musical o Nada
+    var rClases = tarifaClases(m2Clases, repClasesVal === 'Amenización musical' ? 'Amenización musical' : 'Nada');
     var rMaquinas = tarifaMaquinas(m2Maquinas, repMaquinas);
     var baseTotal = rClases.base + rMaquinas.base;
 
@@ -1257,7 +1224,9 @@
     var p = 'tf-' + prefix + '-';
 
     // Zona clases
-    var labelClases = rClases.label || 'Sin uso';
+    var labelClases = repClasesVal === 'Amenización musical'
+      ? ('Amenización musical · ' + rClases.label)
+      : 'Sin uso';
     document.getElementById(p + 'rep-clases').textContent  = labelClases;
     document.getElementById(p + 'base-clases').textContent = rClases.base > 0 ? fmtGim(rClases.base) + '/mes' : '—';
 
@@ -1311,10 +1280,9 @@
       var el = document.getElementById(prefix + campo);
       if (el) el.addEventListener('input', function() { calcularTarifaGim(prefix); });
     });
-    // Checkboxes clases dirigidas
-    ['_clases_musical','_clases_video','_clases_tv'].forEach(function(chk) {
-      var el = document.getElementById(prefix + chk);
-      if (el) el.addEventListener('change', function() { calcularTarifaGim(prefix); });
+    // Radios clases dirigidas
+    document.querySelectorAll('input[name="' + prefix + '_rep_clases"]').forEach(function(r) {
+      r.addEventListener('change', function() { calcularTarifaGim(prefix); });
     });
     ['rep_maquinas','asoc','pago'].forEach(function(nombre) {
       document.querySelectorAll('input[name="' + prefix + '_' + nombre + '"]').forEach(function(r) {
