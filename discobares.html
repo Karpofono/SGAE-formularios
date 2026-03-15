@@ -134,6 +134,40 @@
     .card-footer { flex-direction: column; }
     .contact-intro { border-right: none; padding-right: 0; }
   }
+
+  /* ===== CALCULADORA DE TARIFA ===== */
+  .tarifa-panel { margin: 16px 36px 4px; border: 2px solid var(--gold); border-radius: 10px; overflow: hidden; transition: all 0.4s ease; }
+  .tarifa-panel.inactive { border-color: var(--border); opacity: 0.6; }
+  .tarifa-header { background: var(--dark); padding: 11px 20px; display: flex; align-items: center; gap: 10px; }
+  .tarifa-header-icon { font-size: 16px; }
+  .tarifa-header-title { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--gold); font-weight: 600; }
+  .tarifa-body { background: white; padding: 14px 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .tarifa-item { display: flex; flex-direction: column; gap: 3px; }
+  .tarifa-item-label { font-size: 9px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); }
+  .tarifa-item-value { font-family: 'Playfair Display', serif; font-size: 14px; color: var(--dark); }
+  .tarifa-descuentos { background: #F7F4EF; border-top: 1px solid var(--border); padding: 10px 20px; display: flex; gap: 7px; flex-wrap: wrap; align-items: center; }
+  .tarifa-desc-label { font-size: 9px; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); margin-right: 2px; white-space: nowrap; }
+  .tarifa-desc-tag { font-size: 10px; font-weight: 600; padding: 3px 9px; border-radius: 10px; transition: all 0.3s; }
+  .tarifa-desc-tag.on  { background: #e8f5e8; color: #2d7a2d; border: 1px solid #a0d4a0; }
+  .tarifa-desc-tag.off { background: #eee; color: #aaa; border: 1px solid #ddd; text-decoration: line-through; }
+  .tarifa-result { background: var(--dark); padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+  .tarifa-result-label { display: flex; flex-direction: column; gap: 3px; }
+  .tarifa-result-label span:first-child { font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--gold); }
+  .tarifa-result-label span:last-child { font-size: 9px; color: #6C6060; }
+  .tarifa-result-amounts { display: flex; gap: 18px; flex-wrap: wrap; align-items: flex-end; }
+  .tarifa-amount-block { display: flex; flex-direction: column; align-items: flex-end; gap: 1px; }
+  .tarifa-amount-type { font-size: 8.5px; letter-spacing: 1px; text-transform: uppercase; color: #6C6060; }
+  .tarifa-amount-value { font-family: 'Playfair Display', serif; font-size: 20px; color: #9a8060; line-height: 1; }
+  .tarifa-amount-value.highlight { font-size: 26px; color: var(--gold); }
+  .tarifa-amount-period { font-size: 8px; color: #504040; }
+  .tarifa-pending { background: white; padding: 14px 20px; text-align: center; font-size: 12px; color: var(--muted); font-style: italic; }
+  .tarifa-nota { background: #F2EEE7; border-top: 1px solid var(--border); padding: 8px 20px; font-size: 10px; color: var(--muted); line-height: 1.6; }
+  .tarifa-nota strong { color: var(--text); }
+  @media (max-width: 640px) {
+    .tarifa-panel { margin: 12px 0 4px; border-radius: 0; border-left: none; border-right: none; }
+    .tarifa-body { grid-template-columns: 1fr; }
+    .tarifa-result { flex-direction: column; align-items: flex-start; }
+  }
 </style>
 </head>
 <body>
@@ -270,7 +304,7 @@
     <div class="field-value">
       <div class="radio-group">
         <label class="radio-opt"><input type="radio" name="f_rep" value="Amenización musical"><span class="radio-btn"></span><span class="radio-label">Amenización musical</span></label>
-        <label class="radio-opt"><input type="radio" name="f_rep" value="Televisión"><span class="radio-btn"></span><span class="radio-label">Televisión</span></label>
+        <label class="radio-opt"><input type="radio" name="f_rep" value="Amenización musical y audiovisual"><span class="radio-btn"></span><span class="radio-label">Amenización musical y audiovisual</span></label>
       </div>
       <span class="inline-err" id="ierr-f_rep">Obligatorio — selecciona una opción</span>
     </div>
@@ -319,6 +353,65 @@
     <div class="field-value">
       <input type="text" id="f_iban" placeholder="ES00 0000 0000 0000 0000 0000">
     </div>
+  </div>
+
+  <!-- CALCULADORA TARIFA -->
+  <div id="tarifa-f" class="tarifa-panel inactive">
+    <div class="tarifa-header">
+      <span class="tarifa-header-icon">🧮</span>
+      <span class="tarifa-header-title">Estimación tarifa SGAE 2026 · Bares Especiales/Musicales</span>
+    </div>
+    <div id="tarifa-f-pending" class="tarifa-pending">Completa el uso del repertorio, m², días de apertura y forma de pago para ver la estimación</div>
+    <div id="tarifa-f-content" style="display:none">
+      <div class="tarifa-body">
+        <div class="tarifa-item">
+          <span class="tarifa-item-label">Uso del repertorio</span>
+          <span class="tarifa-item-value" id="tf-f-rep">—</span>
+        </div>
+        <div class="tarifa-item">
+          <span class="tarifa-item-label">Superficie</span>
+          <span class="tarifa-item-value" id="tf-f-m2">—</span>
+        </div>
+        <div class="tarifa-item">
+          <span class="tarifa-item-label">Días apertura</span>
+          <span class="tarifa-item-value" id="tf-f-dias">—</span>
+        </div>
+        <div class="tarifa-item">
+          <span class="tarifa-item-label">Tarifa base mensual</span>
+          <span class="tarifa-item-value" id="tf-f-base">—</span>
+        </div>
+      </div>
+      <div class="tarifa-descuentos">
+        <span class="tarifa-desc-label">Descuentos:</span>
+        <span class="tarifa-desc-tag off" id="tf-f-d-asoc">Asoc. Hostelería −5%</span>
+        <span class="tarifa-desc-tag off" id="tf-f-d-pago">Pago —</span>
+        <span class="tarifa-desc-tag off" id="tf-f-d-iban">Domiciliación −5%</span>
+      </div>
+      <div class="tarifa-result">
+        <div class="tarifa-result-label">
+          <span>Cuota estimada</span>
+          <span>Primer año · 2026 (sin IVA)</span>
+        </div>
+        <div class="tarifa-result-amounts">
+          <div class="tarifa-amount-block">
+            <span class="tarifa-amount-type">Mensual</span>
+            <span class="tarifa-amount-value highlight" id="tf-f-mensual">—</span>
+            <span class="tarifa-amount-period">€ / mes</span>
+          </div>
+          <div class="tarifa-amount-block">
+            <span class="tarifa-amount-type">Semestral</span>
+            <span class="tarifa-amount-value" id="tf-f-semestral">—</span>
+            <span class="tarifa-amount-period">€ / 6 meses</span>
+          </div>
+          <div class="tarifa-amount-block">
+            <span class="tarifa-amount-type">Anual</span>
+            <span class="tarifa-amount-value" id="tf-f-anual">—</span>
+            <span class="tarifa-amount-period">€ / año</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="tarifa-nota">⚠️ <strong>Estimación orientativa.</strong> Tarifa SGAE 2026 · 1er año de contrato para Bares Especiales/Musicales. El importe definitivo lo confirma SGAE. <strong>No incluye IVA (21%).</strong></div>
   </div>
   <div class="card-footer">
     <div class="footer-left">
@@ -386,7 +479,7 @@
     <div class="field-value">
       <div class="radio-group">
         <label class="radio-opt"><input type="radio" name="s_rep" value="Amenización musical"><span class="radio-btn"></span><span class="radio-label">Amenización musical</span></label>
-        <label class="radio-opt"><input type="radio" name="s_rep" value="Televisión"><span class="radio-btn"></span><span class="radio-label">Televisión</span></label>
+        <label class="radio-opt"><input type="radio" name="s_rep" value="Amenización musical y audiovisual"><span class="radio-btn"></span><span class="radio-label">Amenización musical y audiovisual</span></label>
       </div>
       <span class="inline-err" id="ierr-s_rep">Obligatorio — selecciona una opción</span>
     </div>
@@ -435,6 +528,65 @@
     <div class="field-value">
       <input type="text" id="s_iban" placeholder="ES00 0000 0000 0000 0000 0000">
     </div>
+  </div>
+
+  <!-- CALCULADORA TARIFA -->
+  <div id="tarifa-s" class="tarifa-panel inactive">
+    <div class="tarifa-header">
+      <span class="tarifa-header-icon">🧮</span>
+      <span class="tarifa-header-title">Estimación tarifa SGAE 2026 · Bares Especiales/Musicales</span>
+    </div>
+    <div id="tarifa-s-pending" class="tarifa-pending">Completa el uso del repertorio, m², días de apertura y forma de pago para ver la estimación</div>
+    <div id="tarifa-s-content" style="display:none">
+      <div class="tarifa-body">
+        <div class="tarifa-item">
+          <span class="tarifa-item-label">Uso del repertorio</span>
+          <span class="tarifa-item-value" id="tf-s-rep">—</span>
+        </div>
+        <div class="tarifa-item">
+          <span class="tarifa-item-label">Superficie</span>
+          <span class="tarifa-item-value" id="tf-s-m2">—</span>
+        </div>
+        <div class="tarifa-item">
+          <span class="tarifa-item-label">Días apertura</span>
+          <span class="tarifa-item-value" id="tf-s-dias">—</span>
+        </div>
+        <div class="tarifa-item">
+          <span class="tarifa-item-label">Tarifa base mensual</span>
+          <span class="tarifa-item-value" id="tf-s-base">—</span>
+        </div>
+      </div>
+      <div class="tarifa-descuentos">
+        <span class="tarifa-desc-label">Descuentos:</span>
+        <span class="tarifa-desc-tag off" id="tf-s-d-asoc">Asoc. Hostelería −5%</span>
+        <span class="tarifa-desc-tag off" id="tf-s-d-pago">Pago —</span>
+        <span class="tarifa-desc-tag off" id="tf-s-d-iban">Domiciliación −5%</span>
+      </div>
+      <div class="tarifa-result">
+        <div class="tarifa-result-label">
+          <span>Cuota estimada</span>
+          <span>Primer año · 2026 (sin IVA)</span>
+        </div>
+        <div class="tarifa-result-amounts">
+          <div class="tarifa-amount-block">
+            <span class="tarifa-amount-type">Mensual</span>
+            <span class="tarifa-amount-value highlight" id="tf-s-mensual">—</span>
+            <span class="tarifa-amount-period">€ / mes</span>
+          </div>
+          <div class="tarifa-amount-block">
+            <span class="tarifa-amount-type">Semestral</span>
+            <span class="tarifa-amount-value" id="tf-s-semestral">—</span>
+            <span class="tarifa-amount-period">€ / 6 meses</span>
+          </div>
+          <div class="tarifa-amount-block">
+            <span class="tarifa-amount-type">Anual</span>
+            <span class="tarifa-amount-value" id="tf-s-anual">—</span>
+            <span class="tarifa-amount-period">€ / año</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="tarifa-nota">⚠️ <strong>Estimación orientativa.</strong> Tarifa SGAE 2026 · 1er año de contrato para Bares Especiales/Musicales. El importe definitivo lo confirma SGAE. <strong>No incluye IVA (21%).</strong></div>
   </div>
   <div class="card-footer">
     <div class="footer-left">
@@ -513,7 +665,7 @@
     <div class="field-value">
       <div class="radio-group">
         <label class="radio-opt"><input type="radio" name="c_rep" value="Amenización musical"><span class="radio-btn"></span><span class="radio-label">Amenización musical</span></label>
-        <label class="radio-opt"><input type="radio" name="c_rep" value="Televisión"><span class="radio-btn"></span><span class="radio-label">Televisión</span></label>
+        <label class="radio-opt"><input type="radio" name="c_rep" value="Amenización musical y audiovisual"><span class="radio-btn"></span><span class="radio-label">Amenización musical y audiovisual</span></label>
       </div>
       <span class="inline-err" id="ierr-c_rep">Obligatorio — selecciona una opción</span>
     </div>
@@ -562,6 +714,65 @@
     <div class="field-value">
       <input type="text" id="c_iban" placeholder="ES00 0000 0000 0000 0000 0000">
     </div>
+  </div>
+
+  <!-- CALCULADORA TARIFA -->
+  <div id="tarifa-c" class="tarifa-panel inactive">
+    <div class="tarifa-header">
+      <span class="tarifa-header-icon">🧮</span>
+      <span class="tarifa-header-title">Estimación tarifa SGAE 2026 · Bares Especiales/Musicales</span>
+    </div>
+    <div id="tarifa-c-pending" class="tarifa-pending">Completa el uso del repertorio, m², días de apertura y forma de pago para ver la estimación</div>
+    <div id="tarifa-c-content" style="display:none">
+      <div class="tarifa-body">
+        <div class="tarifa-item">
+          <span class="tarifa-item-label">Uso del repertorio</span>
+          <span class="tarifa-item-value" id="tf-c-rep">—</span>
+        </div>
+        <div class="tarifa-item">
+          <span class="tarifa-item-label">Superficie</span>
+          <span class="tarifa-item-value" id="tf-c-m2">—</span>
+        </div>
+        <div class="tarifa-item">
+          <span class="tarifa-item-label">Días apertura</span>
+          <span class="tarifa-item-value" id="tf-c-dias">—</span>
+        </div>
+        <div class="tarifa-item">
+          <span class="tarifa-item-label">Tarifa base mensual</span>
+          <span class="tarifa-item-value" id="tf-c-base">—</span>
+        </div>
+      </div>
+      <div class="tarifa-descuentos">
+        <span class="tarifa-desc-label">Descuentos:</span>
+        <span class="tarifa-desc-tag off" id="tf-c-d-asoc">Asoc. Hostelería −5%</span>
+        <span class="tarifa-desc-tag off" id="tf-c-d-pago">Pago —</span>
+        <span class="tarifa-desc-tag off" id="tf-c-d-iban">Domiciliación −5%</span>
+      </div>
+      <div class="tarifa-result">
+        <div class="tarifa-result-label">
+          <span>Cuota estimada</span>
+          <span>Primer año · 2026 (sin IVA)</span>
+        </div>
+        <div class="tarifa-result-amounts">
+          <div class="tarifa-amount-block">
+            <span class="tarifa-amount-type">Mensual</span>
+            <span class="tarifa-amount-value highlight" id="tf-c-mensual">—</span>
+            <span class="tarifa-amount-period">€ / mes</span>
+          </div>
+          <div class="tarifa-amount-block">
+            <span class="tarifa-amount-type">Semestral</span>
+            <span class="tarifa-amount-value" id="tf-c-semestral">—</span>
+            <span class="tarifa-amount-period">€ / 6 meses</span>
+          </div>
+          <div class="tarifa-amount-block">
+            <span class="tarifa-amount-type">Anual</span>
+            <span class="tarifa-amount-value" id="tf-c-anual">—</span>
+            <span class="tarifa-amount-period">€ / año</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="tarifa-nota">⚠️ <strong>Estimación orientativa.</strong> Tarifa SGAE 2026 · 1er año de contrato para Bares Especiales/Musicales. El importe definitivo lo confirma SGAE. <strong>No incluye IVA (21%).</strong></div>
   </div>
   <div class="card-footer">
     <div class="footer-left">
@@ -780,6 +991,142 @@
       showToast('Error al enviar. Comprueba la conexión e inténtalo de nuevo.', 'terror');
     });
   }
+
+  // ===== CALCULADORA DE TARIFA SGAE 2025 =====
+  // Tarifa aplicada: SIEMPRE 1er año de contrato (tarifa promediada mensual)
+  // Fuente: SGAE 2026 - Bares Musicales / Bares Especiales (M0400466 / M1300466)
+  // Tabla A = apertura > 3 días/semana | Tabla B = apertura hasta 3 días/semana
+  //
+  //   Tramos:  hasta 60m² | de 61 a 100m² | +29,37€ (ó variante) por cada 50m² o fracción > 100m²
+  //
+  // Tarifas SGAE 2026 · Bares Especiales/Musicales · 1er año de contrato
+  // Fuente: tabla facilitada por el gestor
+  // M0400466 = solo musical | M1300466 = musical + audiovisual | M0520366 = solo audiovisual
+  // Tabla A = apertura > 3 días/semana | Tabla B = apertura hasta 3 días/semana
+  var TARIFAS_2026 = {
+    'musical': {                  // M0400466
+      'mas3dias':   { t60: 115.05, t100: 128.94, extra50: 30.22 },
+      'hasta3dias': { t60:  95.64, t100: 106.05, extra50: 22.65 }
+    },
+    'musical_audiovisual': {      // M1300466
+      'mas3dias':   { t60: 129.03, t100: 142.73, extra50: 39.40 },
+      'hasta3dias': { t60: 102.26, t100: 112.69, extra50: 29.91 }
+    },
+    'audiovisual': {              // M0520366
+      'mas3dias':   { t60: 29.59, t100: 32.17, extra50: 7.46 },
+      'hasta3dias': { t60: 25.28, t100: 27.33, extra50: 5.86 }
+    }
+  };
+
+  function parsearM2(str) {
+    var n = parseFloat(String(str).replace(',', '.').replace(/[^0-9.]/g, ''));
+    return isNaN(n) || n <= 0 ? null : n;
+  }
+
+  function tarifaBase(m2, repKey, diasKey) {
+    var t = TARIFAS_2026[repKey][diasKey];
+    if (m2 <= 60)  return t.t60;
+    if (m2 <= 100) return t.t100;
+    // > 100m²: tramo 61-100 + extra por cada 50m² o fracción sobre los 100m²
+    return t.t100 + Math.ceil((m2 - 100) / 50) * t.extra50;
+  }
+
+  function fmt(n) { return n.toFixed(2).replace('.', ',') + ' €'; }
+
+  function calcularTarifa(prefix) {
+    var repVal  = getRadio(prefix + '_rep');
+    var m2El    = document.getElementById(prefix + '_m2');
+    var diasVal = getRadio(prefix + '_dias');
+    var asocVal = getRadio(prefix + '_asoc');
+    var pagoVal = getRadio(prefix + '_pago');
+    var ibanEl  = document.getElementById(prefix + '_iban');
+
+    var panel      = document.getElementById('tarifa-' + prefix);
+    var pending    = document.getElementById('tarifa-' + prefix + '-pending');
+    var contentDiv = document.getElementById('tarifa-' + prefix + '-content');
+    if (!panel) return;
+
+    var m2     = m2El   ? parsearM2(m2El.value)        : null;
+    var ibanOk = ibanEl ? ibanEl.value.trim().length > 10 : false;
+
+    var repKey  = repVal  === 'Amenización musical'              ? 'musical'
+                : repVal  === 'Amenización musical y audiovisual' ? 'musical_audiovisual' : null;
+    var diasKey = diasVal === 'Superior a 3 días'   ? 'mas3dias'
+                : diasVal === 'Hasta 3 días'         ? 'hasta3dias' : null;
+
+    if (!repKey || !m2 || !diasKey) {
+      panel.classList.add('inactive');
+      pending.style.display = '';
+      contentDiv.style.display = 'none';
+      return;
+    }
+
+    panel.classList.remove('inactive');
+    pending.style.display = 'none';
+    contentDiv.style.display = 'block';
+
+    var base = tarifaBase(m2, repKey, diasKey);
+
+    // Descuentos (acumulables; tope implícito de cada uno)
+    var dAsoc = asocVal === 'Sí'         ? 0.05  : 0;
+    var dPago = pagoVal === 'Anual'      ? 0.05
+              : pagoVal === 'Semestral'  ? 0.025 : 0;
+    var dIban = ibanOk                   ? 0.05  : 0;
+    var totalDesc = dAsoc + dPago + dIban;
+
+    var mensual   = base * (1 - totalDesc);
+    var semestral = mensual * 6;
+    var anual     = mensual * 12;
+
+    // — Actualizar etiquetas informativas —
+    var p = 'tf-' + prefix + '-';
+    document.getElementById(p + 'rep').textContent  = repVal;
+    document.getElementById(p + 'm2').textContent   = m2 + ' m²';
+    document.getElementById(p + 'dias').textContent = diasVal;
+    document.getElementById(p + 'base').textContent = fmt(base);
+
+    // — Descuentos: encender/apagar —
+    var da = document.getElementById(p + 'd-asoc');
+    da.className = 'tarifa-desc-tag ' + (dAsoc > 0 ? 'on' : 'off');
+
+    var dp = document.getElementById(p + 'd-pago');
+    if (!pagoVal) {
+      dp.textContent = 'Pago —';
+      dp.className   = 'tarifa-desc-tag off';
+    } else if (pagoVal === 'Mensual') {
+      dp.textContent = 'Pago mensual';
+      dp.className   = 'tarifa-desc-tag off';
+    } else if (pagoVal === 'Semestral') {
+      dp.textContent = 'Pago semestral −2,5%';
+      dp.className   = 'tarifa-desc-tag ' + (dPago > 0 ? 'on' : 'off');
+    } else {
+      dp.textContent = 'Pago anual −5%';
+      dp.className   = 'tarifa-desc-tag ' + (dPago > 0 ? 'on' : 'off');
+    }
+
+    var di = document.getElementById(p + 'd-iban');
+    di.className = 'tarifa-desc-tag ' + (dIban > 0 ? 'on' : 'off');
+
+    // — Importes finales —
+    document.getElementById(p + 'mensual').textContent   = fmt(mensual);
+    document.getElementById(p + 'semestral').textContent = fmt(semestral);
+    document.getElementById(p + 'anual').textContent     = fmt(anual);
+  }
+
+  // — Event listeners para los tres formularios —
+  ['f', 's', 'c'].forEach(function(prefix) {
+    ['_m2', '_iban'].forEach(function(campo) {
+      var el = document.getElementById(prefix + campo);
+      if (el) el.addEventListener('input', function() { calcularTarifa(prefix); });
+    });
+    ['rep', 'dias', 'asoc', 'pago'].forEach(function(nombre) {
+      document.querySelectorAll('input[name="' + prefix + '_' + nombre + '"]').forEach(function(r) {
+        r.addEventListener('change', function() { calcularTarifa(prefix); });
+      });
+    });
+  });
+  // ===== FIN CALCULADORA =====
+
 </script>
 </body>
 </html>
