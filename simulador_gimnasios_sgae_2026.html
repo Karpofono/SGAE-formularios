@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simulador de Tarifas SGAE 2026 — Gimnasios</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    background: #f5f4f0;
+    color: #1a1a1a;
+    min-height: 100vh;
+    padding: 2rem 1rem;
+  }
+  .container { max-width: 640px; margin: 0 auto; }
+  .header { margin-bottom: 2rem; }
+  .header h1 { font-size: 22px; font-weight: 600; color: #1a1a1a; }
+  .header p { font-size: 13px; color: #666; margin-top: 5px; }
+  .sgae-badge {
+    display: inline-block; font-size: 11px; font-weight: 600;
+    letter-spacing: 0.06em; background: #1a1a8c; color: #fff;
+    padding: 3px 9px; border-radius: 4px; margin-bottom: 10px;
+  }
+  .section-label {
+    font-size: 11px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.08em; color: #999; margin-bottom: 8px; margin-top: 1.5rem;
+  }
+  .card {
+    background: #fff; border: 1px solid #e5e5e5;
+    border-radius: 12px; padding: 1rem 1.25rem; margin-bottom: 10px;
+  }
+  .card-title {
+    font-size: 13px; font-weight: 600; color: #1a1a8c;
+    margin-bottom: 10px; padding-bottom: 8px;
+    border-bottom: 1px solid #e8e8f4;
+  }
+  .radio-group, .check-group { display: flex; flex-direction: column; gap: 7px; }
+  .radio-option, .check-option {
+    display: flex; align-items: center; gap: 10px; cursor: pointer;
+    padding: 9px 11px; border-radius: 8px; border: 1px solid #e5e5e5;
+    transition: background 0.12s;
+  }
+  .radio-option:hover, .check-option:hover { background: #f8f8f6; }
+  .radio-option input[type=radio], .check-option input[type=checkbox] {
+    accent-color: #1a1a8c; width: 16px; height: 16px; flex-shrink: 0;
+  }
+  .radio-option span, .check-option span { font-size: 14px; color: #1a1a1a; flex: 1; }
+  .radio-option small, .check-option small { font-size: 12px; color: #888; white-space: nowrap; }
+  .disabled-zone { opacity: 0.4; pointer-events: none; }
+  .toggle-enable {
+    display: flex; align-items: center; gap: 10px; margin-bottom: 12px;
+  }
+  .toggle-enable label { font-size: 14px; color: #1a1a1a; cursor: pointer; display: flex; align-items: center; gap: 8px; }
+  .toggle-enable input[type=checkbox] { accent-color: #1a1a8c; width: 16px; height: 16px; }
+  .surface-wrap { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+  .surface-wrap input[type=number] {
+    flex: 1; height: 40px; font-size: 15px;
+    border: 1px solid #d0d0d0; border-radius: 8px;
+    padding: 0 12px; background: #fff; color: #1a1a1a; outline: none;
+  }
+  .surface-wrap input[type=number]:focus { border-color: #1a1a8c; }
+  .surface-wrap .unit { font-size: 14px; color: #888; min-width: 24px; }
+  .salas-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 8px; }
+  .sala-row { display: flex; align-items: center; gap: 8px; }
+  .sala-row input[type=number] {
+    flex: 1; height: 38px; font-size: 14px;
+    border: 1px solid #d0d0d0; border-radius: 8px;
+    padding: 0 12px; background: #fff; color: #1a1a1a; outline: none;
+  }
+  .sala-row input[type=number]:focus { border-color: #1a1a8c; }
+  .sala-row .unit { font-size: 13px; color: #888; min-width: 24px; }
+  .btn-remove {
+    background: none; border: 1px solid #e0c0c0; border-radius: 6px;
+    color: #c44; font-size: 16px; width: 32px; height: 32px;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .btn-remove:hover { background: #fff0f0; }
+  .btn-add {
+    background: none; border: 1px dashed #b0b0d8; border-radius: 8px;
+    color: #1a1a8c; font-size: 13px; padding: 7px 14px; cursor: pointer;
+    width: 100%; margin-top: 4px;
+  }
+  .btn-add:hover { background: #f0f0fa; }
+  .tramo-note { font-size: 12px; color: #888; margin-top: 4px; }
+  .total-sup { font-size: 13px; color: #1a1a8c; font-weight: 600; margin-top: 6px; }
+  .toggle-year { display: flex; gap: 8px; }
+  .year-btn {
+    flex: 1; padding: 9px; border: 1px solid #d0d0d0; border-radius: 8px;
+    background: #fff; font-size: 13px; cursor: pointer; color: #666; transition: all 0.15s;
+  }
+  .year-btn.active { background: #1a1a8c; color: #fff; border-color: #1a1a8c; }
+  .result-card {
+    border-radius: 12px; border: 2px solid #1a1a8c;
+    padding: 1.25rem 1.5rem; background: #f0f0fa; margin-top: 1.75rem;
+  }
+  .result-section-title {
+    font-size: 12px; font-weight: 600; color: #1a1a8c;
+    text-transform: uppercase; letter-spacing: 0.06em;
+    margin: 10px 0 4px;
+  }
+  .result-row {
+    display: flex; justify-content: space-between; align-items: baseline;
+    padding: 5px 0; border-bottom: 1px solid #ddddf0; font-size: 13px;
+  }
+  .result-row:last-of-type { border-bottom: none; }
+  .result-row .label { color: #555; }
+  .result-row .value { font-weight: 500; color: #1a1a1a; }
+  .result-row.discount .value { color: #0a6e40; }
+  .result-row.subtotal .value { color: #1a1a8c; font-weight: 600; }
+  .result-divider { border: none; border-top: 1px dashed #c0c0e0; margin: 8px 0; }
+  .result-total {
+    display: flex; justify-content: space-between; align-items: flex-end;
+    padding-top: 12px; margin-top: 10px; border-top: 1.5px solid #c0c0e0;
+  }
+  .result-total .period-lbl { font-size: 14px; color: #555; }
+  .result-total .amount { font-size: 28px; font-weight: 700; color: #1a1a8c; }
+  .result-mensual { font-size: 12px; color: #888; margin-top: 2px; text-align: right; }
+  .footer-note {
+    font-size: 13px; color: #1a1a1a; margin-top: 1.5rem; margin-bottom: 1rem;
+    text-align: center; line-height: 1.9; background: #e8e8f4;
+    border: 1px solid #b0b0d8; border-radius: 8px; padding: 14px 18px;
+  }
+  @media (max-width: 480px) {
+    body { padding: 1.25rem 0.75rem; }
+    .result-total .amount { font-size: 24px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div class="sgae-badge">SGAE · Tarifas 2026</div>
+    <h1>Simulador de tarifas</h1>
+    <p>Gimnasios e instalaciones deportivas</p>
+  </div>
+
+  <!-- USO SECUNDARIO -->
+  <div class="section-label">Zona de máquinas — Uso secundario</div>
+  <div class="card">
+    <div class="toggle-enable">
+      <label>
+        <input type="checkbox" id="activa-secundario" checked onchange="toggleZona('secundario')">
+        El gimnasio tiene zona de máquinas / musculación
+      </label>
+    </div>
+    <div id="zona-secundario">
+      <div class="card-title">Tipo de uso en zona de máquinas</div>
+      <div class="radio-group" style="margin-bottom:12px;">
+        <label class="radio-option">
+          <input type="radio" name="uso-sec" value="musica" checked>
+          <span>Utilización del repertorio mediante amenización musical</span>
+        </label>
+        <label class="radio-option">
+          <input type="radio" name="uso-sec" value="tv">
+          <span>Utilización del repertorio mediante aparato de televisión y amenización musical</span>
+        </label>
+      </div>
+      <div class="card-title" style="margin-top:10px;">Superficie zona de máquinas</div>
+      <div class="surface-wrap">
+        <input type="number" id="sup-sec" min="1" max="2000" value="200" placeholder="m²">
+        <span class="unit">m²</span>
+      </div>
+      <p class="tramo-note" id="tramo-sec">Tramo aplicado: de 151 a 200 m²</p>
+    </div>
+  </div>
+
+  <!-- USO SIGNIFICATIVO -->
+  <div class="section-label">Salas de clases dirigidas — Uso significativo</div>
+  <div class="card">
+    <div class="toggle-enable">
+      <label>
+        <input type="checkbox" id="activa-significativo" checked onchange="toggleZona('significativo')">
+        El gimnasio tiene salas de clases dirigidas
+      </label>
+    </div>
+    <div id="zona-significativo">
+      <div class="card-title">Superficie de cada sala de clases dirigidas</div>
+      <div class="salas-list" id="salas-list">
+        <div class="sala-row">
+          <input type="number" class="sala-input" min="1" max="9999" value="80" placeholder="m²">
+          <span class="unit">m²</span>
+        </div>
+      </div>
+      <button class="btn-add" onclick="addSala()">+ Añadir otra sala</button>
+      <p class="total-sup" id="total-sig-sup">Total: 80 m²</p>
+      <p class="tramo-note" id="tramo-sig">Tramo aplicado: hasta 100 m²</p>
+    </div>
+  </div>
+
+  <!-- AÑO DE CONTRATO -->
+  <div class="section-label">Año de contrato</div>
+  <div class="card">
+    <div class="toggle-year">
+      <button class="year-btn active" id="btn-y1" onclick="setYear(1)">1º año</button>
+      <button class="year-btn" id="btn-y2" onclick="setYear(2)">2º año en adelante</button>
+    </div>
+  </div>
+
+  <!-- DESCUENTOS -->
+  <div class="section-label">Descuentos aplicables</div>
+  <div class="card">
+    <div class="check-group">
+      <label class="check-option">
+        <input type="checkbox" id="desc-fneid">
+        <span>Si pertenece a la FNEID (Federación Nacional de Empresarios de Instalaciones Deportivas)</span>
+        <small>−5%</small>
+      </label>
+      <label class="check-option">
+        <input type="checkbox" id="desc-dom">
+        <span>Si los pagos se hacen por domiciliación bancaria</span>
+        <small>−5%</small>
+      </label>
+    </div>
+  </div>
+
+  <!-- PERIODICIDAD -->
+  <div class="section-label">Periodicidad de pago</div>
+  <div class="card">
+    <div class="radio-group">
+      <label class="radio-option">
+        <input type="radio" name="periodo" value="trimestral" checked>
+        <span>Trimestral (opción habitual)</span>
+        <small>sin descuento adicional</small>
+      </label>
+      <label class="radio-option">
+        <input type="radio" name="periodo" value="semestral">
+        <span>Semestral</span>
+        <small>−2,5%</small>
+      </label>
+      <label class="radio-option">
+        <input type="radio" name="periodo" value="anual">
+        <span>Anual</span>
+        <small>−5%</small>
+      </label>
+    </div>
+  </div>
+
+  <!-- RESULTADO -->
+  <div class="result-card">
+    <div id="result-rows"></div>
+    <div class="result-total">
+      <div><div class="period-lbl" id="periodo-label-txt">Importe trimestral</div></div>
+      <div style="text-align:right">
+        <div class="amount" id="total-display">—</div>
+        <div class="result-mensual" id="mensual-equiv"></div>
+      </div>
+    </div>
+  </div>
+
+  <p class="footer-note">
+    <strong>Tarifas vigentes 2026 · Solo para uso comercial interno SGAE<br>
+    Los importes indicados no incluyen el 21% de IVA vigente.<br>
+    Las tarifas se actualizan cada enero conforme al Índice de Precios al Consumo (IPC).</strong>
+  </p>
+</div>
+
+<script>
+  // ── TABLAS DE TARIFAS ─────────────────────────────────────────────────────
+
+  const SEC_MUSICA = [
+    {max:50,   y1:10.28,  y2:7.88},  {max:100,  y1:18.17,  y2:15.77},
+    {max:150,  y1:26.04,  y2:23.64}, {max:200,  y1:33.91,  y2:31.51},
+    {max:250,  y1:41.81,  y2:39.41}, {max:300,  y1:49.68,  y2:47.28},
+    {max:350,  y1:52.33,  y2:49.93}, {max:400,  y1:54.95,  y2:52.55},
+    {max:450,  y1:57.56,  y2:55.16}, {max:500,  y1:60.16,  y2:57.76},
+    {max:550,  y1:62.76,  y2:60.36}, {max:600,  y1:65.33,  y2:62.93},
+    {max:650,  y1:66.22,  y2:63.82}, {max:700,  y1:67.12,  y2:64.72},
+    {max:750,  y1:67.99,  y2:65.59}, {max:800,  y1:68.87,  y2:66.47},
+    {max:850,  y1:69.73,  y2:67.33}, {max:900,  y1:70.59,  y2:68.19},
+    {max:950,  y1:71.44,  y2:69.04}, {max:1000, y1:72.27,  y2:69.87},
+    {max:1050, y1:73.00,  y2:70.60}, {max:1100, y1:73.72,  y2:71.32},
+    {max:1150, y1:74.43,  y2:72.03}, {max:1200, y1:75.12,  y2:72.72},
+    {max:1250, y1:75.81,  y2:73.41}, {max:1300, y1:76.50,  y2:74.10},
+    {max:1350, y1:77.17,  y2:74.77}, {max:1400, y1:77.81,  y2:75.41},
+    {max:1450, y1:78.48,  y2:76.08}, {max:1500, y1:79.11,  y2:76.71},
+    {max:1550, y1:79.66,  y2:77.26}, {max:1600, y1:80.21,  y2:77.81},
+    {max:1650, y1:80.77,  y2:78.37}, {max:1700, y1:81.29,  y2:78.89},
+    {max:1750, y1:81.81,  y2:79.41}, {max:1800, y1:82.31,  y2:79.91},
+    {max:1850, y1:82.82,  y2:80.42}, {max:1900, y1:83.30,  y2:80.90},
+    {max:1950, y1:83.78,  y2:81.38}, {max:2000, y1:84.26,  y2:81.86},
+  ];
+
+  const SEC_TV = [
+    {max:50,   y1:14.00,  y2:10.57}, {max:100,  y1:24.59,  y2:21.16},
+    {max:150,  y1:35.15,  y2:31.72}, {max:200,  y1:45.72,  y2:42.29},
+    {max:250,  y1:56.32,  y2:52.89}, {max:300,  y1:66.88,  y2:63.45},
+    {max:350,  y1:70.41,  y2:66.98}, {max:400,  y1:73.93,  y2:70.50},
+    {max:450,  y1:77.46,  y2:74.03}, {max:500,  y1:80.92,  y2:77.49},
+    {max:550,  y1:84.40,  y2:80.97}, {max:600,  y1:87.86,  y2:84.43},
+    {max:650,  y1:89.08,  y2:85.65}, {max:700,  y1:90.26,  y2:86.83},
+    {max:750,  y1:91.45,  y2:88.02}, {max:800,  y1:92.63,  y2:89.20},
+    {max:850,  y1:93.79,  y2:90.36}, {max:900,  y1:94.94,  y2:91.51},
+    {max:950,  y1:96.07,  y2:92.64}, {max:1000, y1:97.20,  y2:93.77},
+    {max:1050, y1:98.19,  y2:94.76}, {max:1100, y1:99.13,  y2:95.70},
+    {max:1150, y1:100.09, y2:96.66}, {max:1200, y1:101.02, y2:97.59},
+    {max:1250, y1:101.95, y2:98.52}, {max:1300, y1:102.85, y2:99.42},
+    {max:1350, y1:103.75, y2:100.32},{max:1400, y1:104.64, y2:101.21},
+    {max:1450, y1:105.49, y2:102.06},{max:1500, y1:106.38, y2:102.95},
+    {max:1550, y1:107.12, y2:103.69},{max:1600, y1:107.85, y2:104.42},
+    {max:1650, y1:108.58, y2:105.15},{max:1700, y1:109.28, y2:105.85},
+    {max:1750, y1:109.98, y2:106.55},{max:1800, y1:110.67, y2:107.24},
+    {max:1850, y1:111.34, y2:107.91},{max:1900, y1:111.99, y2:108.56},
+    {max:1950, y1:112.63, y2:109.20},{max:2000, y1:113.25, y2:109.82},
+  ];
+
+  const SIG = [
+    {max:100,  y1:36.88,   y2:30.74},  {max:125,  y1:53.56,   y2:47.42},
+    {max:150,  y1:73.22,   y2:67.08},  {max:175,  y1:95.69,   y2:89.55},
+    {max:200,  y1:121.01,  y2:114.87}, {max:225,  y1:149.20,  y2:143.06},
+    {max:250,  y1:180.22,  y2:174.08}, {max:275,  y1:214.17,  y2:208.03},
+    {max:300,  y1:250.95,  y2:244.81}, {max:325,  y1:266.99,  y2:260.85},
+    {max:350,  y1:283.08,  y2:276.94}, {max:375,  y1:299.27,  y2:293.13},
+    {max:400,  y1:315.56,  y2:309.42}, {max:425,  y1:331.87,  y2:325.73},
+    {max:450,  y1:348.31,  y2:342.17}, {max:475,  y1:364.83,  y2:358.69},
+    {max:500,  y1:381.44,  y2:375.30}, {max:550,  y1:413.16,  y2:407.02},
+    {max:600,  y1:444.86,  y2:438.72}, {max:650,  y1:476.59,  y2:470.45},
+    {max:700,  y1:508.37,  y2:502.23}, {max:750,  y1:540.15,  y2:534.01},
+    {max:800,  y1:571.87,  y2:565.73}, {max:850,  y1:603.70,  y2:597.56},
+    {max:900,  y1:635.45,  y2:629.31}, {max:950,  y1:667.21,  y2:661.07},
+    {max:1000, y1:701.57,  y2:695.43}, {max:1100, y1:765.59,  y2:759.45},
+    {max:1200, y1:829.69,  y2:823.55}, {max:1300, y1:893.76,  y2:887.62},
+    {max:1400, y1:957.90,  y2:951.76}, {max:1500, y1:1022.07, y2:1015.93},
+    {max:1600, y1:1086.26, y2:1080.12},{max:1700, y1:1150.42, y2:1144.28},
+    {max:1800, y1:1214.58, y2:1208.44},{max:1900, y1:1278.77, y2:1272.63},
+    {max:2000, y1:1347.88, y2:1341.74},
+  ];
+  const SIG_EXCESO = { y1: 75.26, y2: 69.12, por: 100 };
+
+  // ── ESTADO ────────────────────────────────────────────────────────────────
+  let anyo = 1;
+
+  function setYear(y) {
+    anyo = y;
+    document.getElementById('btn-y1').classList.toggle('active', y === 1);
+    document.getElementById('btn-y2').classList.toggle('active', y === 2);
+    calcular();
+  }
+
+  function toggleZona(zona) {
+    const cb = document.getElementById('activa-' + zona);
+    const div = document.getElementById('zona-' + zona);
+    div.classList.toggle('disabled-zone', !cb.checked);
+    calcular();
+  }
+
+  // ── SALAS SIGNIFICATIVO ───────────────────────────────────────────────────
+  function addSala() {
+    const list = document.getElementById('salas-list');
+    const row = document.createElement('div');
+    row.className = 'sala-row';
+    row.innerHTML = `
+      <input type="number" class="sala-input" min="1" max="9999" value="" placeholder="m²">
+      <span class="unit">m²</span>
+      <button class="btn-remove" onclick="removeSala(this)" title="Eliminar sala">×</button>
+    `;
+    list.appendChild(row);
+    row.querySelector('input').addEventListener('input', calcular);
+    calcular();
+  }
+
+  function removeSala(btn) {
+    btn.closest('.sala-row').remove();
+    calcular();
+  }
+
+  function getTotalSalas() {
+    return Array.from(document.querySelectorAll('.sala-input'))
+      .reduce((sum, inp) => sum + (parseInt(inp.value) || 0), 0);
+  }
+
+  // ── LOOKUP TARIFAS ────────────────────────────────────────────────────────
+  function lookupTramo(tabla, sup, key) {
+    for (const t of tabla) {
+      if (sup <= t.max) return { tarifa: t[key], label: sup <= tabla[0].max ? `hasta ${tabla[0].max} m²` : `hasta ${t.max} m²` };
+    }
+    return null;
+  }
+
+  function getSecundario(uso, sup, year) {
+    const key = year === 1 ? 'y1' : 'y2';
+    const tabla = uso === 'tv' ? SEC_TV : SEC_MUSICA;
+    if (sup > 2000) {
+      const last = tabla[tabla.length - 1];
+      return { tarifa: last[key], label: 'más de 2.000 m² (máximo tabla)' };
+    }
+    const found = lookupTramo(tabla, sup, key);
+    const prev = tabla.find(t => t.max >= sup);
+    const idx = tabla.indexOf(prev);
+    const label = idx === 0 ? `hasta ${prev.max} m²` : `de ${tabla[idx-1].max + 1} a ${prev.max} m²`;
+    return { tarifa: found.tarifa, label };
+  }
+
+  function getSignificativo(sup, year) {
+    const key = year === 1 ? 'y1' : 'y2';
+    if (sup > 2000) {
+      const base = SIG[SIG.length - 1][key];
+      const fracciones = Math.ceil((sup - 2000) / SIG_EXCESO.por);
+      return {
+        tarifa: base + fracciones * SIG_EXCESO[key],
+        label: `más de 2.000 m² (+${fracciones} fracc. de 100 m²)`
+      };
+    }
+    const found = SIG.find(t => sup <= t.max);
+    const idx = SIG.indexOf(found);
+    const label = idx === 0 ? `hasta ${found.max} m²` : `de ${SIG[idx-1].max + 1} a ${found.max} m²`;
+    return { tarifa: found[key], label };
+  }
+
+  // ── FORMATO ───────────────────────────────────────────────────────────────
+  function fmt(n) { return n.toFixed(2).replace('.', ',') + ' €'; }
+
+  // ── CÁLCULO PRINCIPAL ─────────────────────────────────────────────────────
+  function calcular() {
+    const activaSec = document.getElementById('activa-secundario').checked;
+    const activaSig = document.getElementById('activa-significativo').checked;
+
+    const usoSec = document.querySelector('input[name=uso-sec]:checked').value;
+    const supSec = parseInt(document.getElementById('sup-sec').value) || 0;
+
+    const totalSig = getTotalSalas();
+    const numSalas = document.querySelectorAll('.sala-input').length;
+
+    const descFneid = document.getElementById('desc-fneid').checked;
+    const descDom = document.getElementById('desc-dom').checked;
+    const periodo = document.querySelector('input[name=periodo]:checked').value;
+
+    // Actualizar info tramos
+    if (activaSec && supSec > 0) {
+      const r = getSecundario(usoSec, supSec, anyo);
+      document.getElementById('tramo-sec').textContent = 'Tramo aplicado: ' + r.label;
+    }
+    if (activaSig && totalSig > 0) {
+      const r = getSignificativo(totalSig, anyo);
+      document.getElementById('tramo-sig').textContent = 'Tramo aplicado: ' + r.label;
+      document.getElementById('total-sig-sup').textContent =
+        numSalas > 1 ? `Total salas: ${totalSig} m²` : `Total: ${totalSig} m²`;
+    } else if (activaSig) {
+      document.getElementById('total-sig-sup').textContent = 'Total: 0 m²';
+      document.getElementById('tramo-sig').textContent = '';
+    }
+
+    // Tarifas base mensuales
+    let tarifaSecMensual = 0, labelSec = '', tramoPrint = '';
+    if (activaSec && supSec > 0) {
+      const r = getSecundario(usoSec, supSec, anyo);
+      tarifaSecMensual = r.tarifa;
+      labelSec = r.label;
+    }
+
+    let tarifaSigMensual = 0, labelSig = '';
+    if (activaSig && totalSig > 0) {
+      const r = getSignificativo(totalSig, anyo);
+      tarifaSigMensual = r.tarifa;
+      labelSig = r.label;
+    }
+
+    const tarifaTotalMensual = tarifaSecMensual + tarifaSigMensual;
+
+    if (tarifaTotalMensual === 0) {
+      document.getElementById('result-rows').innerHTML = '<p style="font-size:13px;color:#888;padding:4px 0;">Activa al menos una zona e introduce la superficie.</p>';
+      document.getElementById('total-display').textContent = '—';
+      document.getElementById('mensual-equiv').textContent = '';
+      return;
+    }
+
+    // Meses según período
+    let meses = 3, periodoLabel = 'Importe trimestral';
+    let descPeriodo = 0;
+    if (periodo === 'semestral') { meses = 6; periodoLabel = 'Importe semestral'; descPeriodo = 0.025; }
+    if (periodo === 'anual')     { meses = 12; periodoLabel = 'Importe anual';     descPeriodo = 0.05; }
+
+    const brutoPeriodo = tarifaTotalMensual * meses;
+    const descFneidImp  = descFneid ? brutoPeriodo * 0.05 : 0;
+    const descDomImp    = descDom   ? brutoPeriodo * 0.05 : 0;
+    const descPerImp    = brutoPeriodo * descPeriodo;
+    const total         = brutoPeriodo - descFneidImp - descDomImp - descPerImp;
+    const mensualFinal  = total / meses;
+
+    let rows = '';
+
+    if (activaSec && tarifaSecMensual > 0) {
+      rows += `<div class="result-section-title">Zona de máquinas (uso secundario)</div>`;
+      rows += `<div class="result-row"><span class="label">Tramo: ${labelSec}</span><span class="value">${fmt(tarifaSecMensual)}/mes</span></div>`;
+    }
+    if (activaSig && tarifaSigMensual > 0) {
+      rows += `<div class="result-section-title">Salas de clases dirigidas (uso significativo)</div>`;
+      if (numSalas > 1) rows += `<div class="result-row"><span class="label">Superficie total (${numSalas} salas: ${totalSig} m²)</span><span class="value"></span></div>`;
+      rows += `<div class="result-row"><span class="label">Tramo: ${labelSig}</span><span class="value">${fmt(tarifaSigMensual)}/mes</span></div>`;
+    }
+
+    if (activaSec && activaSig && tarifaSecMensual > 0 && tarifaSigMensual > 0) {
+      rows += `<hr class="result-divider">`;
+      rows += `<div class="result-row"><span class="label">Tarifa base mensual combinada</span><span class="value">${fmt(tarifaTotalMensual)}/mes</span></div>`;
+    }
+
+    rows += `<hr class="result-divider">`;
+    rows += `<div class="result-row"><span class="label">Subtotal (${meses} meses)</span><span class="value">${fmt(brutoPeriodo)}</span></div>`;
+
+    if (descFneid) rows += `<div class="result-row discount"><span class="label">Dto. FNEID (−5%)</span><span class="value">−${fmt(descFneidImp)}</span></div>`;
+    if (descDom)   rows += `<div class="result-row discount"><span class="label">Dto. domiciliación bancaria (−5%)</span><span class="value">−${fmt(descDomImp)}</span></div>`;
+    if (descPeriodo > 0) {
+      const lbl = periodo === 'semestral' ? 'Dto. pago semestral (−2,5%)' : 'Dto. pago anual (−5%)';
+      rows += `<div class="result-row discount"><span class="label">${lbl}</span><span class="value">−${fmt(descPerImp)}</span></div>`;
+    }
+
+    document.getElementById('result-rows').innerHTML = rows;
+    document.getElementById('total-display').textContent = fmt(total);
+    document.getElementById('periodo-label-txt').textContent = periodoLabel;
+    document.getElementById('mensual-equiv').textContent = fmt(mensualFinal) + '/mes';
+  }
+
+  // ── LISTENERS ─────────────────────────────────────────────────────────────
+  document.getElementById('sup-sec').addEventListener('input', calcular);
+  document.querySelectorAll('input[name=uso-sec]').forEach(r => r.addEventListener('change', calcular));
+  document.querySelectorAll('input[name=periodo]').forEach(r => r.addEventListener('change', calcular));
+  document.getElementById('desc-fneid').addEventListener('change', calcular);
+  document.getElementById('desc-dom').addEventListener('change', calcular);
+  document.querySelectorAll('.sala-input').forEach(i => i.addEventListener('input', calcular));
+
+  calcular();
+</script>
+</body>
+</html>
