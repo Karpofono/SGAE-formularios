@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simulador de Tarifas SGAE 2026 — Hostelería</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    background: #f5f4f0;
+    color: #1a1a1a;
+    min-height: 100vh;
+    padding: 2rem 1rem;
+  }
+  .container { max-width: 620px; margin: 0 auto; }
+  .header { margin-bottom: 2rem; }
+  .header h1 { font-size: 22px; font-weight: 600; color: #1a1a1a; }
+  .header p { font-size: 13px; color: #666; margin-top: 5px; }
+  .sgae-badge {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    background: #1a1a8c;
+    color: #fff;
+    padding: 3px 9px;
+    border-radius: 4px;
+    margin-bottom: 10px;
+  }
+  .section-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #999;
+    margin-bottom: 8px;
+    margin-top: 1.5rem;
+  }
+  .card {
+    background: #fff;
+    border: 1px solid #e5e5e5;
+    border-radius: 12px;
+    padding: 1rem 1.25rem;
+    margin-bottom: 10px;
+  }
+  .radio-group, .check-group { display: flex; flex-direction: column; gap: 7px; }
+  .radio-option, .check-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    padding: 9px 11px;
+    border-radius: 8px;
+    border: 1px solid #e5e5e5;
+    transition: background 0.12s;
+  }
+  .radio-option:hover, .check-option:hover { background: #f8f8f6; }
+  .radio-option input[type=radio],
+  .check-option input[type=checkbox] {
+    accent-color: #1a1a8c;
+    width: 16px; height: 16px;
+    flex-shrink: 0;
+  }
+  .radio-option span, .check-option span { font-size: 14px; color: #1a1a1a; flex: 1; }
+  .radio-option small, .check-option small {
+    font-size: 12px; color: #888; white-space: nowrap;
+  }
+  .surface-wrap { display: flex; align-items: center; gap: 10px; }
+  .surface-wrap input[type=number] {
+    flex: 1;
+    height: 42px;
+    font-size: 16px;
+    border: 1px solid #d0d0d0;
+    border-radius: 8px;
+    padding: 0 14px;
+    background: #fff;
+    color: #1a1a1a;
+    outline: none;
+  }
+  .surface-wrap input[type=number]:focus { border-color: #1a1a8c; }
+  .surface-wrap .unit { font-size: 14px; color: #888; }
+  .tramo-note { font-size: 12px; color: #888; margin-top: 8px; }
+  .toggle-year { display: flex; gap: 8px; }
+  .year-btn {
+    flex: 1; padding: 9px;
+    border: 1px solid #d0d0d0;
+    border-radius: 8px;
+    background: #fff;
+    font-size: 13px;
+    cursor: pointer;
+    color: #666;
+    transition: all 0.15s;
+  }
+  .year-btn.active { background: #1a1a8c; color: #fff; border-color: #1a1a8c; }
+  .result-card {
+    border-radius: 12px;
+    border: 2px solid #1a1a8c;
+    padding: 1.25rem 1.5rem;
+    background: #f0f0fa;
+    margin-top: 1.75rem;
+  }
+  .result-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 5px 0;
+    border-bottom: 1px solid #ddddf0;
+    font-size: 13px;
+  }
+  .result-row:last-of-type { border-bottom: none; }
+  .result-row .label { color: #555; }
+  .result-row .value { font-weight: 500; color: #1a1a1a; }
+  .result-row.discount .value { color: #0a6e40; }
+  .result-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    padding-top: 12px;
+    margin-top: 10px;
+    border-top: 1.5px solid #c0c0e0;
+  }
+  .result-total .period-lbl { font-size: 14px; color: #555; }
+  .result-total .amount { font-size: 28px; font-weight: 700; color: #1a1a8c; }
+  .result-mensual { font-size: 12px; color: #888; margin-top: 2px; text-align: right; }
+  .footer-note {
+    font-size: 13px;
+    color: #1a1a1a;
+    margin-top: 1.5rem;
+    margin-bottom: 1rem;
+    text-align: center;
+    line-height: 1.9;
+    background: #e8e8f4;
+    border: 1px solid #b0b0d8;
+    border-radius: 8px;
+    padding: 14px 18px;
+  }
+  @media (max-width: 480px) {
+    body { padding: 1.25rem 0.75rem; }
+    .result-total .amount { font-size: 24px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div class="sgae-badge">SGAE · Tarifas 2026</div>
+    <h1>Simulador de tarifas</h1>
+    <p>Hostelería y restauración — Amenización musical</p>
+  </div>
+
+  <div class="section-label">Tipo de uso musical</div>
+  <div class="card">
+    <div class="radio-group">
+      <label class="radio-option">
+        <input type="radio" name="uso" value="tv" checked>
+        <span>Utilización del repertorio mediante aparato de televisión</span>
+      </label>
+      <label class="radio-option">
+        <input type="radio" name="uso" value="musica">
+        <span>Utilización del repertorio mediante amenización musical</span>
+      </label>
+    </div>
+  </div>
+
+  <div class="section-label">Superficie del establecimiento</div>
+  <div class="card">
+    <div class="surface-wrap">
+      <input type="number" id="superficie" min="1" max="9999" value="80" placeholder="Ej: 80">
+      <span class="unit">m²</span>
+    </div>
+    <p class="tramo-note" id="tramo-label">Tramo aplicado: de 51 a 100 m²</p>
+  </div>
+
+  <div class="section-label">Año de contrato</div>
+  <div class="card">
+    <div class="toggle-year">
+      <button class="year-btn active" id="btn-y1" onclick="setYear(1)">1º año</button>
+      <button class="year-btn" id="btn-y2" onclick="setYear(2)">2º año en adelante</button>
+    </div>
+  </div>
+
+  <div class="section-label">Descuentos aplicables</div>
+  <div class="card">
+    <div class="check-group">
+      <label class="check-option">
+        <input type="checkbox" id="desc-asoc">
+        <span>Asociación de Hostelería de Salamanca</span>
+        <small>−5%</small>
+      </label>
+      <label class="check-option">
+        <input type="checkbox" id="desc-dom">
+        <span>Domiciliación bancaria</span>
+        <small>−5%</small>
+      </label>
+    </div>
+  </div>
+
+  <div class="section-label">Periodicidad de pago</div>
+  <div class="card">
+    <div class="radio-group">
+      <label class="radio-option">
+        <input type="radio" name="periodo" value="trimestral" checked>
+        <span>Trimestral (opción habitual)</span>
+        <small>sin descuento adicional</small>
+      </label>
+      <label class="radio-option">
+        <input type="radio" name="periodo" value="semestral">
+        <span>Semestral</span>
+        <small>−2,5%</small>
+      </label>
+      <label class="radio-option">
+        <input type="radio" name="periodo" value="anual">
+        <span>Anual</span>
+        <small>−5%</small>
+      </label>
+    </div>
+  </div>
+
+  <div class="result-card">
+    <div id="result-rows"></div>
+    <div class="result-total">
+      <div>
+        <div class="period-lbl" id="periodo-label-txt">Importe trimestral</div>
+      </div>
+      <div style="text-align:right">
+        <div class="amount" id="total-display">—</div>
+        <div class="result-mensual" id="mensual-equiv"></div>
+      </div>
+    </div>
+  </div>
+
+  <p class="footer-note">
+    <strong>Tarifas vigentes 2026 · Solo para uso comercial interno SGAE<br>
+    Los importes indicados no incluyen el 21% de IVA vigente.<br>
+    Las tarifas se actualizan cada enero conforme al Índice de Precios al Consumo (IPC).</strong>
+  </p>
+</div>
+
+<script>
+  const TARIFAS = {
+    tv: {
+      tramos: [
+        { label: "hasta 50 m²", max: 50, y1: 25.84, y2: 22.04 },
+        { label: "de 51 a 100 m²", max: 100, y1: 28.70, y2: 24.90 },
+        { label: "de 101 a 200 m²", max: 200, y1: 36.20, y2: 32.40 },
+      ],
+      exceso: { y1: 8.90, y2: 8.90, por: 50 }
+    },
+    musica: {
+      tramos: [
+        { label: "hasta 50 m²", max: 50, y1: 20.67, y2: 16.87 },
+        { label: "de 51 a 100 m²", max: 100, y1: 22.53, y2: 18.73 },
+        { label: "de 101 a 200 m²", max: 200, y1: 28.67, y2: 24.87 },
+      ],
+      exceso: { y1: 5.80, y2: 5.80, por: 50 }
+    }
+  };
+
+  let anyo = 1;
+
+  function setYear(y) {
+    anyo = y;
+    document.getElementById('btn-y1').classList.toggle('active', y === 1);
+    document.getElementById('btn-y2').classList.toggle('active', y === 2);
+    calcular();
+  }
+
+  function getTarifa(uso, sup, year) {
+    const t = TARIFAS[uso];
+    const key = year === 1 ? 'y1' : 'y2';
+    let base = 0, tramo = '';
+    if (sup <= 50) { base = t.tramos[0][key]; tramo = t.tramos[0].label; }
+    else if (sup <= 100) { base = t.tramos[1][key]; tramo = t.tramos[1].label; }
+    else if (sup <= 200) { base = t.tramos[2][key]; tramo = t.tramos[2].label; }
+    else {
+      base = t.tramos[2][key];
+      const fracciones = Math.ceil((sup - 200) / t.exceso.por);
+      base += fracciones * t.exceso[key];
+      tramo = `más de 200 m² (${fracciones} fracc. adicional${fracciones > 1 ? 'es' : ''} de 50 m²)`;
+    }
+    return { base, tramo };
+  }
+
+  function fmt(n) {
+    return n.toFixed(2).replace('.', ',') + ' €';
+  }
+
+  function calcular() {
+    const uso = document.querySelector('input[name=uso]:checked').value;
+    const sup = parseInt(document.getElementById('superficie').value) || 0;
+    const descAsoc = document.getElementById('desc-asoc').checked;
+    const descDom = document.getElementById('desc-dom').checked;
+    const periodo = document.querySelector('input[name=periodo]:checked').value;
+
+    if (sup <= 0) {
+      document.getElementById('result-rows').innerHTML = '';
+      document.getElementById('total-display').textContent = '—';
+      document.getElementById('mensual-equiv').textContent = '';
+      return;
+    }
+
+    const { base, tramo } = getTarifa(uso, sup, anyo);
+    document.getElementById('tramo-label').textContent = 'Tramo aplicado: ' + tramo;
+
+    let descPeriodo = 0;
+    if (periodo === 'semestral') descPeriodo = 0.025;
+    if (periodo === 'anual') descPeriodo = 0.05;
+
+    let meses = 1, periodoLabel = 'Importe mensual';
+    if (periodo === 'trimestral') { meses = 3; periodoLabel = 'Importe trimestral'; }
+    if (periodo === 'semestral') { meses = 6; periodoLabel = 'Importe semestral'; }
+    if (periodo === 'anual') { meses = 12; periodoLabel = 'Importe anual'; }
+
+    const importeBruto = base * meses;
+    const descAsocImporte = descAsoc ? importeBruto * 0.05 : 0;
+    const descDomImporte = descDom ? importeBruto * 0.05 : 0;
+    const descPeriodoImporte = importeBruto * descPeriodo;
+    const total = importeBruto - descAsocImporte - descDomImporte - descPeriodoImporte;
+    const mensualFinal = total / meses;
+
+    let rows = '';
+    rows += `<div class="result-row"><span class="label">Tarifa base mensual</span><span class="value">${fmt(base)}</span></div>`;
+    rows += `<div class="result-row"><span class="label">Subtotal (${meses} ${meses === 1 ? 'mes' : 'meses'})</span><span class="value">${fmt(importeBruto)}</span></div>`;
+    if (descAsoc) rows += `<div class="result-row discount"><span class="label">Dto. Asociación Hostelería Salamanca (−5%)</span><span class="value">−${fmt(descAsocImporte)}</span></div>`;
+    if (descDom) rows += `<div class="result-row discount"><span class="label">Dto. domiciliación bancaria (−5%)</span><span class="value">−${fmt(descDomImporte)}</span></div>`;
+    if (descPeriodo > 0) {
+      const lbl = periodo === 'semestral' ? 'Dto. pago semestral (−2,5%)' : 'Dto. pago anual (−5%)';
+      rows += `<div class="result-row discount"><span class="label">${lbl}</span><span class="value">−${fmt(descPeriodoImporte)}</span></div>`;
+    }
+
+    document.getElementById('result-rows').innerHTML = rows;
+    document.getElementById('total-display').textContent = fmt(total);
+    document.getElementById('periodo-label-txt').textContent = periodoLabel;
+    document.getElementById('mensual-equiv').textContent = meses > 1 ? fmt(mensualFinal) + '/mes' : '';
+  }
+
+  document.getElementById('superficie').addEventListener('input', calcular);
+  document.querySelectorAll('input[name=uso]').forEach(r => r.addEventListener('change', calcular));
+  document.querySelectorAll('input[name=periodo]').forEach(r => r.addEventListener('change', calcular));
+  document.getElementById('desc-asoc').addEventListener('change', calcular);
+  document.getElementById('desc-dom').addEventListener('change', calcular);
+
+  calcular();
+</script>
+</body>
+</html>
