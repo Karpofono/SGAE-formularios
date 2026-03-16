@@ -185,6 +185,10 @@
   .val-msg { font-size: 10px; margin-top: 2px; display: none; }
   .val-msg.show-ok  { display: block; color: #2d7a2d; }
   .val-msg.show-err { display: block; color: var(--error); }
+  /* Campo m² deshabilitado automáticamente al elegir "Nada" */
+  input.m2-auto { background: #f0f0ec !important; color: var(--muted) !important; cursor: not-allowed !important; font-style: italic; border-bottom-color: var(--border) !important; }
+  .m2-auto-note { font-size: 10px; color: var(--muted); font-style: italic; display: none; margin-top: 2px; }
+  .m2-auto-note.show { display: block; }
 </style>
 </head>
 <body>
@@ -340,15 +344,17 @@
   <div class="field-row" id="frow-f_m2_clases">
     <div class="field-label lbl-block"><span class="dot"></span>M² clases dirigidas</div>
     <div class="field-value">
-      <input type="text" id="f_m2_clases" placeholder="Ej: 120 m² — Poner 0 si no tiene música/tv">
+      <input type="text" id="f_m2_clases" placeholder="Ej: 120 m²">
       <span class="inline-err" id="ierr-f_m2_clases">Obligatorio</span>
+      <span class="m2-auto-note" id="anote-f_m2_clases">✓ Rellenado automáticamente a 0 — sin uso de música/tv en clases dirigidas</span>
     </div>
   </div>
   <div class="field-row" id="frow-f_m2_maquinas">
     <div class="field-label lbl-block"><span class="dot"></span>M² máquinas / resto</div>
     <div class="field-value">
-      <input type="text" id="f_m2_maquinas" placeholder="Ej: 120 m² — Poner 0 si no tiene música/tv">
+      <input type="text" id="f_m2_maquinas" placeholder="Ej: 120 m²">
       <span class="inline-err" id="ierr-f_m2_maquinas">Obligatorio</span>
+      <span class="m2-auto-note" id="anote-f_m2_maquinas">✓ Rellenado automáticamente a 0 — sin uso de música/tv en máquinas/resto</span>
     </div>
   </div>
   <div class="section-title">Asociación y condiciones</div>
@@ -526,15 +532,17 @@
   <div class="field-row" id="frow-s_m2_clases">
     <div class="field-label lbl-block"><span class="dot"></span>M² clases dirigidas</div>
     <div class="field-value">
-      <input type="text" id="s_m2_clases" placeholder="Ej: 250 m² — Poner 0 si no tiene música/tv">
+      <input type="text" id="s_m2_clases" placeholder="Ej: 250 m²">
       <span class="inline-err" id="ierr-s_m2_clases">Obligatorio</span>
+      <span class="m2-auto-note" id="anote-s_m2_clases">✓ Rellenado automáticamente a 0 — sin uso de música/tv en clases dirigidas</span>
     </div>
   </div>
   <div class="field-row" id="frow-s_m2_maquinas">
     <div class="field-label lbl-block"><span class="dot"></span>M² máquinas / resto</div>
     <div class="field-value">
-      <input type="text" id="s_m2_maquinas" placeholder="Ej: 250 m² — Poner 0 si no tiene música/tv">
+      <input type="text" id="s_m2_maquinas" placeholder="Ej: 250 m²">
       <span class="inline-err" id="ierr-s_m2_maquinas">Obligatorio</span>
+      <span class="m2-auto-note" id="anote-s_m2_maquinas">✓ Rellenado automáticamente a 0 — sin uso de música/tv en máquinas/resto</span>
     </div>
   </div>
   <div class="section-title">Asociación y condiciones</div>
@@ -723,15 +731,17 @@
   <div class="field-row" id="frow-c_m2_clases">
     <div class="field-label lbl-block"><span class="dot"></span>M² clases dirigidas</div>
     <div class="field-value">
-      <input type="text" id="c_m2_clases" placeholder="Ej: 80 m² — Poner 0 si no tiene música/tv">
+      <input type="text" id="c_m2_clases" placeholder="Ej: 80 m²">
       <span class="inline-err" id="ierr-c_m2_clases">Obligatorio</span>
+      <span class="m2-auto-note" id="anote-c_m2_clases">✓ Rellenado automáticamente a 0 — sin uso de música/tv en clases dirigidas</span>
     </div>
   </div>
   <div class="field-row" id="frow-c_m2_maquinas">
     <div class="field-label lbl-block"><span class="dot"></span>M² máquinas / resto</div>
     <div class="field-value">
-      <input type="text" id="c_m2_maquinas" placeholder="Ej: 80 m² — Poner 0 si no tiene música/tv">
+      <input type="text" id="c_m2_maquinas" placeholder="Ej: 80 m²">
       <span class="inline-err" id="ierr-c_m2_maquinas">Obligatorio</span>
+      <span class="m2-auto-note" id="anote-c_m2_maquinas">✓ Rellenado automáticamente a 0 — sin uso de música/tv en máquinas/resto</span>
     </div>
   </div>
   <div class="section-title">Asociación y condiciones</div>
@@ -952,7 +962,15 @@
   function runValidation(tipo) {
     var bFails=[], sFails=[];
     getChecks(tipo).forEach(function(c) {
-      var empty = c.kind==='input' ? !val(c.id) : !getRadio(c.id);
+      var empty;
+      if (c.kind==='input') {
+        var inpEl = document.getElementById(c.id);
+        // Campo auto-rellenado (readOnly): nunca falla obligatorio
+        if (inpEl && inpEl.readOnly) { empty = false; }
+        else { empty = !val(c.id); }
+      } else {
+        empty = !getRadio(c.id);
+      }
       if (!empty) return;
       (c.blocking ? bFails : sFails).push(c);
       if (c.kind==='input') {
@@ -1350,7 +1368,7 @@
   }
   function validarM2(v){
     var n=parseFloat(v.trim().replace(',','.'));
-    return !isNaN(n)&&n>0;
+    return !isNaN(n)&&n>=0;
   }
 
   // — Motor de validación —
@@ -1365,6 +1383,8 @@
     }
     function check(){
       var msg=document.getElementById(mid);
+      // No validar campos auto-rellenados (readOnly)
+      if(el.readOnly){ el.classList.remove('val-ok','val-err'); msg.className='val-msg'; return; }
       var v=el.value.trim();
       if(!v){ el.classList.remove('val-ok','val-err'); msg.className='val-msg'; return; }
       if(fn(v)){
@@ -1378,6 +1398,45 @@
     el.addEventListener('input', check);
     el.addEventListener('blur',  check);
   }
+
+  // — Automatización m² cuando repertorio = "Nada" —
+  function gestionarM2PorRepertorio(prefijo, zona) {
+    // zona: 'clases' o 'maquinas'
+    var repVal = getRadio(prefijo + '_rep_' + zona);
+    var inputEl = document.getElementById(prefijo + '_m2_' + zona);
+    var noteEl  = document.getElementById('anote-' + prefijo + '_m2_' + zona);
+    var errEl   = document.getElementById('ierr-' + prefijo + '_m2_' + zona);
+    var valMsgEl = document.getElementById('valmsg-' + prefijo + '_m2_' + zona);
+    if (!inputEl) return;
+    if (repVal === 'Nada') {
+      inputEl.value = '0';
+      inputEl.classList.add('m2-auto');
+      inputEl.readOnly = true;
+      // limpiar errores y validación en tiempo real
+      inputEl.classList.remove('inp-err','val-err','val-ok');
+      if (errEl)    errEl.classList.remove('show');
+      if (valMsgEl) { valMsgEl.className = 'val-msg'; }
+      if (noteEl)   noteEl.classList.add('show');
+    } else {
+      // Solo limpiar si el valor es exactamente "0" (puesto automáticamente)
+      if (inputEl.value === '0') inputEl.value = '';
+      inputEl.classList.remove('m2-auto');
+      inputEl.readOnly = false;
+      if (noteEl) noteEl.classList.remove('show');
+    }
+  }
+
+  // Wire up: cuando cambia el radio de repertorio, gestionar el m² correspondiente
+  ['f','s','c'].forEach(function(pfx) {
+    ['clases','maquinas'].forEach(function(zona) {
+      var nombre = pfx + '_rep_' + zona;
+      document.querySelectorAll('input[name="' + nombre + '"]').forEach(function(r) {
+        r.addEventListener('change', function() {
+          gestionarM2PorRepertorio(pfx, zona);
+        });
+      });
+    });
+  });
 
   // — Registro de validaciones por formulario —
   // Prefijos: f=Persona Física, s=Sociedad, c=Comunidad/CB
@@ -1409,7 +1468,7 @@
   ['f_m2','s_m2','c_m2',
    'f_m2_clases','s_m2_clases','c_m2_clases',
    'f_m2_maquinas','s_m2_maquinas','c_m2_maquinas'].forEach(function(id){
-    setupVal(id, validarM2, 'Superficie v\u00e1lida', 'Introduce un n\u00famero positivo');
+    setupVal(id, validarM2, 'Superficie v\u00e1lida', 'Introduce un n\u00famero igual o mayor que 0');
   });
 
   // — Validaci\u00f3n final al enviar: bloquear si hay campos con val-err —
@@ -1421,8 +1480,8 @@
     card.querySelectorAll('input[type="text"],input[type="email"],input[type="tel"]').forEach(function(el){
       el.dispatchEvent(new Event('blur'));
     });
-    // Bloquear si alguno tiene val-err
-    var errores = card.querySelectorAll('.val-err');
+    // Bloquear si alguno tiene val-err (excluir campos readOnly — auto-rellenados)
+    var errores = Array.prototype.filter.call(card.querySelectorAll('.val-err'), function(el){ return !el.readOnly; });
     if(errores.length>0){
       errores[0].scrollIntoView({behavior:'smooth',block:'center'});
       // Reusar showToast si existe
