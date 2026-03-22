@@ -77,7 +77,7 @@
   .inline-err.show, .inline-warn.show { display: block; }
   .radio-group { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
   .radio-opt { display: flex; align-items: center; gap: 6px; cursor: pointer; padding: 3px 2px; }
-  .radio-opt input { display: none; }
+  .radio-opt input { position: absolute; opacity: 0; width: 0; height: 0; }
   .radio-btn { width: 18px; height: 18px; border: 2px solid var(--border); border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: all 0.2s; flex-shrink: 0; }
   .radio-opt input:checked ~ .radio-btn { border-color: var(--gold); background: var(--gold); }
   .radio-opt input:checked ~ .radio-btn::after { content: ''; width: 6px; height: 6px; background: white; border-radius: 50%; display: block; }
@@ -102,6 +102,37 @@
   .notice-tabs { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
   .notice-pill { background: var(--dark); color: var(--gold-light); font-size: 11px; padding: 5px 14px; border-radius: 20px; cursor: pointer; border: none; font-family: 'DM Sans', sans-serif; transition: background 0.2s; }
   .notice-pill:hover { background: #333; }
+  .btn-print { display: inline-flex; align-items: center; gap: 8px; background: white; color: #1a5c1a; border: 1.5px solid #a0d4a0; border-radius: 6px; padding: 10px 22px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; margin-top: 14px; transition: all 0.2s; }
+  .btn-print:hover { background: #d4edd4; }
+  .success-banner { display: none; background: #e8f5e8; border: 1.5px solid #a0d4a0; border-radius: 10px; padding: 20px 28px; margin-top: 16px; text-align: center; animation: fadeUp 0.4s ease both; width: 100%; max-width: 840px; }
+  .success-banner.visible { display: block; }
+  .sb-icon { font-size: 36px; margin-bottom: 8px; }
+  .sb-title { font-family: 'Playfair Display', serif; font-size: 18px; color: #1a5c1a; margin-bottom: 6px; }
+  .sb-sub { font-size: 13px; color: #2d7a2d; }
+  .btn-print:hover { background: #d4edd4; }
+
+  @page { margin: 1cm; }
+  @media print {
+    body { background: white !important; padding: 0 !important; }
+    .header, .contact-block, .info-banner, .selector-section, .click-hint,
+    .notice-card, .local-block, .card-footer, .toast, .success-banner,
+    .legend { display: none !important; }
+    .form-card { display: none !important; box-shadow: none !important; border: none !important; }
+    .form-card.visible { display: block !important; }
+    .card-header { background: #1A1A1A !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .gold-bar { background: #C8A96E !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .field-row, .field-row-split { break-inside: avoid; }
+    .section-title { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .tarifa-panel { display: block !important; margin: 12px 0 !important; border: 2px solid #C8A96E !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .tarifa-panel.inactive { display: none !important; }
+    .tarifa-header { background: #1A1A1A !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .tarifa-result { background: #1A1A1A !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .tarifa-result-label span:first-child { color: #C8A96E !important; }
+    .tarifa-amount-value.highlight { color: #C8A96E !important; }
+    .tarifa-amount-value { color: #9a8060 !important; }
+    .tarifa-desc-tag.on { background: #e8f5e8 !important; color: #2d7a2d !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .tarifa-pending { display: none !important; }
+  }
   .success-banner { display: none; background: #e8f5e8; border: 1.5px solid #a0d4a0; border-radius: 10px; padding: 20px 28px; margin-top: 16px; text-align: center; animation: fadeUp 0.4s ease both; width: 100%; max-width: 840px; }
   .success-banner.visible { display: block; }
   .sb-icon { font-size: 36px; margin-bottom: 8px; }
@@ -169,6 +200,30 @@
     .tarifa-result { flex-direction: column; align-items: flex-start; }
   }
 
+  /* ===== BANNER INFORMATIVO ===== */
+  .info-banner { width: 100%; max-width: 840px; margin-bottom: 20px; animation: fadeUp 0.5s ease 0.06s both; }
+  .info-toggle { width: 100%; background: var(--dark); border: none; border-radius: 10px 10px 0 0; padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; transition: background 0.2s; }
+  .info-toggle.collapsed { border-radius: 10px; }
+  .info-toggle:hover { background: #2a2a2a; }
+  .info-toggle-left { display: flex; align-items: center; gap: 12px; }
+  .info-toggle-icon { font-size: 18px; }
+  .info-toggle-text { font-size: 11px; letter-spacing: 1.8px; text-transform: uppercase; color: var(--gold); font-weight: 600; }
+  .info-toggle-badge { background: var(--gold); color: var(--dark); font-size: 9px; font-weight: 700; letter-spacing: 1px; padding: 3px 9px; border-radius: 10px; text-transform: uppercase; }
+  .info-toggle-arrow { font-size: 12px; color: var(--gold-light); transition: transform 0.3s ease; }
+  .info-toggle.collapsed .info-toggle-arrow { transform: rotate(-90deg); }
+  .info-body { background: white; border: 1.5px solid var(--dark); border-top: none; border-radius: 0 0 10px 10px; overflow: hidden; max-height: 2000px; transition: max-height 0.5s ease, opacity 0.3s ease; opacity: 1; }
+  .info-body.hidden { max-height: 0; opacity: 0; border: none; }
+  .info-section { padding: 16px 28px; border-bottom: 1px solid var(--border); }
+  .info-section-title { font-family: 'Playfair Display', serif; font-size: 14px; font-weight: 600; color: var(--dark); margin-bottom: 8px; }
+  .info-section-text { font-size: 12px; color: var(--muted); line-height: 1.7; }
+  .info-section-text strong { color: var(--text); }
+  .info-link { color: var(--gold); font-weight: 600; text-decoration: none; }
+  .info-link:hover { text-decoration: underline; }
+  .info-section-steps { display: flex; flex-direction: column; gap: 10px; margin-top: 6px; }
+  .info-step { display: flex; align-items: flex-start; gap: 12px; }
+  .info-step-num { width: 20px; height: 20px; background: var(--gold); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; color: var(--dark); flex-shrink: 0; margin-top: 1px; }
+  .info-step-text { font-size: 12px; color: var(--muted); line-height: 1.6; }
+  .info-step-text strong { color: var(--text); }
   /* ===== VALIDACIÓN EN TIEMPO REAL ===== */
   .val-ok  { border-bottom-color: #2d7a2d !important; }
   .val-err { border-bottom-color: var(--error) !important; }
@@ -206,6 +261,50 @@
         <span class="contact-label">WhatsApp / Móvil</span>
         <span class="contact-value">629 847 923</span>
       </div>
+    </div>
+  </div>
+</div>
+
+<div class="info-banner">
+  <button class="info-toggle collapsed" id="info-toggle" onclick="toggleInfo()">
+    <div class="info-toggle-left">
+      <span class="info-toggle-icon">🎵</span>
+      <span class="info-toggle-text">¿Por qué necesita licencia este negocio?</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;">
+      <span class="info-toggle-badge">Información SGAE</span>
+      <span class="info-toggle-arrow">▼</span>
+    </div>
+  </button>
+  <div class="info-body hidden" id="info-body">
+    <div class="info-section">
+      <div class="info-section-title">1. Dale ritmo a tu negocio.</div>
+      <div class="info-section-text">En tu establecimiento cuentas con elementos clave como tu atractiva oferta, tu trato cercano o la decoración de interiores. Sin duda, todo ello te ayuda a crear emociones positivas en tus clientes. Pero si, además, añades música para ambientar y amenizar tu local, multiplicarás esas buenas sensaciones. ¿Nos dejas ayudarte para que la música se convierta en un factor diferenciador de tu negocio?</div>
+    </div>
+    <div class="info-section">
+      <div class="info-section-title">2. ¡Música, maestros!</div>
+      <div class="info-section-text">Escuchar a tu artista favorito en tu ámbito privado no tiene limitaciones, ya sea en una plataforma de streaming o en canales de pago. Sin embargo, cuando utilizas esa misma música para ambientar o amenizar un espacio público y comercial, existen otras reglas que has de conocer.</div>
+      <div class="info-section-text" style="margin-top:8px;">Como sabes, detrás de cada creación musical hay un profesional que se gana la vida. Para garantizar la creación de obras nuevas y proteger a sus autores, existe la propiedad intelectual: es decir, cada obra musical, fonograma o grabación audiovisual, utilizada en un establecimiento, está protegida y aporta a su creador unos derechos a través de unas tarifas oficiales.</div>
+      <div class="info-section-text" style="margin-top:8px;">Solo si todos cumplimos con nuestras obligaciones y respetamos los derechos de autor, podremos garantizar que la música siga sonando en todas partes, tanto en nuestro ámbito privado como en espacios de cara al público.</div>
+    </div>
+    <div class="info-section">
+      <div class="info-section-title">3. Descubre cómo se gestionan los derechos de autor.</div>
+      <div class="info-section-steps">
+        <div class="info-step"><span class="info-step-num">1</span><span class="info-step-text">En <strong>SGAE</strong> gestionamos derechos de Propiedad intelectual, a través de licencias, y percibimos cantidades fijadas y publicadas en tarifas oficiales y acordadas en convenios sectoriales suscritos con las asociaciones representativas de cada mercado.</span></div>
+        <div class="info-step"><span class="info-step-num">2</span><span class="info-step-text"><strong>SGAE</strong> reparte equitativamente esos ingresos entre los autores de las obras musicales y audiovisuales, descontando exclusivamente los costes derivados de su gestión.</span></div>
+        <div class="info-step"><span class="info-step-num">3</span><span class="info-step-text">Si utilizas música en tu local, necesitas una licencia. Ponte en contacto con <strong>SGAE</strong> y nosotros nos ocupamos de todas las gestiones para tramitarla. ¡Así de sencillo es proteger la cultura!</span></div>
+      </div>
+    </div>
+    <div class="info-section">
+      <div class="info-section-title">4. Ponle banda sonora a tu negocio.</div>
+      <div class="info-section-text">En <strong>SGAE</strong> te ofrecemos un inmenso catálogo de obras musicales y audiovisuales que podrás utilizar. Consúltanos y descubre todo el poder de la música para tu establecimiento. Puedes consultar las tarifas, con todo detalle, en <a class="info-link" href="https://www.sgae.es" target="_blank">www.sgae.es</a> así como en el apartado de Propiedad Intelectual del Ministerio de Cultura.</div>
+    </div>
+    <div class="info-section" style="border-bottom:none;">
+      <div class="info-section-title">5. Somos SGAE ¿te sonamos?</div>
+      <div class="info-section-text">Seguro que te sonamos, pero queremos que nos conozcas un poco mejor:</div>
+      <div class="info-section-text" style="margin-top:8px;">Somos la <strong>Sociedad General de Autores y Editores (SGAE)</strong>: entidad privada sin ánimo de lucro fundada en 1899 y creada para la defensa y gestión colectiva de los derechos de propiedad intelectual en nombre de sus socios. Para ejercer nuestra labor de gestión de los derechos de autor contamos con la autorización oficial del Ministerio de Cultura.</div>
+      <div class="info-section-text" style="margin-top:8px;">Esta tarea no solo supone la protección del patrimonio cultural, también facilita y garantiza el acceso a las obras y otras prestaciones a la sociedad.</div>
+      <div class="info-section-text" style="margin-top:8px;">Si quieres saber más de nosotros, entra en <a class="info-link" href="https://www.sgae.es" target="_blank">www.sgae.es</a>.</div>
     </div>
   </div>
 </div>
@@ -414,6 +513,7 @@
   <div class="card-footer">
     <div class="footer-left">
       <span class="footer-note">Ficha SGAE · Hostelería y Restauración</span>
+      <span class="footer-note" style="margin-top:4px;">&#128438; <strong>Tras enviar podrá guardar una copia en PDF o imprimir la ficha.</strong></span>
       <span class="footer-err-list" id="ferr-fisica"></span>
       <span class="footer-warn-list" id="fwarn-fisica"></span>
     </div>
@@ -580,6 +680,7 @@
   <div class="card-footer">
     <div class="footer-left">
       <span class="footer-note">Ficha SGAE · Hostelería y Restauración</span>
+      <span class="footer-note" style="margin-top:4px;">&#128438; <strong>Tras enviar podrá guardar una copia en PDF o imprimir la ficha.</strong></span>
       <span class="footer-err-list" id="ferr-sociedad"></span>
       <span class="footer-warn-list" id="fwarn-sociedad"></span>
     </div>
@@ -757,6 +858,7 @@
   <div class="card-footer">
     <div class="footer-left">
       <span class="footer-note">Ficha SGAE · Hostelería y Restauración</span>
+      <span class="footer-note" style="margin-top:4px;">&#128438; <strong>Tras enviar podrá guardar una copia en PDF o imprimir la ficha.</strong></span>
       <span class="footer-err-list" id="ferr-comunidad"></span>
       <span class="footer-warn-list" id="fwarn-comunidad"></span>
     </div>
@@ -770,6 +872,7 @@
   <div class="sb-icon">&#9989;</div>
   <div class="sb-title">&#161;Ficha enviada correctamente!</div>
   <div class="sb-sub" id="success-email-msg"></div>
+  <button class="btn-print" onclick="imprimirFicha()">&#128438; Guardar copia en PDF / Imprimir</button>
 </div>
 
 <div style="margin-top:18px;text-align:center;animation:fadeUp 0.5s ease 0.35s both">
@@ -798,6 +901,28 @@
   }
 
   function toggleNotice() { document.getElementById('notice-unknown').classList.toggle('visible'); }
+  var tipoEnviado = null;
+  function imprimirFicha() {
+    if (tipoEnviado) {
+      document.getElementById('card-' + tipoEnviado).classList.add('visible');
+    }
+    window.print();
+    if (tipoEnviado) {
+      document.getElementById('card-' + tipoEnviado).classList.remove('visible');
+    }
+  }
+  function toggleInfo() {
+    var btn = document.getElementById('info-toggle');
+    var body = document.getElementById('info-body');
+    var isCollapsed = btn.classList.contains('collapsed');
+    if (isCollapsed) {
+      btn.classList.remove('collapsed');
+      body.classList.remove('hidden');
+    } else {
+      btn.classList.add('collapsed');
+      body.classList.add('hidden');
+    }
+  }
   function getRadio(name) { var s = document.querySelector('input[name="'+name+'"]:checked'); return s ? s.value : ''; }
   function val(id) { var e = document.getElementById(id); return e ? e.value.trim() : ''; }
 
@@ -986,6 +1111,7 @@
       body: JSON.stringify(datos)
     }).then(function(resp) {
       if (resp.ok) {
+        tipoEnviado = tipo;
         document.getElementById('card-'+tipo).classList.remove('visible');
         document.getElementById('success-banner').classList.add('visible');
         document.getElementById('success-banner').scrollIntoView({behavior:'smooth', block:'center'});
@@ -1256,11 +1382,12 @@
     card.querySelectorAll('input[type="text"],input[type="email"],input[type="tel"]').forEach(function(el){
       el.dispatchEvent(new Event('blur'));
     });
-    // Bloquear si alguno tiene val-err
+    // Bloquear si alguno tiene val-err Y tiene contenido (no bloquear vacíos)
     var errores = card.querySelectorAll('.val-err');
-    if(errores.length>0){
-      errores[0].scrollIntoView({behavior:'smooth',block:'center'});
-      // Reusar showToast si existe
+    var erroresConContenido = [];
+    errores.forEach(function(el){ if(el.value && el.value.trim()) erroresConContenido.push(el); });
+    if(erroresConContenido.length>0){
+      erroresConContenido[0].scrollIntoView({behavior:'smooth',block:'center'});
       if(typeof showToast==='function')
         showToast('Corrige los campos marcados en rojo antes de enviar','terror');
       return;
