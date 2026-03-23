@@ -92,6 +92,9 @@
   .btn-send { display: inline-flex; align-items: center; gap: 8px; background: var(--gold); color: var(--dark); border: none; border-radius: 6px; padding: 12px 28px; font-family: 'DM Sans', sans-serif; font-size: 13px; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; transition: all 0.2s; font-weight: 700; flex-shrink: 0; margin-top: 3px; }
   .btn-send:hover { background: var(--gold-light); transform: translateY(-1px); box-shadow: 0 4px 16px rgba(200,169,110,0.4); }
   .btn-send:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+  .btn-pdf { display: inline-flex; align-items: center; gap: 8px; background: white; color: var(--dark); border: 1.5px solid var(--border); border-radius: 6px; padding: 11px 20px; font-family: 'DM Sans', sans-serif; font-size: 13px; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; transition: all 0.2s; font-weight: 600; flex-shrink: 0; margin-top: 3px; }
+  .btn-pdf:hover { border-color: var(--gold); background: #FDFAF5; transform: translateY(-1px); }
+  .footer-btns { display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-start; }
   .notice-card { width: 100%; max-width: 840px; background: white; border: 1.5px solid var(--gold-light); border-radius: 12px; padding: 24px 28px; margin-top: 8px; display: none; }
   .notice-card.visible { display: block; animation: fadeUp 0.4s ease both; }
   .notice-header { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
@@ -132,6 +135,13 @@
     .tarifa-amount-value { color: #9a8060 !important; }
     .tarifa-desc-tag.on { background: #e8f5e8 !important; color: #2d7a2d !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
     .tarifa-pending { display: none !important; }
+
+    /* Radios: mostrar estado seleccionado en PDF/impresión */
+    .radio-opt input { position: static !important; opacity: 1 !important; width: auto !important; height: auto !important; accent-color: #C8A96E; }
+    .radio-btn { display: none !important; }
+    .radio-opt input:not(:checked) + .radio-btn + .radio-label,
+    .radio-opt input:not(:checked) ~ .radio-label { color: #bbb !important; }
+    .radio-label { font-size: 12px !important; }
   }
   .success-banner { display: none; background: #e8f5e8; border: 1.5px solid #a0d4a0; border-radius: 10px; padding: 20px 28px; margin-top: 16px; text-align: center; animation: fadeUp 0.4s ease both; width: 100%; max-width: 840px; }
   .success-banner.visible { display: block; }
@@ -513,11 +523,13 @@
   <div class="card-footer">
     <div class="footer-left">
       <span class="footer-note">Ficha SGAE · Hostelería y Restauración</span>
-      <span class="footer-note" style="margin-top:4px;">&#128438; <strong>Tras enviar podrá guardar una copia en PDF o imprimir la ficha.</strong></span>
       <span class="footer-err-list" id="ferr-fisica"></span>
       <span class="footer-warn-list" id="fwarn-fisica"></span>
     </div>
-    <button class="btn-send" onclick="enviarFormulario('fisica')">&#128228; Enviar ficha</button>
+    <div class="footer-btns">
+      <button class="btn-pdf" onclick="guardarPDF('fisica')">&#128438; Guardar PDF</button>
+      <button class="btn-send" onclick="enviarFormulario('fisica')">&#128228; Enviar ficha</button>
+    </div>
   </div>
 </div>
 
@@ -680,11 +692,13 @@
   <div class="card-footer">
     <div class="footer-left">
       <span class="footer-note">Ficha SGAE · Hostelería y Restauración</span>
-      <span class="footer-note" style="margin-top:4px;">&#128438; <strong>Tras enviar podrá guardar una copia en PDF o imprimir la ficha.</strong></span>
       <span class="footer-err-list" id="ferr-sociedad"></span>
       <span class="footer-warn-list" id="fwarn-sociedad"></span>
     </div>
-    <button class="btn-send" onclick="enviarFormulario('sociedad')">&#128228; Enviar ficha</button>
+    <div class="footer-btns">
+      <button class="btn-pdf" onclick="guardarPDF('sociedad')">&#128438; Guardar PDF</button>
+      <button class="btn-send" onclick="enviarFormulario('sociedad')">&#128228; Enviar ficha</button>
+    </div>
   </div>
 </div>
 
@@ -858,11 +872,13 @@
   <div class="card-footer">
     <div class="footer-left">
       <span class="footer-note">Ficha SGAE · Hostelería y Restauración</span>
-      <span class="footer-note" style="margin-top:4px;">&#128438; <strong>Tras enviar podrá guardar una copia en PDF o imprimir la ficha.</strong></span>
       <span class="footer-err-list" id="ferr-comunidad"></span>
       <span class="footer-warn-list" id="fwarn-comunidad"></span>
     </div>
-    <button class="btn-send" onclick="enviarFormulario('comunidad')">&#128228; Enviar ficha</button>
+    <div class="footer-btns">
+      <button class="btn-pdf" onclick="guardarPDF('comunidad')">&#128438; Guardar PDF</button>
+      <button class="btn-send" onclick="enviarFormulario('comunidad')">&#128228; Enviar ficha</button>
+    </div>
   </div>
 </div>
 
@@ -910,6 +926,14 @@
     if (tipoEnviado) {
       document.getElementById('card-' + tipoEnviado).classList.remove('visible');
     }
+  }
+  function guardarPDF(tipo) {
+    // Asegurarse de que la card es visible antes de imprimir
+    var card = document.getElementById('card-' + tipo);
+    var yaVisible = card.classList.contains('visible');
+    if (!yaVisible) card.classList.add('visible');
+    window.print();
+    if (!yaVisible) card.classList.remove('visible');
   }
   function toggleInfo() {
     var btn = document.getElementById('info-toggle');
