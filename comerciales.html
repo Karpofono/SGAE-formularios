@@ -83,6 +83,8 @@
   .radio-opt input:checked ~ .radio-btn::after { content: ''; width: 6px; height: 6px; background: white; border-radius: 50%; display: block; }
   .radio-label { font-size: 13px; color: var(--dark); white-space: nowrap; display: flex; align-items: center; gap: 5px; }
   .desc-tag { display: inline-block; background: #e8f5e8; color: #2d7a2d; font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 10px; }
+  .pago-nota { font-size: 10.5px; color: var(--muted); font-style: italic; margin-top: 5px; display: flex; align-items: flex-start; gap: 5px; line-height: 1.5; }
+  .pago-nota::before { content: 'ℹ'; font-style: normal; font-size: 11px; color: var(--gold); flex-shrink: 0; margin-top: 1px; }
   .card-footer { background: #F2EEE7; border-top: 1px solid var(--border); padding: 14px 36px; display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
   .footer-left { display: flex; flex-direction: column; gap: 5px; flex: 1; }
   .footer-note { font-size: 11px; color: var(--muted); font-style: italic; }
@@ -92,9 +94,6 @@
   .btn-send { display: inline-flex; align-items: center; gap: 8px; background: var(--gold); color: var(--dark); border: none; border-radius: 6px; padding: 12px 28px; font-family: 'DM Sans', sans-serif; font-size: 13px; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; transition: all 0.2s; font-weight: 700; flex-shrink: 0; margin-top: 3px; }
   .btn-send:hover { background: var(--gold-light); transform: translateY(-1px); box-shadow: 0 4px 16px rgba(200,169,110,0.4); }
   .btn-send:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
-  .btn-pdf { display: inline-flex; align-items: center; gap: 8px; background: white; color: var(--dark); border: 1.5px solid var(--border); border-radius: 6px; padding: 11px 20px; font-family: 'DM Sans', sans-serif; font-size: 13px; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; transition: all 0.2s; font-weight: 600; flex-shrink: 0; margin-top: 3px; }
-  .btn-pdf:hover { border-color: var(--gold); background: #FDFAF5; transform: translateY(-1px); }
-  .footer-btns { display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-start; }
   .notice-card { width: 100%; max-width: 840px; background: white; border: 1.5px solid var(--gold-light); border-radius: 12px; padding: 24px 28px; margin-top: 8px; display: none; }
   .notice-card.visible { display: block; animation: fadeUp 0.4s ease both; }
   .notice-header { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
@@ -220,12 +219,6 @@
     .tarifa-desc-tag.on { background: #e8f5e8 !important; color: #2d7a2d !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
     .tarifa-pending { display: none !important; }
     .btn-print { display: none !important; }
-
-    /* Radios: mostrar estado seleccionado en PDF/impresión */
-    .radio-opt input { display: inline-block !important; width: auto !important; height: auto !important; accent-color: #C8A96E; }
-    .radio-btn { display: none !important; }
-    .radio-opt input:not(:checked) ~ .radio-label { color: #bbb !important; }
-    .radio-label { font-size: 12px !important; }
   }
   /* ===== VALIDACIÓN EN TIEMPO REAL ===== */
   .val-ok  { border-bottom-color: #2d7a2d !important; }
@@ -435,6 +428,7 @@
         <label class="radio-opt"><input type="radio" name="f_pago" value="Semestral"><span class="radio-btn"></span><span class="radio-label">Semestral <span class="desc-tag">descuento -2,5%</span></span></label>
         <label class="radio-opt"><input type="radio" name="f_pago" value="Anual"><span class="radio-btn"></span><span class="radio-label">Anual <span class="desc-tag">descuento -5%</span></span></label>
       </div>
+      <span class="pago-nota">El descuento se aplica por pago anticipado en el primer mes del semestre o del año, según la modalidad elegida.</span>
       <span class="inline-warn" id="iwarn-f_pago">Recomendado — selecciona una opción</span>
     </div>
   </div>
@@ -506,13 +500,11 @@
   <div class="card-footer">
     <div class="footer-left">
       <span class="footer-note">Ficha SGAE · Establecimientos Comerciales</span>
+      <span class="footer-note"><strong>🖶 Tras enviar podrá guardar una copia en PDF o imprimir la ficha.</strong></span>
       <span class="footer-err-list" id="ferr-fisica"></span>
       <span class="footer-warn-list" id="fwarn-fisica"></span>
     </div>
-    <div class="footer-btns">
-      <button class="btn-pdf" onclick="guardarPDF('fisica')">&#128438; Guardar PDF</button>
-      <button class="btn-send" onclick="enviarFormulario('fisica')">&#128228; Enviar ficha</button>
-    </div>
+    <button class="btn-send" onclick="enviarFormulario('fisica')">&#128228; Enviar ficha</button>
   </div>
 </div>
 
@@ -594,6 +586,7 @@
         <label class="radio-opt"><input type="radio" name="s_pago" value="Semestral"><span class="radio-btn"></span><span class="radio-label">Semestral <span class="desc-tag">descuento -2,5%</span></span></label>
         <label class="radio-opt"><input type="radio" name="s_pago" value="Anual"><span class="radio-btn"></span><span class="radio-label">Anual <span class="desc-tag">descuento -5%</span></span></label>
       </div>
+      <span class="pago-nota">El descuento se aplica por pago anticipado en el primer mes del semestre o del año, según la modalidad elegida.</span>
       <span class="inline-warn" id="iwarn-s_pago">Recomendado — selecciona una opción</span>
     </div>
   </div>
@@ -665,13 +658,11 @@
   <div class="card-footer">
     <div class="footer-left">
       <span class="footer-note">Ficha SGAE · Establecimientos Comerciales</span>
+      <span class="footer-note"><strong>🖶 Tras enviar podrá guardar una copia en PDF o imprimir la ficha.</strong></span>
       <span class="footer-err-list" id="ferr-sociedad"></span>
       <span class="footer-warn-list" id="fwarn-sociedad"></span>
     </div>
-    <div class="footer-btns">
-      <button class="btn-pdf" onclick="guardarPDF('sociedad')">&#128438; Guardar PDF</button>
-      <button class="btn-send" onclick="enviarFormulario('sociedad')">&#128228; Enviar ficha</button>
-    </div>
+    <button class="btn-send" onclick="enviarFormulario('sociedad')">&#128228; Enviar ficha</button>
   </div>
 </div>
 
@@ -764,6 +755,7 @@
         <label class="radio-opt"><input type="radio" name="c_pago" value="Semestral"><span class="radio-btn"></span><span class="radio-label">Semestral <span class="desc-tag">descuento -2,5%</span></span></label>
         <label class="radio-opt"><input type="radio" name="c_pago" value="Anual"><span class="radio-btn"></span><span class="radio-label">Anual <span class="desc-tag">descuento -5%</span></span></label>
       </div>
+      <span class="pago-nota">El descuento se aplica por pago anticipado en el primer mes del semestre o del año, según la modalidad elegida.</span>
       <span class="inline-warn" id="iwarn-c_pago">Recomendado — selecciona una opción</span>
     </div>
   </div>
@@ -835,13 +827,11 @@
   <div class="card-footer">
     <div class="footer-left">
       <span class="footer-note">Ficha SGAE · Establecimientos Comerciales</span>
+      <span class="footer-note"><strong>🖶 Tras enviar podrá guardar una copia en PDF o imprimir la ficha.</strong></span>
       <span class="footer-err-list" id="ferr-comunidad"></span>
       <span class="footer-warn-list" id="fwarn-comunidad"></span>
     </div>
-    <div class="footer-btns">
-      <button class="btn-pdf" onclick="guardarPDF('comunidad')">&#128438; Guardar PDF</button>
-      <button class="btn-send" onclick="enviarFormulario('comunidad')">&#128228; Enviar ficha</button>
-    </div>
+    <button class="btn-send" onclick="enviarFormulario('comunidad')">&#128228; Enviar ficha</button>
   </div>
 </div>
 
@@ -890,13 +880,6 @@
     if (tipoEnviado) {
       document.getElementById('card-' + tipoEnviado).classList.remove('visible');
     }
-  }
-  function guardarPDF(tipo) {
-    var card = document.getElementById('card-' + tipo);
-    var yaVisible = card.classList.contains('visible');
-    if (!yaVisible) card.classList.add('visible');
-    window.print();
-    if (!yaVisible) card.classList.remove('visible');
   }
 
   function toggleInfo() {
