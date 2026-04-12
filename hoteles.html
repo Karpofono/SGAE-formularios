@@ -912,6 +912,8 @@
 
   function calcularTarifa(tipo) {
     var idx = estrellasIdx[tipo];
+    var prefix = 'tf-' + tipo;
+    var panel  = document.getElementById('tarifa-' + tipo);
     var catLabel = ['1 estrella','2 estrellas','3 estrellas','4 estrellas','5 estrellas'][idx];
     var activaHab = document.getElementById(tipo+'_activa_hab').checked;
     var activaZc  = document.getElementById(tipo+'_activa_zc').checked;
@@ -925,8 +927,7 @@
     var ibanVal  = (document.getElementById(tipo+'_iban').value || '').trim();
     var descIban = ibanVal.length > 10;
 
-    var prefix = 'tf-' + (tipo==='f'?'f':tipo==='s'?'s':'c');
-    var panel  = document.getElementById('tarifa-' + (tipo==='f'?'f':tipo==='s'?'s':'c'));
+
 
     // Notas por zona
     ['hab','zc'].forEach(function(zona) {
