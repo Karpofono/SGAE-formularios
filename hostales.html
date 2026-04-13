@@ -356,10 +356,10 @@
   <div class="section-title">Tipo de establecimiento</div>
   <div class="field-row" id="frow-f_tipo" style="display:block;border-bottom:1px solid var(--border)">
     <div class="tipo-group">
-      <label class="tipo-opt"><input type="radio" name="f_tipo" value="hostal_1" onchange="calcularTarifa('f')"><span class="tipo-radio"></span><span class="tipo-label">Hostal o Pensión — 1 estrella</span><span class="tipo-tarifa">6,61 €/mes</span></label>
-      <label class="tipo-opt"><input type="radio" name="f_tipo" value="hostal_2" onchange="calcularTarifa('f')"><span class="tipo-radio"></span><span class="tipo-label">Hostal o Pensión — 2 estrellas</span><span class="tipo-tarifa">8,35 €/mes</span></label>
-      <label class="tipo-opt"><input type="radio" name="f_tipo" value="hostal_3" onchange="calcularTarifa('f')"><span class="tipo-radio"></span><span class="tipo-label">Hostal o Pensión — 3 estrellas</span><span class="tipo-tarifa">15,01 €/mes</span></label>
-      <label class="tipo-opt"><input type="radio" name="f_tipo" value="fonda" onchange="calcularTarifa('f')"><span class="tipo-radio"></span><span class="tipo-label">Fonda</span><span class="tipo-tarifa">4,58 €/mes</span></label>
+      <label class="tipo-opt"><input type="radio" name="f_tipo" value="hostal_1" onchange="calcularTarifaHostal('f')"><span class="tipo-radio"></span><span class="tipo-label">Hostal o Pensión — 1 estrella</span><span class="tipo-tarifa">6,61 €/mes</span></label>
+      <label class="tipo-opt"><input type="radio" name="f_tipo" value="hostal_2" onchange="calcularTarifaHostal('f')"><span class="tipo-radio"></span><span class="tipo-label">Hostal o Pensión — 2 estrellas</span><span class="tipo-tarifa">8,35 €/mes</span></label>
+      <label class="tipo-opt"><input type="radio" name="f_tipo" value="hostal_3" onchange="calcularTarifaHostal('f')"><span class="tipo-radio"></span><span class="tipo-label">Hostal o Pensión — 3 estrellas</span><span class="tipo-tarifa">15,01 €/mes</span></label>
+      <label class="tipo-opt"><input type="radio" name="f_tipo" value="fonda" onchange="calcularTarifaHostal('f')"><span class="tipo-radio"></span><span class="tipo-label">Fonda</span><span class="tipo-tarifa">4,58 €/mes</span></label>
     </div>
     <p style="font-size:10.5px;color:var(--muted);font-style:italic;padding:0 18px 12px;line-height:1.5;">ℹ Tarifa mensual por amenización mediante TV y/o amenización musical en todo el ámbito del establecimiento.</p>
     <span class="inline-err" id="ierr-f_tipo" style="padding:0 18px 10px;display:none">Selecciona el tipo de establecimiento</span>
@@ -370,8 +370,8 @@
     <div class="field-label lbl-soft"><span class="dot"></span>Asoc. de Hoteles</div>
     <div class="field-value">
       <div class="radio-group">
-        <label class="radio-opt"><input type="radio" name="f_asoc" value="Sí" onchange="calcularTarifa('f')"><span class="radio-btn"></span><span class="radio-label">Sí <span class="desc-tag">descuento -5%</span></span></label>
-        <label class="radio-opt"><input type="radio" name="f_asoc" value="No" checked onchange="calcularTarifa('f')"><span class="radio-btn"></span><span class="radio-label">No</span></label>
+        <label class="radio-opt"><input type="radio" name="f_asoc" value="Sí" onchange="calcularTarifaHostal('f')"><span class="radio-btn"></span><span class="radio-label">Sí <span class="desc-tag">descuento -5%</span></span></label>
+        <label class="radio-opt"><input type="radio" name="f_asoc" value="No" checked onchange="calcularTarifaHostal('f')"><span class="radio-btn"></span><span class="radio-label">No</span></label>
       </div>
     </div>
   </div>
@@ -379,9 +379,9 @@
     <div class="field-label lbl-soft"><span class="dot"></span>Forma de pago</div>
     <div class="field-value">
       <div class="radio-group">
-        <label class="radio-opt"><input type="radio" name="f_pago" value="Trimestral" onchange="calcularTarifa('f')"><span class="radio-btn"></span><span class="radio-label">Trimestral</span></label>
-        <label class="radio-opt"><input type="radio" name="f_pago" value="Semestral" onchange="calcularTarifa('f')"><span class="radio-btn"></span><span class="radio-label">Semestral <span class="desc-tag">-2,5%</span></span></label>
-        <label class="radio-opt"><input type="radio" name="f_pago" value="Anual" onchange="calcularTarifa('f')"><span class="radio-btn"></span><span class="radio-label">Anual <span class="desc-tag">-5%</span></span></label>
+        <label class="radio-opt"><input type="radio" name="f_pago" value="Trimestral" onchange="calcularTarifaHostal('f')"><span class="radio-btn"></span><span class="radio-label">Trimestral</span></label>
+        <label class="radio-opt"><input type="radio" name="f_pago" value="Semestral" onchange="calcularTarifaHostal('f')"><span class="radio-btn"></span><span class="radio-label">Semestral <span class="desc-tag">-2,5%</span></span></label>
+        <label class="radio-opt"><input type="radio" name="f_pago" value="Anual" onchange="calcularTarifaHostal('f')"><span class="radio-btn"></span><span class="radio-label">Anual <span class="desc-tag">-5%</span></span></label>
       </div>
       <span class="pago-nota">El descuento se aplica por pago anticipado en el primer mes del semestre o del año, según la modalidad elegida.</span>
       <span class="inline-warn" id="iwarn-f_pago">Recomendado — selecciona una opción</span>
@@ -389,7 +389,7 @@
   </div>
   <div class="field-row">
     <div class="field-label"><span class="dot"></span>IBAN domiciliación <span class="desc-tag" style="margin-left:4px">descuento -5%</span></div>
-    <div class="field-value"><input type="text" id="f_iban" placeholder="ES00 0000 0000 0000 0000 0000" oninput="calcularTarifa('f')"></div>
+    <div class="field-value"><input type="text" id="f_iban" placeholder="ES00 0000 0000 0000 0000 0000" oninput="calcularTarifaHostal('f')"></div>
   </div>
 
   <!-- Calculadora -->
@@ -469,10 +469,10 @@
   <div class="section-title">Tipo de establecimiento</div>
   <div class="field-row" id="frow-s_tipo" style="display:block;border-bottom:1px solid var(--border)">
     <div class="tipo-group">
-      <label class="tipo-opt"><input type="radio" name="s_tipo" value="hostal_1" onchange="calcularTarifa('s')"><span class="tipo-radio"></span><span class="tipo-label">Hostal o Pensión — 1 estrella</span><span class="tipo-tarifa">6,61 €/mes</span></label>
-      <label class="tipo-opt"><input type="radio" name="s_tipo" value="hostal_2" onchange="calcularTarifa('s')"><span class="tipo-radio"></span><span class="tipo-label">Hostal o Pensión — 2 estrellas</span><span class="tipo-tarifa">8,35 €/mes</span></label>
-      <label class="tipo-opt"><input type="radio" name="s_tipo" value="hostal_3" onchange="calcularTarifa('s')"><span class="tipo-radio"></span><span class="tipo-label">Hostal o Pensión — 3 estrellas</span><span class="tipo-tarifa">15,01 €/mes</span></label>
-      <label class="tipo-opt"><input type="radio" name="s_tipo" value="fonda" onchange="calcularTarifa('s')"><span class="tipo-radio"></span><span class="tipo-label">Fonda</span><span class="tipo-tarifa">4,58 €/mes</span></label>
+      <label class="tipo-opt"><input type="radio" name="s_tipo" value="hostal_1" onchange="calcularTarifaHostal('s')"><span class="tipo-radio"></span><span class="tipo-label">Hostal o Pensión — 1 estrella</span><span class="tipo-tarifa">6,61 €/mes</span></label>
+      <label class="tipo-opt"><input type="radio" name="s_tipo" value="hostal_2" onchange="calcularTarifaHostal('s')"><span class="tipo-radio"></span><span class="tipo-label">Hostal o Pensión — 2 estrellas</span><span class="tipo-tarifa">8,35 €/mes</span></label>
+      <label class="tipo-opt"><input type="radio" name="s_tipo" value="hostal_3" onchange="calcularTarifaHostal('s')"><span class="tipo-radio"></span><span class="tipo-label">Hostal o Pensión — 3 estrellas</span><span class="tipo-tarifa">15,01 €/mes</span></label>
+      <label class="tipo-opt"><input type="radio" name="s_tipo" value="fonda" onchange="calcularTarifaHostal('s')"><span class="tipo-radio"></span><span class="tipo-label">Fonda</span><span class="tipo-tarifa">4,58 €/mes</span></label>
     </div>
     <p style="font-size:10.5px;color:var(--muted);font-style:italic;padding:0 18px 12px;line-height:1.5;">ℹ Tarifa mensual por amenización mediante TV y/o amenización musical en todo el ámbito del establecimiento.</p>
     <span class="inline-err" id="ierr-s_tipo" style="padding:0 18px 10px;display:none">Selecciona el tipo de establecimiento</span>
@@ -483,8 +483,8 @@
     <div class="field-label lbl-soft"><span class="dot"></span>Asoc. de Hoteles</div>
     <div class="field-value">
       <div class="radio-group">
-        <label class="radio-opt"><input type="radio" name="s_asoc" value="Sí" onchange="calcularTarifa('s')"><span class="radio-btn"></span><span class="radio-label">Sí <span class="desc-tag">descuento -5%</span></span></label>
-        <label class="radio-opt"><input type="radio" name="s_asoc" value="No" checked onchange="calcularTarifa('s')"><span class="radio-btn"></span><span class="radio-label">No</span></label>
+        <label class="radio-opt"><input type="radio" name="s_asoc" value="Sí" onchange="calcularTarifaHostal('s')"><span class="radio-btn"></span><span class="radio-label">Sí <span class="desc-tag">descuento -5%</span></span></label>
+        <label class="radio-opt"><input type="radio" name="s_asoc" value="No" checked onchange="calcularTarifaHostal('s')"><span class="radio-btn"></span><span class="radio-label">No</span></label>
       </div>
     </div>
   </div>
@@ -492,9 +492,9 @@
     <div class="field-label lbl-soft"><span class="dot"></span>Forma de pago</div>
     <div class="field-value">
       <div class="radio-group">
-        <label class="radio-opt"><input type="radio" name="s_pago" value="Trimestral" onchange="calcularTarifa('s')"><span class="radio-btn"></span><span class="radio-label">Trimestral</span></label>
-        <label class="radio-opt"><input type="radio" name="s_pago" value="Semestral" onchange="calcularTarifa('s')"><span class="radio-btn"></span><span class="radio-label">Semestral <span class="desc-tag">-2,5%</span></span></label>
-        <label class="radio-opt"><input type="radio" name="s_pago" value="Anual" onchange="calcularTarifa('s')"><span class="radio-btn"></span><span class="radio-label">Anual <span class="desc-tag">-5%</span></span></label>
+        <label class="radio-opt"><input type="radio" name="s_pago" value="Trimestral" onchange="calcularTarifaHostal('s')"><span class="radio-btn"></span><span class="radio-label">Trimestral</span></label>
+        <label class="radio-opt"><input type="radio" name="s_pago" value="Semestral" onchange="calcularTarifaHostal('s')"><span class="radio-btn"></span><span class="radio-label">Semestral <span class="desc-tag">-2,5%</span></span></label>
+        <label class="radio-opt"><input type="radio" name="s_pago" value="Anual" onchange="calcularTarifaHostal('s')"><span class="radio-btn"></span><span class="radio-label">Anual <span class="desc-tag">-5%</span></span></label>
       </div>
       <span class="pago-nota">El descuento se aplica por pago anticipado en el primer mes del semestre o del año, según la modalidad elegida.</span>
       <span class="inline-warn" id="iwarn-s_pago">Recomendado — selecciona una opción</span>
@@ -502,7 +502,7 @@
   </div>
   <div class="field-row">
     <div class="field-label"><span class="dot"></span>IBAN domiciliación <span class="desc-tag" style="margin-left:4px">descuento -5%</span></div>
-    <div class="field-value"><input type="text" id="s_iban" placeholder="ES00 0000 0000 0000 0000 0000" oninput="calcularTarifa('s')"></div>
+    <div class="field-value"><input type="text" id="s_iban" placeholder="ES00 0000 0000 0000 0000 0000" oninput="calcularTarifaHostal('s')"></div>
   </div>
 
   <div id="tarifa-s" class="tarifa-panel inactive">
@@ -586,10 +586,10 @@
   <div class="section-title">Tipo de establecimiento</div>
   <div class="field-row" id="frow-c_tipo" style="display:block;border-bottom:1px solid var(--border)">
     <div class="tipo-group">
-      <label class="tipo-opt"><input type="radio" name="c_tipo" value="hostal_1" onchange="calcularTarifa('c')"><span class="tipo-radio"></span><span class="tipo-label">Hostal o Pensión — 1 estrella</span><span class="tipo-tarifa">6,61 €/mes</span></label>
-      <label class="tipo-opt"><input type="radio" name="c_tipo" value="hostal_2" onchange="calcularTarifa('c')"><span class="tipo-radio"></span><span class="tipo-label">Hostal o Pensión — 2 estrellas</span><span class="tipo-tarifa">8,35 €/mes</span></label>
-      <label class="tipo-opt"><input type="radio" name="c_tipo" value="hostal_3" onchange="calcularTarifa('c')"><span class="tipo-radio"></span><span class="tipo-label">Hostal o Pensión — 3 estrellas</span><span class="tipo-tarifa">15,01 €/mes</span></label>
-      <label class="tipo-opt"><input type="radio" name="c_tipo" value="fonda" onchange="calcularTarifa('c')"><span class="tipo-radio"></span><span class="tipo-label">Fonda</span><span class="tipo-tarifa">4,58 €/mes</span></label>
+      <label class="tipo-opt"><input type="radio" name="c_tipo" value="hostal_1" onchange="calcularTarifaHostal('c')"><span class="tipo-radio"></span><span class="tipo-label">Hostal o Pensión — 1 estrella</span><span class="tipo-tarifa">6,61 €/mes</span></label>
+      <label class="tipo-opt"><input type="radio" name="c_tipo" value="hostal_2" onchange="calcularTarifaHostal('c')"><span class="tipo-radio"></span><span class="tipo-label">Hostal o Pensión — 2 estrellas</span><span class="tipo-tarifa">8,35 €/mes</span></label>
+      <label class="tipo-opt"><input type="radio" name="c_tipo" value="hostal_3" onchange="calcularTarifaHostal('c')"><span class="tipo-radio"></span><span class="tipo-label">Hostal o Pensión — 3 estrellas</span><span class="tipo-tarifa">15,01 €/mes</span></label>
+      <label class="tipo-opt"><input type="radio" name="c_tipo" value="fonda" onchange="calcularTarifaHostal('c')"><span class="tipo-radio"></span><span class="tipo-label">Fonda</span><span class="tipo-tarifa">4,58 €/mes</span></label>
     </div>
     <p style="font-size:10.5px;color:var(--muted);font-style:italic;padding:0 18px 12px;line-height:1.5;">ℹ Tarifa mensual por amenización mediante TV y/o amenización musical en todo el ámbito del establecimiento.</p>
     <span class="inline-err" id="ierr-c_tipo" style="padding:0 18px 10px;display:none">Selecciona el tipo de establecimiento</span>
@@ -600,8 +600,8 @@
     <div class="field-label lbl-soft"><span class="dot"></span>Asoc. de Hoteles</div>
     <div class="field-value">
       <div class="radio-group">
-        <label class="radio-opt"><input type="radio" name="c_asoc" value="Sí" onchange="calcularTarifa('c')"><span class="radio-btn"></span><span class="radio-label">Sí <span class="desc-tag">descuento -5%</span></span></label>
-        <label class="radio-opt"><input type="radio" name="c_asoc" value="No" checked onchange="calcularTarifa('c')"><span class="radio-btn"></span><span class="radio-label">No</span></label>
+        <label class="radio-opt"><input type="radio" name="c_asoc" value="Sí" onchange="calcularTarifaHostal('c')"><span class="radio-btn"></span><span class="radio-label">Sí <span class="desc-tag">descuento -5%</span></span></label>
+        <label class="radio-opt"><input type="radio" name="c_asoc" value="No" checked onchange="calcularTarifaHostal('c')"><span class="radio-btn"></span><span class="radio-label">No</span></label>
       </div>
     </div>
   </div>
@@ -609,9 +609,9 @@
     <div class="field-label lbl-soft"><span class="dot"></span>Forma de pago</div>
     <div class="field-value">
       <div class="radio-group">
-        <label class="radio-opt"><input type="radio" name="c_pago" value="Trimestral" onchange="calcularTarifa('c')"><span class="radio-btn"></span><span class="radio-label">Trimestral</span></label>
-        <label class="radio-opt"><input type="radio" name="c_pago" value="Semestral" onchange="calcularTarifa('c')"><span class="radio-btn"></span><span class="radio-label">Semestral <span class="desc-tag">-2,5%</span></span></label>
-        <label class="radio-opt"><input type="radio" name="c_pago" value="Anual" onchange="calcularTarifa('c')"><span class="radio-btn"></span><span class="radio-label">Anual <span class="desc-tag">-5%</span></span></label>
+        <label class="radio-opt"><input type="radio" name="c_pago" value="Trimestral" onchange="calcularTarifaHostal('c')"><span class="radio-btn"></span><span class="radio-label">Trimestral</span></label>
+        <label class="radio-opt"><input type="radio" name="c_pago" value="Semestral" onchange="calcularTarifaHostal('c')"><span class="radio-btn"></span><span class="radio-label">Semestral <span class="desc-tag">-2,5%</span></span></label>
+        <label class="radio-opt"><input type="radio" name="c_pago" value="Anual" onchange="calcularTarifaHostal('c')"><span class="radio-btn"></span><span class="radio-label">Anual <span class="desc-tag">-5%</span></span></label>
       </div>
       <span class="pago-nota">El descuento se aplica por pago anticipado en el primer mes del semestre o del año, según la modalidad elegida.</span>
       <span class="inline-warn" id="iwarn-c_pago">Recomendado — selecciona una opción</span>
@@ -619,7 +619,7 @@
   </div>
   <div class="field-row">
     <div class="field-label"><span class="dot"></span>IBAN domiciliación <span class="desc-tag" style="margin-left:4px">descuento -5%</span></div>
-    <div class="field-value"><input type="text" id="c_iban" placeholder="ES00 0000 0000 0000 0000 0000" oninput="calcularTarifa('c')"></div>
+    <div class="field-value"><input type="text" id="c_iban" placeholder="ES00 0000 0000 0000 0000 0000" oninput="calcularTarifaHostal('c')"></div>
   </div>
 
   <div id="tarifa-c" class="tarifa-panel inactive">
@@ -691,68 +691,113 @@
   document.getElementById('email-display').textContent = em;
   document.getElementById('success-email-msg').innerHTML = 'Los datos han llegado a <strong>' + em + '</strong>';
 
+  // ===== CALCULADORA HOSTALES / PENSIONES / FONDAS =====
   var TARIFAS_H = {
     hostal_1: { label: 'Hostal / Pensión 1★', mensual: 6.61 },
     hostal_2: { label: 'Hostal / Pensión 2★', mensual: 8.35 },
     hostal_3: { label: 'Hostal / Pensión 3★', mensual: 15.01 },
-    fonda:    { label: 'Fonda',               mensual: 4.58 }
+    fonda:    { label: 'Fonda',                mensual: 4.58 }
   };
 
-  function fmtH(n){ return n.toFixed(2).replace('.',',') + ' €'; }
+  function fmtH(n) { return n.toFixed(2).replace('.', ',') + ' €'; }
 
-  function calcularTarifa(tipo) {
-    var tipoEl = document.querySelector('input[name="'+tipo+'_tipo"]:checked');
-    var pagoEl = document.querySelector('input[name="'+tipo+'_pago"]:checked');
-    var asocEl = document.querySelector('input[name="'+tipo+'_asoc"]:checked');
-    var ibanVal = (document.getElementById(tipo+'_iban').value||'').trim();
-    var prefix  = 'tf-' + tipo;
-    var panel   = document.getElementById('tarifa-' + tipo);
-    var descIban = ibanVal.length > 10;
+  function calcularTarifaHostal(prefix) {
+    // Leer tipo de establecimiento
+    var tipoEl = null;
+    document.querySelectorAll('input[name="' + prefix + '_tipo"]').forEach(function(r) {
+      if (r.checked) tipoEl = r;
+    });
+    // Leer pago
+    var pagoEl = null;
+    document.querySelectorAll('input[name="' + prefix + '_pago"]').forEach(function(r) {
+      if (r.checked) pagoEl = r;
+    });
+    // Leer asoc
+    var asocEl = null;
+    document.querySelectorAll('input[name="' + prefix + '_asoc"]').forEach(function(r) {
+      if (r.checked) asocEl = r;
+    });
+
+    var ibanEl  = document.getElementById(prefix + '_iban');
+    var ibanOk  = ibanEl ? ibanEl.value.trim().length > 10 : false;
     var descAsoc = asocEl && asocEl.value === 'Sí';
+
+    var panel      = document.getElementById('tarifa-' + prefix);
+    var pending    = document.getElementById('tarifa-' + prefix + '-pending');
+    var contentDiv = document.getElementById('tarifa-' + prefix + '-content');
+    if (!panel) return;
 
     if (!tipoEl) {
       panel.classList.add('inactive');
-      document.getElementById(prefix+'-pending').style.display = '';
-      document.getElementById(prefix+'-content').style.display = 'none';
-      return;
+      pending.style.display = ''; contentDiv.style.display = 'none'; return;
     }
 
-    var datos = TARIFAS_H[tipoEl.value];
+    var datos    = TARIFAS_H[tipoEl.value];
+    var pagoVal  = pagoEl ? pagoEl.value : '';
+    var dAsoc    = descAsoc ? 0.05 : 0;
+    var dPago    = pagoVal === 'Anual' ? 0.05 : pagoVal === 'Semestral' ? 0.025 : 0;
+    var dIban    = ibanOk ? 0.05 : 0;
+    var mensual  = datos.mensual * (1 - dAsoc - dPago - dIban);
+
     panel.classList.remove('inactive');
-    document.getElementById(prefix+'-pending').style.display = 'none';
-    document.getElementById(prefix+'-content').style.display = '';
-    document.getElementById(prefix+'-tipo').textContent    = datos.label;
-    document.getElementById(prefix+'-mensual').textContent = fmtH(datos.mensual) + '/mes';
-    document.getElementById(prefix+'-d-asoc').className = 'tarifa-desc-tag ' + (descAsoc?'on':'off');
-    document.getElementById(prefix+'-d-iban').className = 'tarifa-desc-tag ' + (descIban?'on':'off');
+    pending.style.display = 'none';
+    contentDiv.style.display = 'block';
 
-    if (!pagoEl) {
-      document.getElementById(prefix+'-pago-pending').style.display = '';
-      ['trimestral','semestral','anual'].forEach(function(p){ document.getElementById(prefix+'-bloque-'+p).style.display='none'; });
-      document.getElementById(prefix+'-d-pago').className = 'tarifa-desc-tag off';
-      document.getElementById(prefix+'-d-pago').textContent = 'Pago —';
-      return;
+    var p = 'tf-' + prefix + '-';
+    document.getElementById(p + 'tipo').textContent    = datos.label;
+    document.getElementById(p + 'mensual').textContent = fmtH(datos.mensual) + '/mes';
+
+    document.getElementById(p + 'd-asoc').className = 'tarifa-desc-tag ' + (dAsoc > 0 ? 'on' : 'off');
+    document.getElementById(p + 'd-iban').className  = 'tarifa-desc-tag ' + (dIban > 0 ? 'on' : 'off');
+
+    var dp = document.getElementById(p + 'd-pago');
+    if (!pagoVal || pagoVal === 'Trimestral') {
+      dp.textContent = pagoVal ? 'Pago trimestral' : 'Pago —';
+      dp.className   = 'tarifa-desc-tag off';
+    } else if (pagoVal === 'Semestral') {
+      dp.textContent = 'Pago semestral −2,5%';
+      dp.className   = 'tarifa-desc-tag on';
+    } else {
+      dp.textContent = 'Pago anual −5%';
+      dp.className   = 'tarifa-desc-tag on';
     }
 
-    var pago = pagoEl.value;
-    var descPago = pago==='Semestral'?0.025:pago==='Anual'?0.05:0;
-    var meses    = pago==='Trimestral'?3:pago==='Semestral'?6:12;
-    document.getElementById(prefix+'-pago-pending').style.display = 'none';
-    document.getElementById(prefix+'-d-pago').className = 'tarifa-desc-tag ' + (descPago>0?'on':'off');
-    document.getElementById(prefix+'-d-pago').textContent = pago==='Semestral'?'Semestral −2,5%':pago==='Anual'?'Anual −5%':'Trimestral (sin dto.)';
-
-    var bruto = datos.mensual * meses;
-    var dAsoc = descAsoc ? bruto*0.05 : 0;
-    var dIban = descIban ? bruto*0.05 : 0;
-    var dPago = bruto * descPago;
-    var total = bruto - dAsoc - dIban - dPago;
-
-    ['trimestral','semestral','anual'].forEach(function(p){
-      document.getElementById(prefix+'-bloque-'+p).style.display = pago.toLowerCase()===p?'':'none';
+    ['trimestral','semestral','anual'].forEach(function(b) {
+      var el = document.getElementById(p + 'bloque-' + b);
+      if (el) el.style.display = 'none';
     });
-    document.getElementById(prefix+'-'+pago.toLowerCase()).textContent = fmtH(total);
+    var pendingPago = document.getElementById(p + 'pago-pending');
+    if (pagoVal === 'Trimestral') {
+      document.getElementById(p + 'trimestral').textContent = fmtH(mensual * 3);
+      document.getElementById(p + 'bloque-trimestral').style.display = '';
+      if (pendingPago) pendingPago.style.display = 'none';
+    } else if (pagoVal === 'Semestral') {
+      document.getElementById(p + 'semestral').textContent = fmtH(mensual * 6);
+      document.getElementById(p + 'bloque-semestral').style.display = '';
+      if (pendingPago) pendingPago.style.display = 'none';
+    } else if (pagoVal === 'Anual') {
+      document.getElementById(p + 'anual').textContent = fmtH(mensual * 12);
+      document.getElementById(p + 'bloque-anual').style.display = '';
+      if (pendingPago) pendingPago.style.display = 'none';
+    } else {
+      if (pendingPago) pendingPago.style.display = '';
+    }
   }
 
+  // Event listeners directos
+  ['f', 's', 'c'].forEach(function(prefix) {
+    ['tipo','asoc','pago'].forEach(function(nombre) {
+      document.querySelectorAll('input[name="' + prefix + '_' + nombre + '"]').forEach(function(r) {
+        r.addEventListener('change', function() { calcularTarifaHostal(prefix); });
+      });
+    });
+    var ibanEl = document.getElementById(prefix + '_iban');
+    if (ibanEl) ibanEl.addEventListener('input', function() { calcularTarifaHostal(prefix); });
+  });
+  // ===== FIN CALCULADORA =====
+
+  // ─── Navegación formularios ───
+  var tipoMap = { fisica:'f', sociedad:'s', comunidad:'c' };
   function showForm(t) {
     ['fisica','sociedad','comunidad'].forEach(function(x){
       document.getElementById('card-'+x).classList.remove('visible');
@@ -762,42 +807,89 @@
     document.getElementById('tab-'+t).classList.add('active');
     document.getElementById('notice-unknown').classList.remove('visible');
     document.getElementById('card-'+t).scrollIntoView({behavior:'smooth',block:'start'});
+    calcularTarifaHostal(tipoMap[t]);
   }
 
-  function showToast(msg,type){
-    var t=document.getElementById('toast');
-    t.textContent=msg; t.className='toast show'+(type?' '+type:'');
-    setTimeout(function(){t.className='toast';},5000);
+  function showToast(msg, type) {
+    var t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'toast show' + (type?' '+type:'');
+    setTimeout(function(){ t.className='toast'; }, 5000);
   }
 
   function getVal(id){ var e=document.getElementById(id); return e?e.value.trim():''; }
   function getRadio(name){ var s=document.querySelector('input[name="'+name+'"]:checked'); return s?s.value:''; }
 
-  function validarDNIoNIE(v){v=v.trim().toUpperCase();var l='TRWAGMYFPDXBNJZSQVHLCKE';if(/^\d{8}[A-Z]$/.test(v))return l[parseInt(v)%23]===v[8];if(/^[XYZ]\d{7}[A-Z]$/.test(v)){var n=v.replace('X','0').replace('Y','1').replace('Z','2');return l[parseInt(n)%23]===v[8];}return false;}
-  function validarCIF(v){v=v.trim().toUpperCase();if(!/^[ABCDEFGHJKLMNPQRSUVW]\d{7}[\dA-J]$/.test(v))return false;var s=0;for(var i=1;i<8;i++){var d=parseInt(v[i]);if(i%2===0)s+=d;else{var d2=d*2;s+=d2>9?d2-9:d2;}}var c=10-(s%10);if(c===10)c=0;var last=v[8];if(/\d/.test(last))return parseInt(last)===c;return String.fromCharCode(64+c)===last;}
-  function validarIBAN(v){v=v.trim().toUpperCase().replace(/\s/g,'');if(!/^ES\d{22}$/.test(v))return false;var r=v.slice(4)+v.slice(0,4),num='';for(var i=0;i<r.length;i++){var cc=r.charCodeAt(i);num+=cc>=65?String(cc-55):r[i];}var mod=0;for(var j=0;j<num.length;j++)mod=(mod*10+parseInt(num[j]))%97;return mod===1;}
-  function validarMovil(v){return /^[67]\d{8}$/.test(v.trim().replace(/[\s-]/g,''));}
-  function validarEmail(v){return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v.trim());}
+  function validarDNIoNIE(v){
+    v=v.trim().toUpperCase();
+    var letras='TRWAGMYFPDXBNJZSQVHLCKE';
+    if(/^\d{8}[A-Z]$/.test(v)) return letras[parseInt(v)%23]===v[8];
+    if(/^[XYZ]\d{7}[A-Z]$/.test(v)){var n=v.replace('X','0').replace('Y','1').replace('Z','2');return letras[parseInt(n)%23]===v[8];}
+    return false;
+  }
+  function validarCIF(v){
+    v=v.trim().toUpperCase();
+    if(!/^[ABCDEFGHJKLMNPQRSUVW]\d{7}[\dA-J]$/.test(v)) return false;
+    var s=0; for(var i=1;i<8;i++){var d=parseInt(v[i]);if(i%2===0)s+=d;else{var d2=d*2;s+=d2>9?d2-9:d2;}}
+    var ctrl=10-(s%10); if(ctrl===10)ctrl=0;
+    var last=v[8]; if(/\d/.test(last)) return parseInt(last)===ctrl;
+    return String.fromCharCode(64+ctrl)===last;
+  }
+  function validarIBAN(v){
+    v=v.trim().toUpperCase().replace(/\s/g,'');
+    if(!/^ES\d{22}$/.test(v)) return false;
+    var r=v.slice(4)+v.slice(0,4),num='';
+    for(var i=0;i<r.length;i++){var cc=r.charCodeAt(i);num+=cc>=65?String(cc-55):r[i];}
+    var mod=0; for(var j=0;j<num.length;j++) mod=(mod*10+parseInt(num[j]))%97;
+    return mod===1;
+  }
+  function validarMovil(v){ return /^[67]\d{8}$/.test(v.trim().replace(/[\s-]/g,'')); }
+  function validarEmail(v){ return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v.trim()); }
 
-  function setupVal(id,fn,msgOk,msgErr){
-    var el=document.getElementById(id);if(!el)return;
+  function setupVal(id, fn, msgOk, msgErr){
+    var el=document.getElementById(id); if(!el) return;
     var mid='valmsg-'+id;
     if(!document.getElementById(mid)){var sp=document.createElement('span');sp.id=mid;sp.className='val-msg';el.parentNode.appendChild(sp);}
-    function check(){var msg=document.getElementById(mid);var v=el.value.trim();if(!v){el.classList.remove('val-ok','val-err');msg.className='val-msg';return;}if(fn(v)){el.classList.remove('val-err');el.classList.add('val-ok');msg.textContent='✓ '+msgOk;msg.className='val-msg show-ok';}else{el.classList.remove('val-ok');el.classList.add('val-err');msg.textContent='✗ '+msgErr;msg.className='val-msg show-err';}}
-    el.addEventListener('input',check);el.addEventListener('blur',check);
+    function check(){
+      var msg=document.getElementById(mid); var v=el.value.trim();
+      if(!v){el.classList.remove('val-ok','val-err');msg.className='val-msg';return;}
+      if(fn(v)){el.classList.remove('val-err');el.classList.add('val-ok');msg.textContent='✓ '+msgOk;msg.className='val-msg show-ok';}
+      else{el.classList.remove('val-ok');el.classList.add('val-err');msg.textContent='✗ '+msgErr;msg.className='val-msg show-err';}
+    }
+    el.addEventListener('input',check); el.addEventListener('blur',check);
   }
 
-  ['f_dni','s_adni','c_dni1','c_dni2'].forEach(function(id){setupVal(id,validarDNIoNIE,'DNI/NIE correcto','Formato o letra incorrecta — ej: 12345678Z');});
-  ['s_cif','c_cif'].forEach(function(id){setupVal(id,validarCIF,'CIF correcto','Formato o dígito de control incorrecto');});
-  ['f_iban','s_iban','c_iban'].forEach(function(id){setupVal(id,validarIBAN,'IBAN correcto','IBAN inválido — debe ser ES + 22 dígitos');});
-  ['f_movil','s_movil','c_movil'].forEach(function(id){setupVal(id,validarMovil,'Móvil correcto','Debe tener 9 dígitos y empezar por 6 ó 7');});
-  ['f_email','s_email','c_email'].forEach(function(id){setupVal(id,validarEmail,'Email correcto','Formato de email no válido');});
+  ['f_dni','s_adni','c_dni1','c_dni2'].forEach(function(id){
+    setupVal(id,validarDNIoNIE,'DNI/NIE correcto','Formato o letra incorrecta — ej: 12345678Z');
+  });
+  ['s_cif','c_cif'].forEach(function(id){
+    setupVal(id,validarCIF,'CIF correcto','Formato o dígito de control incorrecto — ej: B12345678');
+  });
+  ['f_iban','s_iban','c_iban'].forEach(function(id){
+    setupVal(id,validarIBAN,'IBAN correcto','IBAN inválido — debe ser ES + 22 dígitos');
+  });
+  ['f_movil','s_movil','c_movil'].forEach(function(id){
+    setupVal(id,validarMovil,'Móvil correcto','Debe tener 9 dígitos y empezar por 6 ó 7');
+  });
+  ['f_email','s_email','c_email'].forEach(function(id){
+    setupVal(id,validarEmail,'Email correcto','Formato de email no válido');
+  });
 
   var tipoEnviado = null;
   function printFicha(){
     if(tipoEnviado) document.getElementById('card-'+tipoEnviado).classList.add('visible');
     window.print();
     if(tipoEnviado) document.getElementById('card-'+tipoEnviado).classList.remove('visible');
+  }
+
+  function toggleInfo() {
+    var toggle = document.getElementById('info-toggle');
+    var body   = document.getElementById('info-body');
+    if (toggle.classList.contains('collapsed')) {
+      toggle.classList.remove('collapsed'); body.classList.remove('hidden');
+    } else {
+      toggle.classList.add('collapsed'); body.classList.add('hidden');
+    }
   }
 
   function enviarFormulario(tipo) {
