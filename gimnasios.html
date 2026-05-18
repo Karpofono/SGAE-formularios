@@ -144,6 +144,26 @@
   .check-opt input:checked ~ .check-btn { border-color: var(--gold); background: var(--gold); }
   .check-opt input:checked ~ .check-btn::after { content: ''; width: 9px; height: 6px; border-left: 2px solid white; border-bottom: 2px solid white; display: block; transform: rotate(-45deg) translate(1px, -1px); }
   .check-label { font-size: 13px; color: var(--dark); white-space: nowrap; }
+  /* ===== DOMICILIO SOCIAL (SA/SL) ===== */
+  .dom-social-toggle { display: flex; align-items: center; gap: 10px; padding: 12px 18px; cursor: pointer; user-select: none; }
+  .dom-social-toggle input[type="checkbox"] { position: absolute; opacity: 0; width: 0; height: 0; }
+  .dom-social-check { width: 18px; height: 18px; border: 2px solid var(--border); border-radius: 4px; display: flex; align-items: center; justify-content: center; transition: all 0.2s; flex-shrink: 0; }
+  .dom-social-toggle input:checked ~ .dom-social-check { border-color: var(--gold); background: var(--gold); }
+  .dom-social-toggle input:checked ~ .dom-social-check::after { content: '✓'; font-size: 11px; color: white; font-weight: 700; line-height: 1; }
+  .dom-social-label { font-size: 12px; color: var(--muted); font-style: italic; }
+  .dom-social-fields { display: none; border-top: 1px dashed var(--border); }
+  .dom-social-fields.open { display: block; animation: fadeUp 0.3s ease both; }
+
+  /* ===== INTEGRANTES EXTRA (CB/SC) ===== */
+  .integrantes-nota { display: flex; align-items: flex-start; gap: 8px; padding: 10px 36px 8px; font-size: 11px; color: var(--muted); font-style: italic; line-height: 1.5; border-bottom: 1px solid var(--border); background: #FDFAF5; }
+  .integrantes-nota::before { content: 'ℹ'; font-style: normal; font-size: 12px; color: var(--gold); flex-shrink: 0; margin-top: 1px; }
+  .btn-mas-integrantes { display: inline-flex; align-items: center; gap: 6px; background: none; border: 1.5px dashed var(--border); border-radius: 6px; padding: 8px 18px; font-family: 'DM Sans', sans-serif; font-size: 11px; letter-spacing: 0.5px; color: var(--muted); cursor: pointer; margin: 10px 36px; transition: all 0.2s; }
+  .btn-mas-integrantes:hover { border-color: var(--gold); color: var(--dark); }
+  .btn-mas-integrantes .btn-icon { font-size: 14px; transition: transform 0.3s; }
+  .btn-mas-integrantes.open .btn-icon { transform: rotate(45deg); }
+  .integrantes-extra { display: none; }
+  .integrantes-extra.open { display: block; animation: fadeUp 0.3s ease both; }
+
   /* ===== CALCULADORA DE TARIFA ===== */
   .tarifa-panel { margin: 16px 36px 4px; border: 2px solid var(--gold); border-radius: 10px; overflow: hidden; transition: all 0.4s ease; }
   .tarifa-panel.inactive { border-color: var(--border); opacity: 0.6; }
@@ -591,6 +611,25 @@
       <span class="inline-err" id="ierr-s_adni">Obligatorio</span>
     </div>
   </div>
+  <!-- DOMICILIO SOCIAL (opcional, solo si difiere del local) -->
+  <div style="border-bottom: 1px solid var(--border); background: #FDFAF5;">
+    <label class="dom-social-toggle">
+      <input type="checkbox" id="s_dom_distinto" onchange="toggleDomSocial()">
+      <span class="dom-social-check"></span>
+      <span class="dom-social-label">El domicilio social es distinto al del local — marcar para añadirlo y que conste correctamente en la factura</span>
+    </label>
+    <div class="dom-social-fields" id="s_dom_social_fields">
+      <div class="field-row">
+        <div class="field-label"><span class="dot"></span>Calle y número</div>
+        <div class="field-value"><input type="text" id="s_dom_calle" placeholder="Calle, número, piso…"></div>
+      </div>
+      <div class="field-row-split" style="border-bottom:none;">
+        <div class="field-label"><span class="dot"></span>Municipio y provincia</div>
+        <div class="field-value"><input type="text" id="s_dom_municipio" placeholder="Municipio"></div>
+        <div class="field-value"><input type="text" id="s_dom_cp" placeholder="C.P. · 00000"></div>
+      </div>
+    </div>
+  </div>
   <div class="field-row" id="frow-s_movil">
     <div class="field-label lbl-block"><span class="dot"></span>Móvil de contacto</div>
     <div class="field-value">
@@ -770,6 +809,15 @@
       <span class="inline-err" id="ierr-c_cif">Obligatorio</span>
     </div>
   </div>
+  <!-- Fecha de constitución (opcional) -->
+  <div class="field-row">
+    <div class="field-label"><span class="dot"></span>Fecha de constitución</div>
+    <div class="field-value"><input type="text" id="c_fecha_const" placeholder="dd/mm/aaaa — opcional"></div>
+  </div>
+  <!-- Nota informativa integrantes -->
+  <div class="integrantes-nota">
+    Se solicitan datos de un mínimo de 2 integrantes. Si hay más de 2, y aunque no es imprescindible, pueden añadirse a continuación. Es necesaria la firma posterior en el contrato de todos los integrantes facilitados.
+  </div>
   <div class="field-row-split" id="frow-c_int1">
     <div class="field-label lbl-block"><span class="dot"></span>Integrante 1</div>
     <div class="field-value">
@@ -790,6 +838,29 @@
     <div class="field-value">
       <input type="text" id="c_dni2" placeholder="D.N.I. · 00000000A">
       <span class="inline-err" id="ierr-c_dni2">Obligatorio</span>
+    </div>
+  </div>
+  <!-- Más integrantes (ocultos por defecto) -->
+  <div style="border-bottom: 1px solid var(--border);">
+    <button type="button" class="btn-mas-integrantes" id="btn-mas-int" onclick="toggleMasIntegrantes()">
+      <span class="btn-icon">＋</span> Añadir más integrantes
+    </button>
+    <div class="integrantes-extra" id="c_integrantes_extra">
+      <div class="field-row-split">
+        <div class="field-label"><span class="dot"></span>Integrante 3</div>
+        <div class="field-value"><input type="text" id="c_nombre3" placeholder="Nombre completo"></div>
+        <div class="field-value"><input type="text" id="c_dni3" placeholder="D.N.I. · 00000000A"></div>
+      </div>
+      <div class="field-row-split">
+        <div class="field-label"><span class="dot"></span>Integrante 4</div>
+        <div class="field-value"><input type="text" id="c_nombre4" placeholder="Nombre completo"></div>
+        <div class="field-value"><input type="text" id="c_dni4" placeholder="D.N.I. · 00000000A"></div>
+      </div>
+      <div class="field-row-split" style="border-bottom:none;">
+        <div class="field-label"><span class="dot"></span>Integrante 5</div>
+        <div class="field-value"><input type="text" id="c_nombre5" placeholder="Nombre completo"></div>
+        <div class="field-value"><input type="text" id="c_dni5" placeholder="D.N.I. · 00000000A"></div>
+      </div>
     </div>
   </div>
   <div class="field-row" id="frow-c_movil">
@@ -981,6 +1052,37 @@
 
   function toggleNotice() { document.getElementById('notice-unknown').classList.toggle('visible'); }
 
+  function toggleDomSocial() {
+    var chk = document.getElementById('s_dom_distinto');
+    var fields = document.getElementById('s_dom_social_fields');
+    if (chk.checked) {
+      fields.classList.add('open');
+    } else {
+      fields.classList.remove('open');
+      ['s_dom_calle','s_dom_municipio','s_dom_cp'].forEach(function(id){
+        var el = document.getElementById(id); if(el) el.value = '';
+      });
+    }
+  }
+
+  function toggleMasIntegrantes() {
+    var btn = document.getElementById('btn-mas-int');
+    var extra = document.getElementById('c_integrantes_extra');
+    var isOpen = extra.classList.contains('open');
+    if (isOpen) {
+      extra.classList.remove('open');
+      btn.classList.remove('open');
+      btn.innerHTML = '<span class="btn-icon">＋</span> Añadir más integrantes';
+      ['c_nombre3','c_dni3','c_nombre4','c_dni4','c_nombre5','c_dni5'].forEach(function(id){
+        var el = document.getElementById(id); if(el) el.value = '';
+      });
+    } else {
+      extra.classList.add('open');
+      btn.classList.add('open');
+      btn.innerHTML = '<span class="btn-icon">＋</span> Ocultar integrantes adicionales';
+    }
+  }
+
   var tipoEnviado = null;
   function printFicha() {
     if (tipoEnviado) {
@@ -1153,6 +1255,14 @@
     } else if (tipo === 'sociedad') {
       datos['Nombre sociedad'] = val('s_nombre'); datos['C.I.F.'] = val('s_cif');
       datos['Administrador'] = val('s_admin'); datos['D.N.I. administrador'] = val('s_adni');
+      var domDistinto = document.getElementById('s_dom_distinto');
+      if (domDistinto && domDistinto.checked) {
+        datos['Domicilio social (calle)']     = val('s_dom_calle')     || 'No facilitado';
+        datos['Domicilio social (municipio)'] = val('s_dom_municipio') || 'No facilitado';
+        datos['Domicilio social (C.P.)']      = val('s_dom_cp')        || 'No facilitado';
+      } else {
+        datos['Domicilio social'] = 'Igual al del local';
+      }
       datos['Movil'] = val('s_movil'); datos['Email'] = val('s_email');
       datos['Repertorio clases dirigidas'] = getRadio('s_rep_clases');
       datos['Repertorio máquinas/resto'] = getRadio('s_rep_maquinas');
@@ -1163,8 +1273,16 @@
       datos['IBAN domiciliacion'] = val('s_iban') || 'No facilitado';
     } else {
       datos['Nombre de la empresa'] = val('c_empresa'); datos['C.I.F.'] = val('c_cif');
+      datos['Fecha de constitucion'] = val('c_fecha_const') || 'No facilitada';
       datos['Integrante 1 nombre'] = val('c_nombre1'); datos['Integrante 1 D.N.I.'] = val('c_dni1');
       datos['Integrante 2 nombre'] = val('c_nombre2'); datos['Integrante 2 D.N.I.'] = val('c_dni2');
+      [3,4,5].forEach(function(n){
+        var nom = val('c_nombre'+n); var dni = val('c_dni'+n);
+        if (nom || dni) {
+          datos['Integrante '+n+' nombre'] = nom || '—';
+          datos['Integrante '+n+' D.N.I.'] = dni || '—';
+        }
+      });
       datos['Movil'] = val('c_movil'); datos['Email'] = val('c_email');
       datos['Repertorio clases dirigidas'] = getRadio('c_rep_clases');
       datos['Repertorio máquinas/resto'] = getRadio('c_rep_maquinas');
@@ -1567,7 +1685,7 @@
   // — Registro de validaciones por formulario —
   // Prefijos: f=Persona Física, s=Sociedad, c=Comunidad/CB
   // Campos DNI/NIE (titular, admin, integrantes)
-  ['f_dni','s_adni','c_dni1','c_dni2'].forEach(function(id){
+  ['f_dni','s_adni','c_dni1','c_dni2','c_dni3','c_dni4','c_dni5'].forEach(function(id){
     setupVal(id, validarDNIoNIE, 'DNI/NIE correcto',
       'Formato o letra incorrecta \u2014 ej: 12345678Z \u00f3 X1234567L');
   });
