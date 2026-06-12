@@ -1,0 +1,1176 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SGAE — Hostales, Pensiones y Fondas</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --gold: #C8A96E; --gold-light: #E8D5A8; --dark: #1A1A1A;
+    --surface: #F7F4EF; --border: #DDD5C4; --text: #3A3530; --muted: #8C8070;
+    --error: #c0392b; --error-bg: #fdf0ef; --warn-bg: #fff8ee;
+  }
+  body { font-family: 'DM Sans', sans-serif; background: var(--surface); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 40px 20px 60px; }
+  .header { text-align: center; margin-bottom: 28px; animation: fadeDown 0.6s ease both; }
+  h1 { font-family: 'Playfair Display', serif; font-size: clamp(24px, 4vw, 36px); font-weight: 400; color: var(--dark); line-height: 1.2; margin-bottom: 8px; }
+  .subtitle { font-size: 14px; color: var(--muted); font-weight: 300; margin-bottom: 14px; }
+  .sector-badge { display: inline-block; background: var(--gold); color: var(--dark); font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; padding: 6px 20px; border-radius: 20px; }
+  .contact-block { width: 100%; max-width: 840px; margin-bottom: 28px; animation: fadeUp 0.5s ease 0.05s both; }
+  .contact-inner { background: white; border-radius: 10px; border: 1.5px solid var(--border); padding: 16px 28px; display: flex; align-items: center; justify-content: center; gap: 28px; flex-wrap: wrap; }
+  .contact-intro { font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); font-weight: 500; padding-right: 16px; border-right: 1px solid var(--border); white-space: nowrap; }
+  .contact-item { display: flex; align-items: center; gap: 10px; }
+  .contact-icon { font-size: 18px; flex-shrink: 0; }
+  .contact-details { display: flex; flex-direction: column; }
+  .contact-label { font-size: 9.5px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); margin-bottom: 2px; }
+  .contact-value { font-family: 'Playfair Display', serif; font-size: 14px; color: var(--dark); display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .contact-divider { width: 1px; height: 36px; background: var(--border); flex-shrink: 0; }
+  .selector-section { width: 100%; max-width: 840px; margin-bottom: 16px; animation: fadeUp 0.5s ease 0.1s both; }
+  .selector-label { font-size: 14px; letter-spacing: 1px; text-transform: uppercase; color: var(--dark); margin-bottom: 16px; font-weight: 700; }
+  .type-tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .type-tab { background: white; border: 2px solid var(--border); border-radius: 10px; padding: 24px 18px; cursor: pointer; text-align: center; transition: all 0.25s ease; position: relative; overflow: hidden; box-shadow: 0 3px 12px rgba(26,26,26,0.07); }
+  .type-tab::before { content: ''; position: absolute; inset: 0; background: var(--dark); transform: scaleY(0); transform-origin: bottom; transition: transform 0.3s ease; z-index: 0; }
+  .type-tab.active::before { transform: scaleY(1); }
+  .type-tab .tab-icon { font-size: 34px; margin-bottom: 12px; position: relative; z-index: 1; transition: transform 0.3s ease; display: block; }
+  .type-tab.active .tab-icon { transform: scale(1.15); }
+  .type-tab .tab-title { font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 600; color: var(--dark); display: block; position: relative; z-index: 1; transition: color 0.3s ease; line-height: 1.3; }
+  .type-tab .tab-sub { font-size: 12px; color: var(--muted); display: block; margin-top: 6px; position: relative; z-index: 1; transition: color 0.3s ease; }
+  .type-tab.active .tab-title, .type-tab.active .tab-sub { color: var(--gold-light); }
+  .type-tab:not(.active):hover { border-color: var(--gold); box-shadow: 0 8px 28px rgba(200,169,110,0.25); transform: translateY(-4px); }
+  .click-hint { text-align: center; margin-bottom: 24px; animation: fadeUp 0.5s ease 0.15s both; }
+  .click-hint span { font-size: 11px; color: var(--muted); letter-spacing: 1px; }
+  .card-container { width: 100%; max-width: 840px; animation: fadeUp 0.5s ease 0.2s both; }
+  .form-card { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 8px 40px rgba(26,26,26,0.08); display: none; }
+  .form-card.visible { display: block; animation: cardIn 0.4s cubic-bezier(0.22,1,0.36,1) both; }
+  @keyframes cardIn { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+  .card-header { background: var(--dark); padding: 24px 36px; display: flex; align-items: center; gap: 18px; }
+  .card-header-icon { font-size: 32px; flex-shrink: 0; }
+  .card-header-title { font-family: 'Playfair Display', serif; font-size: 20px; color: white; font-weight: 400; }
+  .card-header-sub { font-size: 12px; color: var(--gold); margin-top: 3px; letter-spacing: 1px; text-transform: uppercase; }
+  .gold-bar { height: 3px; background: linear-gradient(90deg, var(--gold), var(--gold-light), var(--gold)); }
+  .section-title { font-size: 10px; letter-spacing: 2.5px; text-transform: uppercase; color: var(--gold); font-weight: 600; padding: 16px 36px 8px; border-bottom: 1px solid var(--border); background: #FDFAF5; }
+  .legend { font-size: 11px; color: var(--muted); padding: 10px 36px 2px; display: flex; gap: 20px; flex-wrap: wrap; }
+  .leg-block { color: var(--error); font-weight: 700; font-size: 15px; line-height: 1; }
+  .leg-soft  { color: #e67e22; font-weight: 700; font-size: 15px; line-height: 1; }
+  .field-row       { display: grid; grid-template-columns: 240px 1fr;     border-bottom: 1px solid var(--border); min-height: 54px; transition: background 0.2s; }
+  .field-row-split { display: grid; grid-template-columns: 240px 1fr 1fr; border-bottom: 1px solid var(--border); min-height: 54px; transition: background 0.2s; }
+  .field-row:last-child, .field-row-split:last-child { border-bottom: none; }
+  .field-row:hover, .field-row-split:hover { background: #FDFAF5; }
+  .field-row.err-block { background: var(--error-bg) !important; }
+  .field-row-split .field-value + .field-value { border-left: 1px dashed var(--border); }
+  .field-label { display: flex; align-items: center; padding: 12px 14px 12px 36px; font-size: 11px; font-weight: 500; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); border-right: 2px solid var(--gold-light); gap: 8px; flex-wrap: wrap; }
+  .field-label .dot { width: 5px; height: 5px; border-radius: 50%; background: var(--gold); flex-shrink: 0; }
+  .field-label.lbl-block::after { content: ' *'; color: var(--error); font-size: 14px; line-height: 1; }
+  .field-label.lbl-soft::after  { content: ' °'; color: #e67e22; font-size: 14px; line-height: 1; }
+  .field-value { display: flex; flex-direction: column; justify-content: center; padding: 10px 20px 10px 18px; gap: 4px; }
+  .field-value input[type="text"], .field-value input[type="email"], .field-value input[type="tel"] { width: 100%; border: none; border-bottom: 1.5px solid transparent; outline: none; background: transparent; font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--dark); transition: border-color 0.2s; padding-bottom: 2px; }
+  .field-value input:focus { border-bottom-color: var(--gold); }
+  .field-value input.inp-err { border-bottom-color: var(--error) !important; }
+  .field-value input::placeholder { color: #C8BFB0; font-style: italic; font-size: 13px; }
+  .inline-err  { font-size: 11px; color: var(--error); display: none; }
+  .inline-warn { font-size: 11px; color: #e67e22; display: none; }
+  .inline-err.show, .inline-warn.show { display: block; }
+  .radio-group { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .radio-opt { display: flex; align-items: center; gap: 6px; cursor: pointer; padding: 3px 2px; }
+  .radio-opt input { display: none; }
+  .radio-btn { width: 18px; height: 18px; border: 2px solid var(--border); border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: all 0.2s; flex-shrink: 0; }
+  .radio-opt input:checked ~ .radio-btn { border-color: var(--gold); background: var(--gold); }
+  .radio-opt input:checked ~ .radio-btn::after { content: ''; width: 6px; height: 6px; background: white; border-radius: 50%; display: block; }
+  .radio-label { font-size: 13px; color: var(--dark); white-space: nowrap; display: flex; align-items: center; gap: 5px; }
+  /* Tipo establecimiento como radio visual */
+  .tipo-group { display: flex; flex-direction: column; gap: 6px; padding: 14px 18px; }
+  .tipo-opt { display: flex; align-items: center; gap: 10px; cursor: pointer; padding: 10px 14px; border: 1.5px solid var(--border); border-radius: 8px; transition: all 0.15s; }
+  .tipo-opt:hover { border-color: var(--gold); background: #FDFAF5; }
+  .tipo-opt input { display: none; }
+  .tipo-opt input:checked ~ .tipo-radio { border-color: var(--gold); background: var(--gold); }
+  .tipo-opt input:checked ~ .tipo-radio::after { content: ''; width: 6px; height: 6px; background: white; border-radius: 50%; display: block; }
+  .tipo-opt input:checked ~ .tipo-label { color: var(--dark); font-weight: 500; }
+  .tipo-radio { width: 18px; height: 18px; border: 2px solid var(--border); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.2s; }
+  .tipo-label { font-size: 13px; color: var(--text); flex: 1; }
+  .tipo-tarifa { font-size: 11px; color: var(--gold); font-weight: 600; white-space: nowrap; }
+  .tipo-info { font-size: 11px; color: var(--muted); margin-top: 2px; font-style: italic; padding: 6px 14px 10px 46px; display: none; }
+  .tipo-info.visible { display: block; }
+  .desc-tag { display: inline-block; background: #e8f5e8; color: #2d7a2d; font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 10px; }
+  .pago-nota { font-size: 10.5px; color: var(--muted); font-style: italic; margin-top: 5px; display: flex; align-items: flex-start; gap: 5px; line-height: 1.5; }
+  .pago-nota::before { content: 'ℹ'; font-style: normal; font-size: 11px; color: var(--gold); flex-shrink: 0; margin-top: 1px; }
+  /* Calculadora */
+  .tarifa-panel { margin: 16px 36px 4px; border: 2px solid var(--gold); border-radius: 10px; overflow: hidden; transition: all 0.4s ease; }
+  .tarifa-panel.inactive { border-color: var(--border); opacity: 0.6; }
+  .tarifa-header { background: var(--dark); padding: 11px 20px; display: flex; align-items: center; gap: 10px; }
+  .tarifa-header-icon { font-size: 16px; }
+  .tarifa-header-title { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--gold); font-weight: 600; }
+  .tarifa-body { background: white; padding: 14px 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .tarifa-item { display: flex; flex-direction: column; gap: 3px; }
+  .tarifa-item-label { font-size: 9px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); }
+  .tarifa-item-value { font-family: 'Playfair Display', serif; font-size: 14px; color: var(--dark); }
+  .tarifa-descuentos { background: #F7F4EF; border-top: 1px solid var(--border); padding: 10px 20px; display: flex; gap: 7px; flex-wrap: wrap; align-items: center; }
+  .tarifa-desc-label { font-size: 9px; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); margin-right: 2px; white-space: nowrap; }
+  .tarifa-desc-tag { font-size: 10px; font-weight: 600; padding: 3px 9px; border-radius: 10px; transition: all 0.3s; }
+  .tarifa-desc-tag.on  { background: #e8f5e8; color: #2d7a2d; border: 1px solid #a0d4a0; }
+  .tarifa-desc-tag.off { background: #eee; color: #aaa; border: 1px solid #ddd; text-decoration: line-through; }
+  .tarifa-result { background: var(--dark); padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+  .tarifa-result-label { display: flex; flex-direction: column; gap: 3px; }
+  .tarifa-result-label span:first-child { font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--gold); }
+  .tarifa-result-label span:last-child { font-size: 9px; color: #6C6060; }
+  .tarifa-result-amounts { display: flex; gap: 18px; flex-wrap: wrap; align-items: flex-end; }
+  .tarifa-amount-block { display: flex; flex-direction: column; align-items: flex-end; gap: 1px; }
+  .tarifa-amount-type { font-size: 8.5px; letter-spacing: 1px; text-transform: uppercase; color: #6C6060; }
+  .tarifa-amount-value { font-family: 'Playfair Display', serif; font-size: 20px; color: #9a8060; line-height: 1; }
+  .tarifa-amount-value.highlight { font-size: 26px; color: var(--gold); }
+  .tarifa-amount-period { font-size: 8px; color: #504040; }
+  .tarifa-pending { background: white; padding: 14px 20px; text-align: center; font-size: 12px; color: var(--muted); font-style: italic; }
+  .tarifa-nota { background: #F2EEE7; border-top: 1px solid var(--border); padding: 8px 20px; font-size: 10px; color: var(--muted); line-height: 1.6; }
+  .tarifa-nota strong { color: var(--text); }
+  .card-footer { background: #F2EEE7; border-top: 1px solid var(--border); padding: 14px 36px; display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+  .footer-left { display: flex; flex-direction: column; gap: 5px; flex: 1; }
+  .footer-note { font-size: 11px; color: var(--muted); font-style: italic; }
+  .footer-err-list  { font-size: 11px; color: var(--error); display: none; line-height: 1.5; }
+  .footer-warn-list { font-size: 11px; color: #b7600a;   display: none; line-height: 1.5; }
+  .footer-err-list.show, .footer-warn-list.show { display: block; }
+  .btn-send { display: inline-flex; align-items: center; gap: 8px; background: var(--gold); color: var(--dark); border: none; border-radius: 6px; padding: 12px 28px; font-family: 'DM Sans', sans-serif; font-size: 13px; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; transition: all 0.2s; font-weight: 700; flex-shrink: 0; margin-top: 3px; }
+  .btn-send:hover { background: var(--gold-light); transform: translateY(-1px); box-shadow: 0 4px 16px rgba(200,169,110,0.4); }
+  .success-banner { display: none; background: #e8f5e8; border: 1.5px solid #a0d4a0; border-radius: 10px; padding: 20px 28px; margin-top: 16px; text-align: center; animation: fadeUp 0.4s ease both; width: 100%; max-width: 840px; }
+  .success-banner.visible { display: block; }
+  .sb-icon { font-size: 36px; margin-bottom: 8px; }
+  .sb-title { font-family: 'Playfair Display', serif; font-size: 18px; color: #1a5c1a; margin-bottom: 6px; }
+  .sb-sub { font-size: 13px; color: #2d7a2d; }
+  .btn-print { display: inline-flex; align-items: center; gap: 8px; background: white; color: #1a5c1a; border: 1.5px solid #a0d4a0; border-radius: 6px; padding: 10px 22px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; margin-top: 14px; transition: all 0.2s; }
+  .btn-print:hover { background: #d4edd4; }
+  .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--dark); color: var(--gold-light); padding: 14px 28px; border-radius: 8px; font-size: 13px; opacity: 0; transition: all 0.4s cubic-bezier(0.22,1,0.36,1); pointer-events: none; z-index: 999; border-left: 3px solid var(--gold); }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .toast.terror { border-left-color: var(--error); }
+  .local-block { width: 100%; max-width: 840px; margin-bottom: 20px; animation: fadeUp 0.5s ease 0.08s both; }
+  .local-inner { background: white; border-radius: 10px; border: 2px solid var(--gold); overflow: hidden; }
+  .local-header { background: var(--dark); padding: 10px 28px; display: flex; align-items: center; gap: 10px; }
+  .local-header span { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--gold); font-weight: 600; }
+  .local-field { display: flex; align-items: center; padding: 14px 28px; gap: 14px; }
+  .local-field input { flex: 1; border: none; border-bottom: 2px solid var(--border); outline: none; background: transparent; font-family: 'Playfair Display', serif; font-size: 20px; color: var(--dark); padding-bottom: 4px; transition: border-color 0.2s; }
+  .local-field input:focus { border-bottom-color: var(--gold); }
+  .local-field input::placeholder { color: #C8BFB0; font-style: italic; font-size: 16px; font-family: 'DM Sans', sans-serif; }
+  .local-err { font-size: 11px; color: var(--error); padding: 0 28px 10px; display: none; }
+  .local-err.show { display: block; }
+  .val-msg { font-size: 10.5px; margin-top: 2px; display: none; }
+  .val-msg.show-ok  { display: block; color: #2d7a2d; }
+  .val-msg.show-err { display: block; color: var(--error); }
+  input.val-ok  { border-bottom-color: #2d7a2d !important; }
+  input.val-err { border-bottom-color: var(--error) !important; }
+  .notice-card { width: 100%; max-width: 840px; background: white; border: 1.5px solid var(--gold-light); border-radius: 12px; padding: 24px 28px; margin-top: 8px; display: none; }
+  .notice-card.visible { display: block; animation: fadeUp 0.4s ease both; }
+
+  .prefill-badge { display:none; margin: 0 28px 12px; background: #e8f5e8; color: #2d7a2d; border: 1px solid #a0d4a0; border-radius: 8px; padding: 8px 12px; font-size: 11px; line-height: 1.5; }
+  .prefill-badge.visible { display:block; }
+  .local-grid { display:grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 0 28px 14px; }
+  .local-item { display:flex; flex-direction:column; gap:5px; }
+  .local-item.full { grid-column: 1 / -1; }
+  .local-item label { font-size: 9.5px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+  .local-item input { width:100%; border: none; border-bottom: 1.5px solid var(--border); outline: none; background: transparent; font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--dark); padding: 5px 0 3px; transition: border-color 0.2s; }
+  .local-item input:focus { border-bottom-color: var(--gold); }
+  .local-note { padding: 0 28px 14px; font-size: 11px; color: var(--muted); line-height: 1.5; font-style: italic; }
+  @media (max-width: 640px) { .local-grid { grid-template-columns: 1fr; padding-left: 20px; padding-right: 20px; } .local-note, .prefill-badge { margin-left: 20px; margin-right: 20px; padding-left: 0; padding-right: 0; } }
+
+  @keyframes fadeDown { from { opacity:0; transform:translateY(-16px); } to { opacity:1; transform:translateY(0); } }
+  @keyframes fadeUp   { from { opacity:0; transform:translateY(14px);  } to { opacity:1; transform:translateY(0); } }
+  @media (max-width: 640px) {
+    .type-tabs { grid-template-columns: 1fr; }
+    .field-row, .field-row-split { grid-template-columns: 1fr; }
+    .field-label { border-right: none; padding: 12px 20px 6px; }
+    .field-value { padding: 6px 20px 12px; }
+    .field-row-split .field-value + .field-value { border-left: none; border-top: 1px dashed var(--border); }
+    .section-title, .legend { padding-left: 20px; padding-right: 20px; }
+    .card-header, .card-footer { padding-left: 20px; padding-right: 20px; }
+    .card-footer { flex-direction: column; }
+    .tarifa-panel { margin: 12px 0 4px; border-radius: 0; border-left: none; border-right: none; }
+    .tarifa-body { grid-template-columns: 1fr; }
+    .tarifa-result { flex-direction: column; align-items: flex-start; }
+    .tipo-group { padding: 10px 12px; }
+  }
+  @media print {
+    body { background: white !important; padding: 0 !important; }
+    .header, .contact-block, .info-banner, .selector-section, .click-hint, .notice-card, .local-block, .card-footer, .toast, .success-banner, .legend { display: none !important; }
+    .form-card { display: none !important; box-shadow: none !important; border: none !important; }
+    .form-card.visible { display: block !important; }
+    .card-header { background: #1A1A1A !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .gold-bar { background: #C8A96E !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .field-row, .field-row-split { break-inside: avoid; }
+    .tarifa-panel { display: block !important; margin: 12px 0 !important; border: 2px solid #C8A96E !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .tarifa-panel.inactive { display: none !important; }
+    .tarifa-header { background: #1A1A1A !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .tarifa-result { background: #1A1A1A !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .tarifa-result-label span:first-child { color: #C8A96E !important; }
+    .tarifa-amount-value.highlight { color: #C8A96E !important; }
+    .tarifa-pending { display: none !important; }
+  }
+  /* ===== DOMICILIO SOCIAL (SA/SL) ===== */
+  .dom-social-toggle { display: flex; align-items: center; gap: 10px; padding: 12px 18px; cursor: pointer; user-select: none; }
+  .dom-social-toggle input[type="checkbox"] { position: absolute; opacity: 0; width: 0; height: 0; }
+  .dom-social-check { width: 18px; height: 18px; border: 2px solid var(--border); border-radius: 4px; display: flex; align-items: center; justify-content: center; transition: all 0.2s; flex-shrink: 0; }
+  .dom-social-toggle input:checked ~ .dom-social-check { border-color: var(--gold); background: var(--gold); }
+  .dom-social-toggle input:checked ~ .dom-social-check::after { content: '✓'; font-size: 11px; color: white; font-weight: 700; line-height: 1; }
+  .dom-social-label { font-size: 12px; color: var(--muted); font-style: italic; }
+  .dom-social-fields { display: none; border-top: 1px dashed var(--border); }
+  .dom-social-fields.open { display: block; animation: fadeUp 0.3s ease both; }
+
+  /* ===== INTEGRANTES EXTRA (CB/SC) ===== */
+  .integrantes-nota { display: flex; align-items: flex-start; gap: 8px; padding: 10px 36px 8px; font-size: 11px; color: var(--muted); font-style: italic; line-height: 1.5; border-bottom: 1px solid var(--border); background: #FDFAF5; }
+  .integrantes-nota::before { content: 'ℹ'; font-style: normal; font-size: 12px; color: var(--gold); flex-shrink: 0; margin-top: 1px; }
+  .btn-mas-integrantes { display: inline-flex; align-items: center; gap: 6px; background: none; border: 1.5px dashed var(--border); border-radius: 6px; padding: 8px 18px; font-family: 'DM Sans', sans-serif; font-size: 11px; letter-spacing: 0.5px; color: var(--muted); cursor: pointer; margin: 10px 36px; transition: all 0.2s; }
+  .btn-mas-integrantes:hover { border-color: var(--gold); color: var(--dark); }
+  .btn-mas-integrantes .btn-icon { font-size: 14px; transition: transform 0.3s; }
+  .btn-mas-integrantes.open .btn-icon { transform: rotate(45deg); }
+  .integrantes-extra { display: none; }
+  .integrantes-extra.open { display: block; animation: fadeUp 0.3s ease both; }
+
+  /* ===== BANNER INFORMATIVO ===== */
+  .info-banner { width: 100%; max-width: 840px; margin-bottom: 20px; animation: fadeUp 0.5s ease 0.06s both; }
+  .info-toggle { width: 100%; background: var(--dark); border: none; border-radius: 10px 10px 0 0; padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; transition: background 0.2s; }
+  .info-toggle.collapsed { border-radius: 10px; }
+  .info-toggle:hover { background: #2a2a2a; }
+  .info-toggle-left { display: flex; align-items: center; gap: 12px; }
+  .info-toggle-icon { font-size: 18px; }
+  .info-toggle-text { font-size: 11px; letter-spacing: 1.8px; text-transform: uppercase; color: var(--gold); font-weight: 600; }
+  .info-toggle-badge { background: var(--gold); color: var(--dark); font-size: 9px; font-weight: 700; letter-spacing: 1px; padding: 3px 9px; border-radius: 10px; text-transform: uppercase; }
+  .info-toggle-arrow { font-size: 12px; color: var(--gold-light); transition: transform 0.3s ease; }
+  .info-toggle.collapsed .info-toggle-arrow { transform: rotate(-90deg); }
+  .info-body { background: white; border: 1.5px solid var(--dark); border-top: none; border-radius: 0 0 10px 10px; overflow: hidden; max-height: 2000px; transition: max-height 0.5s ease, opacity 0.3s ease; opacity: 1; }
+  .info-body.hidden { max-height: 0; opacity: 0; border: none; }
+  .info-section { padding: 16px 28px; border-bottom: 1px solid var(--border); }
+  .info-section-title { font-family: 'Playfair Display', serif; font-size: 14px; font-weight: 600; color: var(--dark); margin-bottom: 8px; }
+  .info-section-text { font-size: 12px; color: var(--muted); line-height: 1.7; }
+  .info-section-text strong { color: var(--text); }
+  .info-link { color: var(--gold); font-weight: 600; text-decoration: none; }
+  .info-link:hover { text-decoration: underline; }
+  .info-section-steps { display: flex; flex-direction: column; gap: 10px; margin-top: 6px; }
+  .info-step { display: flex; align-items: flex-start; gap: 12px; }
+  .info-step-num { width: 20px; height: 20px; background: var(--gold); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; color: var(--dark); flex-shrink: 0; margin-top: 1px; }
+  .info-step-text { font-size: 12px; color: var(--muted); line-height: 1.6; }
+  .info-step-text strong { color: var(--text); }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Ficha de Alta SGAE</h1>
+  <p class="subtitle">Cumplimenta el formulario y envíalo — recibirás una copia por email</p>
+  <span class="sector-badge">🛏 Hostales · Pensiones · Fondas</span>
+</div>
+
+<div class="contact-block">
+  <div class="contact-inner">
+    <span class="contact-intro">Contacto SGAE</span>
+    <div class="contact-item">
+      <span class="contact-icon">📞</span>
+      <div class="contact-details">
+        <span class="contact-label">Teléfono</span>
+        <span class="contact-value">923 123 456</span>
+      </div>
+    </div>
+    <div class="contact-divider"></div>
+    <div class="contact-item">
+      <span class="contact-icon">✉️</span>
+      <div class="contact-details">
+        <span class="contact-label">Email</span>
+        <span class="contact-value" id="email-display">—</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="info-banner">
+  <button class="info-toggle collapsed" id="info-toggle" onclick="toggleInfo()">
+    <div class="info-toggle-left">
+      <span class="info-toggle-icon">🎵</span>
+      <span class="info-toggle-text">¿Por qué necesita licencia este negocio?</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;">
+      <span class="info-toggle-badge">Información SGAE</span>
+      <span class="info-toggle-arrow">▼</span>
+    </div>
+  </button>
+  <div class="info-body hidden" id="info-body">
+    <div class="info-section">
+      <div class="info-section-title">1. Dale ritmo a tu negocio.</div>
+      <div class="info-section-text">En tu establecimiento cuentas con elementos clave como tu atractiva oferta, tu trato cercano o la decoración de interiores. Sin duda, todo ello te ayuda a crear emociones positivas en tus clientes. Pero si, además, añades música para ambientar y amenizar tu local, multiplicarás esas buenas sensaciones. ¿Nos dejas ayudarte para que la música se convierta en un factor diferenciador de tu negocio?</div>
+    </div>
+    <div class="info-section">
+      <div class="info-section-title">2. ¡Música, maestros!</div>
+      <div class="info-section-text">Escuchar a tu artista favorito en tu ámbito privado no tiene limitaciones, ya sea en una plataforma de streaming o en canales de pago. Sin embargo, cuando utilizas esa misma música para ambientar o amenizar un espacio público y comercial, existen otras reglas que has de conocer.</div>
+      <div class="info-section-text" style="margin-top:8px;">Como sabes, detrás de cada creación musical hay un profesional que se gana la vida. Para garantizar la creación de obras nuevas y proteger a sus autores, existe la propiedad intelectual: es decir, cada obra musical, fonograma o grabación audiovisual, utilizada en un establecimiento, está protegida y aporta a su creador unos derechos a través de unas tarifas oficiales.</div>
+      <div class="info-section-text" style="margin-top:8px;">Solo si todos cumplimos con nuestras obligaciones y respetamos los derechos de autor, podremos garantizar que la música siga sonando en todas partes, tanto en nuestro ámbito privado como en espacios de cara al público.</div>
+    </div>
+    <div class="info-section">
+      <div class="info-section-title">3. Descubre cómo se gestionan los derechos de autor.</div>
+      <div class="info-section-steps">
+        <div class="info-step"><span class="info-step-num">1</span><span class="info-step-text">En <strong>SGAE</strong> gestionamos derechos de Propiedad intelectual, a través de licencias, y percibimos cantidades fijadas y publicadas en tarifas oficiales y acordadas en convenios sectoriales suscritos con las asociaciones representativas de cada mercado.</span></div>
+        <div class="info-step"><span class="info-step-num">2</span><span class="info-step-text"><strong>SGAE</strong> reparte equitativamente esos ingresos entre los autores de las obras musicales y audiovisuales, descontando exclusivamente los costes derivados de su gestión.</span></div>
+        <div class="info-step"><span class="info-step-num">3</span><span class="info-step-text">Si utilizas música en tu local, necesitas una licencia. Ponte en contacto con <strong>SGAE</strong> y nosotros nos ocupamos de todas las gestiones para tramitarla. ¡Así de sencillo es proteger la cultura!</span></div>
+      </div>
+    </div>
+    <div class="info-section">
+      <div class="info-section-title">4. Ponle banda sonora a tu negocio.</div>
+      <div class="info-section-text">En <strong>SGAE</strong> te ofrecemos un inmenso catálogo de obras musicales y audiovisuales que podrás utilizar. Consúltanos y descubre todo el poder de la música para tu establecimiento. Puedes consultar las tarifas, con todo detalle, en <a class="info-link" href="https://www.sgae.es" target="_blank">www.sgae.es</a> así como en el apartado de Propiedad Intelectual del Ministerio de Cultura.</div>
+    </div>
+    <div class="info-section" style="border-bottom:none;">
+      <div class="info-section-title">5. Somos SGAE ¿te sonamos?</div>
+      <div class="info-section-text">Seguro que te sonamos, pero queremos que nos conozcas un poco mejor:</div>
+      <div class="info-section-text" style="margin-top:8px;">Somos la <strong>Sociedad General de Autores y Editores (SGAE)</strong>: entidad privada sin ánimo de lucro fundada en 1899 y creada para la defensa y gestión colectiva de los derechos de propiedad intelectual en nombre de sus socios. Para ejercer nuestra labor de gestión de los derechos de autor contamos con la autorización oficial del Ministerio de Cultura.</div>
+      <div class="info-section-text" style="margin-top:8px;">Esta tarea no solo supone la protección del patrimonio cultural, también facilita y garantiza el acceso a las obras y otras prestaciones a la sociedad.</div>
+      <div class="info-section-text" style="margin-top:8px;">Si quieres saber más de nosotros, entra en <a class="info-link" href="https://www.sgae.es" target="_blank">www.sgae.es</a>.</div>
+    </div>
+  </div>
+</div>
+
+<div class="local-block">
+  <div class="local-inner">
+    <div class="local-header">
+      <span>&#127978; Datos del establecimiento <span style="color:#e87070;font-size:15px"> *</span></span>
+    </div>
+    <input type="hidden" id="codigo_sap" value="">
+    <div class="local-field">
+      <input type="text" id="local-nombre" placeholder="Nombre del hostal, pensión o fonda" autocomplete="off">
+    </div>
+    <span class="local-err" id="local-err">El nombre del local es obligatorio</span>
+    <div class="prefill-badge" id="prefill-badge">Datos precargados por SGAE. Revise la información y modifique cualquier dato que no sea correcto.</div>
+    <div class="local-grid">
+      <div class="local-item">
+        <label for="tipo_via">Tipo de vía</label>
+        <input type="text" id="tipo_via" placeholder="Ej: CALLE" autocomplete="off">
+      </div>
+      <div class="local-item full">
+        <label for="direccion_local">Dirección</label>
+        <input type="text" id="direccion_local" placeholder="Nombre de la vía" autocomplete="off">
+      </div>
+      <div class="local-item">
+        <label for="num_edificio">Número</label>
+        <input type="text" id="num_edificio" placeholder="Nº" autocomplete="off">
+      </div>
+      <div class="local-item">
+        <label for="cod_postal">Código postal</label>
+        <input type="text" id="cod_postal" placeholder="37000" autocomplete="off" inputmode="numeric">
+      </div>
+    </div>
+    <div class="local-note">Estos datos se incluyen para evitarle teclear información que ya consta. <strong>Puede corregirlos antes de enviar</strong> si han cambiado.</div>
+  </div>
+</div>
+
+<div class="selector-section">
+  <div class="selector-label">Tipo de empresa o titular</div>
+  <div class="type-tabs">
+    <div class="type-tab" id="tab-fisica" onclick="showForm('fisica')">
+      <span class="tab-icon">🧍</span>
+      <span class="tab-title">Persona Física</span>
+      <span class="tab-sub">Autónomo / Titular individual</span>
+    </div>
+    <div class="type-tab" id="tab-sociedad" onclick="showForm('sociedad')">
+      <span class="tab-icon">🏢</span>
+      <span class="tab-title">Sociedad</span>
+      <span class="tab-sub">S.L., S.A. u otra mercantil</span>
+    </div>
+    <div class="type-tab" id="tab-comunidad" onclick="showForm('comunidad')">
+      <span class="tab-icon">🤝</span>
+      <span class="tab-title">Comunidad / C.B.</span>
+      <span class="tab-sub">Comunidad de bienes</span>
+    </div>
+  </div>
+</div>
+
+<div class="click-hint"><span>▲ Selecciona el tipo de empresa para ver el formulario</span></div>
+
+<div class="card-container">
+
+<!-- ═══ PERSONA FÍSICA ═══ -->
+<div class="form-card" id="card-fisica">
+  <div class="card-header">
+    <span class="card-header-icon">🧍</span>
+    <div>
+      <div class="card-header-title">Persona Física / Autónomo</div>
+      <div class="card-header-sub">Hostal · Pensión · Fonda · SGAE 2026</div>
+    </div>
+  </div>
+  <div class="gold-bar"></div>
+  <div class="section-title">Datos del titular</div>
+  <div class="legend"><span><span class="leg-block">*</span> Campo obligatorio</span><span><span class="leg-soft">°</span> Recomendado</span></div>
+
+  <div class="field-row" id="frow-f_nombre">
+    <div class="field-label lbl-block"><span class="dot"></span>Nombre y apellidos</div>
+    <div class="field-value"><input type="text" id="f_nombre" placeholder="Nombre completo del titular"><span class="inline-err" id="ierr-f_nombre">Obligatorio</span></div>
+  </div>
+  <div class="field-row" id="frow-f_dni">
+    <div class="field-label lbl-block"><span class="dot"></span>DNI / NIE</div>
+    <div class="field-value"><input type="text" id="f_dni" placeholder="00000000A"><span class="inline-err" id="ierr-f_dni">Obligatorio</span></div>
+  </div>
+  <div class="field-row" id="frow-f_movil">
+    <div class="field-label lbl-block"><span class="dot"></span>Móvil de contacto</div>
+    <div class="field-value"><input type="tel" id="f_movil" placeholder="6XX XXX XXX"><span class="inline-err" id="ierr-f_movil">Obligatorio</span></div>
+  </div>
+  <div class="field-row" id="frow-f_email">
+    <div class="field-label lbl-block"><span class="dot"></span>Email de contacto</div>
+    <div class="field-value"><input type="email" id="f_email" placeholder="correo@ejemplo.com"><span class="inline-err" id="ierr-f_email">Obligatorio</span></div>
+  </div>
+
+  <div class="section-title">Tipo de establecimiento</div>
+  <div class="field-row" id="frow-f_tipo" style="display:block;border-bottom:1px solid var(--border)">
+    <div class="tipo-group">
+      <label class="tipo-opt"><input type="radio" name="f_tipo" value="hostal_1" onchange="calcularTarifaHostal('f')"><span class="tipo-radio"></span><span class="tipo-label">Hostal o Pensión — 1 estrella</span><span class="tipo-tarifa">6,61 €/mes</span></label>
+      <label class="tipo-opt"><input type="radio" name="f_tipo" value="hostal_2" onchange="calcularTarifaHostal('f')"><span class="tipo-radio"></span><span class="tipo-label">Hostal o Pensión — 2 estrellas</span><span class="tipo-tarifa">8,35 €/mes</span></label>
+      <label class="tipo-opt"><input type="radio" name="f_tipo" value="hostal_3" onchange="calcularTarifaHostal('f')"><span class="tipo-radio"></span><span class="tipo-label">Hostal o Pensión — 3 estrellas</span><span class="tipo-tarifa">15,01 €/mes</span></label>
+      <label class="tipo-opt"><input type="radio" name="f_tipo" value="fonda" onchange="calcularTarifaHostal('f')"><span class="tipo-radio"></span><span class="tipo-label">Fonda</span><span class="tipo-tarifa">4,58 €/mes</span></label>
+    </div>
+    <p style="font-size:10.5px;color:var(--muted);font-style:italic;padding:0 18px 12px;line-height:1.5;">ℹ Tarifa mensual por amenización mediante TV y/o amenización musical en todo el ámbito del establecimiento.</p>
+    <span class="inline-err" id="ierr-f_tipo" style="padding:0 18px 10px;display:none">Selecciona el tipo de establecimiento</span>
+  </div>
+
+  <div class="section-title">Condiciones</div>
+  <div class="field-row" id="frow-f_asoc">
+    <div class="field-label lbl-soft"><span class="dot"></span>Asoc. de Hoteles</div>
+    <div class="field-value">
+      <div class="radio-group">
+        <label class="radio-opt"><input type="radio" name="f_asoc" value="Sí" onchange="calcularTarifaHostal('f')"><span class="radio-btn"></span><span class="radio-label">Sí <span class="desc-tag">descuento -5%</span></span></label>
+        <label class="radio-opt"><input type="radio" name="f_asoc" value="No" checked onchange="calcularTarifaHostal('f')"><span class="radio-btn"></span><span class="radio-label">No</span></label>
+      </div>
+    </div>
+  </div>
+  <div class="field-row" id="frow-f_pago">
+    <div class="field-label lbl-soft"><span class="dot"></span>Forma de pago</div>
+    <div class="field-value">
+      <div class="radio-group">
+        <label class="radio-opt"><input type="radio" name="f_pago" value="Trimestral" onchange="calcularTarifaHostal('f')"><span class="radio-btn"></span><span class="radio-label">Trimestral</span></label>
+        <label class="radio-opt"><input type="radio" name="f_pago" value="Semestral" onchange="calcularTarifaHostal('f')"><span class="radio-btn"></span><span class="radio-label">Semestral <span class="desc-tag">-2,5%</span></span></label>
+        <label class="radio-opt"><input type="radio" name="f_pago" value="Anual" onchange="calcularTarifaHostal('f')"><span class="radio-btn"></span><span class="radio-label">Anual <span class="desc-tag">-5%</span></span></label>
+      </div>
+      <span class="pago-nota">El descuento se aplica por pago anticipado en el primer mes del semestre o del año, según la modalidad elegida.</span>
+      <span class="inline-warn" id="iwarn-f_pago">Recomendado — selecciona una opción</span>
+    </div>
+  </div>
+  <div class="field-row">
+    <div class="field-label"><span class="dot"></span>IBAN domiciliación <span class="desc-tag" style="margin-left:4px">descuento -5%</span></div>
+    <div class="field-value"><input type="text" id="f_iban" placeholder="ES00 0000 0000 0000 0000 0000" oninput="calcularTarifaHostal('f')"></div>
+  </div>
+
+  <!-- Calculadora -->
+  <div id="tarifa-f" class="tarifa-panel inactive">
+    <div class="tarifa-header"><span class="tarifa-header-icon">🧮</span><span class="tarifa-header-title">Estimación tarifa SGAE 2026 · Hostales · Pensiones · Fondas</span></div>
+    <div id="tarifa-f-pending" class="tarifa-pending">Selecciona el tipo de establecimiento y la forma de pago para ver la estimación</div>
+    <div id="tarifa-f-content" style="display:none">
+      <div class="tarifa-body">
+        <div class="tarifa-item"><span class="tarifa-item-label">Tipo</span><span class="tarifa-item-value" id="tf-f-tipo">—</span></div>
+        <div class="tarifa-item"><span class="tarifa-item-label">Tarifa mensual</span><span class="tarifa-item-value" id="tf-f-mensual">—</span></div>
+      </div>
+      <div class="tarifa-descuentos">
+        <span class="tarifa-desc-label">Descuentos:</span>
+        <span class="tarifa-desc-tag off" id="tf-f-d-asoc">Asociación −5%</span>
+        <span class="tarifa-desc-tag off" id="tf-f-d-pago">Pago —</span>
+        <span class="tarifa-desc-tag off" id="tf-f-d-iban">Domiciliación −5%</span>
+      </div>
+      <div class="tarifa-result">
+        <div class="tarifa-result-label"><span>Cuota estimada</span><span>2026 (sin IVA)</span></div>
+        <div class="tarifa-result-amounts" id="tf-f-amounts">
+          <div class="tarifa-amount-block" id="tf-f-bloque-trimestral" style="display:none"><span class="tarifa-amount-type">Trimestral</span><span class="tarifa-amount-value highlight" id="tf-f-trimestral">—</span><span class="tarifa-amount-period">€ / trimestre</span></div>
+          <div class="tarifa-amount-block" id="tf-f-bloque-semestral" style="display:none"><span class="tarifa-amount-type">Semestral</span><span class="tarifa-amount-value highlight" id="tf-f-semestral">—</span><span class="tarifa-amount-period">€ / 6 meses</span></div>
+          <div class="tarifa-amount-block" id="tf-f-bloque-anual" style="display:none"><span class="tarifa-amount-type">Anual</span><span class="tarifa-amount-value highlight" id="tf-f-anual">—</span><span class="tarifa-amount-period">€ / año</span></div>
+          <span id="tf-f-pago-pending" style="font-size:11px;color:#8C8070;font-style:italic">Selecciona forma de pago</span>
+        </div>
+      </div>
+    </div>
+    <div class="tarifa-nota">⚠️ <strong>Estimación orientativa.</strong> Tarifa SGAE 2026 · 1er año. No incluye IVA (21%).</div>
+  </div>
+
+  <div class="card-footer">
+    <div class="footer-left">
+      <span class="footer-note">Ficha SGAE · Hostales · Pensiones · Fondas</span>
+      <span class="footer-note"><strong>🖶 Tras enviar podrá guardar una copia en PDF o imprimir la ficha.</strong></span>
+      <span class="footer-err-list" id="ferr-fisica"></span>
+      <span class="footer-warn-list" id="fwarn-fisica"></span>
+    </div>
+    <button class="btn-send" onclick="enviarFormulario('fisica')">&#128228; Enviar ficha</button>
+  </div>
+</div>
+
+<!-- ═══ SOCIEDAD ═══ -->
+<div class="form-card" id="card-sociedad">
+  <div class="card-header">
+    <span class="card-header-icon">🏢</span>
+    <div>
+      <div class="card-header-title">Sociedad Mercantil</div>
+      <div class="card-header-sub">Hostal · Pensión · Fonda · SGAE 2026</div>
+    </div>
+  </div>
+  <div class="gold-bar"></div>
+  <div class="section-title">Datos de la sociedad</div>
+  <div class="legend"><span><span class="leg-block">*</span> Campo obligatorio</span><span><span class="leg-soft">°</span> Recomendado</span></div>
+
+  <div class="field-row" id="frow-s_razon">
+    <div class="field-label lbl-block"><span class="dot"></span>Razón social</div>
+    <div class="field-value"><input type="text" id="s_razon" placeholder="Nombre de la sociedad"><span class="inline-err" id="ierr-s_razon">Obligatorio</span></div>
+  </div>
+  <div class="field-row" id="frow-s_cif">
+    <div class="field-label lbl-block"><span class="dot"></span>CIF</div>
+    <div class="field-value"><input type="text" id="s_cif" placeholder="B12345678"><span class="inline-err" id="ierr-s_cif">Obligatorio</span></div>
+  </div>
+  <div class="field-row-split" id="frow-s_admin">
+    <div class="field-label lbl-block"><span class="dot"></span>Administrador / Representante</div>
+    <div class="field-value"><input type="text" id="s_admin" placeholder="Nombre completo"><span class="inline-err" id="ierr-s_admin">Obligatorio</span></div>
+    <div class="field-value"><input type="text" id="s_adni" placeholder="D.N.I. · 00000000A"><span class="inline-err" id="ierr-s_adni">Obligatorio</span></div>
+  </div>
+  <!-- DOMICILIO SOCIAL (opcional, solo si difiere del local) -->
+  <div style="border-bottom: 1px solid var(--border); background: #FDFAF5;">
+    <label class="dom-social-toggle">
+      <input type="checkbox" id="s_dom_distinto" onchange="toggleDomSocial()">
+      <span class="dom-social-check"></span>
+      <span class="dom-social-label">El domicilio social es distinto al del local — marcar para añadirlo y que conste correctamente en la factura</span>
+    </label>
+    <div class="dom-social-fields" id="s_dom_social_fields">
+      <div class="field-row">
+        <div class="field-label"><span class="dot"></span>Calle y número</div>
+        <div class="field-value"><input type="text" id="s_dom_calle" placeholder="Calle, número, piso…"></div>
+      </div>
+      <div class="field-row-split" style="border-bottom:none;">
+        <div class="field-label"><span class="dot"></span>Municipio y provincia</div>
+        <div class="field-value"><input type="text" id="s_dom_municipio" placeholder="Municipio"></div>
+        <div class="field-value"><input type="text" id="s_dom_cp" placeholder="C.P. · 00000"></div>
+      </div>
+    </div>
+  </div>
+  <div class="field-row" id="frow-s_movil">
+    <div class="field-label lbl-block"><span class="dot"></span>Móvil de contacto</div>
+    <div class="field-value"><input type="tel" id="s_movil" placeholder="6XX XXX XXX"><span class="inline-err" id="ierr-s_movil">Obligatorio</span></div>
+  </div>
+  <div class="field-row" id="frow-s_email">
+    <div class="field-label lbl-block"><span class="dot"></span>Email de contacto</div>
+    <div class="field-value"><input type="email" id="s_email" placeholder="correo@empresa.com"><span class="inline-err" id="ierr-s_email">Obligatorio</span></div>
+  </div>
+
+  <div class="section-title">Tipo de establecimiento</div>
+  <div class="field-row" id="frow-s_tipo" style="display:block;border-bottom:1px solid var(--border)">
+    <div class="tipo-group">
+      <label class="tipo-opt"><input type="radio" name="s_tipo" value="hostal_1" onchange="calcularTarifaHostal('s')"><span class="tipo-radio"></span><span class="tipo-label">Hostal o Pensión — 1 estrella</span><span class="tipo-tarifa">6,61 €/mes</span></label>
+      <label class="tipo-opt"><input type="radio" name="s_tipo" value="hostal_2" onchange="calcularTarifaHostal('s')"><span class="tipo-radio"></span><span class="tipo-label">Hostal o Pensión — 2 estrellas</span><span class="tipo-tarifa">8,35 €/mes</span></label>
+      <label class="tipo-opt"><input type="radio" name="s_tipo" value="hostal_3" onchange="calcularTarifaHostal('s')"><span class="tipo-radio"></span><span class="tipo-label">Hostal o Pensión — 3 estrellas</span><span class="tipo-tarifa">15,01 €/mes</span></label>
+      <label class="tipo-opt"><input type="radio" name="s_tipo" value="fonda" onchange="calcularTarifaHostal('s')"><span class="tipo-radio"></span><span class="tipo-label">Fonda</span><span class="tipo-tarifa">4,58 €/mes</span></label>
+    </div>
+    <p style="font-size:10.5px;color:var(--muted);font-style:italic;padding:0 18px 12px;line-height:1.5;">ℹ Tarifa mensual por amenización mediante TV y/o amenización musical en todo el ámbito del establecimiento.</p>
+    <span class="inline-err" id="ierr-s_tipo" style="padding:0 18px 10px;display:none">Selecciona el tipo de establecimiento</span>
+  </div>
+
+  <div class="section-title">Condiciones</div>
+  <div class="field-row" id="frow-s_asoc">
+    <div class="field-label lbl-soft"><span class="dot"></span>Asoc. de Hoteles</div>
+    <div class="field-value">
+      <div class="radio-group">
+        <label class="radio-opt"><input type="radio" name="s_asoc" value="Sí" onchange="calcularTarifaHostal('s')"><span class="radio-btn"></span><span class="radio-label">Sí <span class="desc-tag">descuento -5%</span></span></label>
+        <label class="radio-opt"><input type="radio" name="s_asoc" value="No" checked onchange="calcularTarifaHostal('s')"><span class="radio-btn"></span><span class="radio-label">No</span></label>
+      </div>
+    </div>
+  </div>
+  <div class="field-row" id="frow-s_pago">
+    <div class="field-label lbl-soft"><span class="dot"></span>Forma de pago</div>
+    <div class="field-value">
+      <div class="radio-group">
+        <label class="radio-opt"><input type="radio" name="s_pago" value="Trimestral" onchange="calcularTarifaHostal('s')"><span class="radio-btn"></span><span class="radio-label">Trimestral</span></label>
+        <label class="radio-opt"><input type="radio" name="s_pago" value="Semestral" onchange="calcularTarifaHostal('s')"><span class="radio-btn"></span><span class="radio-label">Semestral <span class="desc-tag">-2,5%</span></span></label>
+        <label class="radio-opt"><input type="radio" name="s_pago" value="Anual" onchange="calcularTarifaHostal('s')"><span class="radio-btn"></span><span class="radio-label">Anual <span class="desc-tag">-5%</span></span></label>
+      </div>
+      <span class="pago-nota">El descuento se aplica por pago anticipado en el primer mes del semestre o del año, según la modalidad elegida.</span>
+      <span class="inline-warn" id="iwarn-s_pago">Recomendado — selecciona una opción</span>
+    </div>
+  </div>
+  <div class="field-row">
+    <div class="field-label"><span class="dot"></span>IBAN domiciliación <span class="desc-tag" style="margin-left:4px">descuento -5%</span></div>
+    <div class="field-value"><input type="text" id="s_iban" placeholder="ES00 0000 0000 0000 0000 0000" oninput="calcularTarifaHostal('s')"></div>
+  </div>
+
+  <div id="tarifa-s" class="tarifa-panel inactive">
+    <div class="tarifa-header"><span class="tarifa-header-icon">🧮</span><span class="tarifa-header-title">Estimación tarifa SGAE 2026 · Hostales · Pensiones · Fondas</span></div>
+    <div id="tarifa-s-pending" class="tarifa-pending">Selecciona el tipo de establecimiento y la forma de pago para ver la estimación</div>
+    <div id="tarifa-s-content" style="display:none">
+      <div class="tarifa-body">
+        <div class="tarifa-item"><span class="tarifa-item-label">Tipo</span><span class="tarifa-item-value" id="tf-s-tipo">—</span></div>
+        <div class="tarifa-item"><span class="tarifa-item-label">Tarifa mensual</span><span class="tarifa-item-value" id="tf-s-mensual">—</span></div>
+      </div>
+      <div class="tarifa-descuentos">
+        <span class="tarifa-desc-label">Descuentos:</span>
+        <span class="tarifa-desc-tag off" id="tf-s-d-asoc">Asociación −5%</span>
+        <span class="tarifa-desc-tag off" id="tf-s-d-pago">Pago —</span>
+        <span class="tarifa-desc-tag off" id="tf-s-d-iban">Domiciliación −5%</span>
+      </div>
+      <div class="tarifa-result">
+        <div class="tarifa-result-label"><span>Cuota estimada</span><span>2026 (sin IVA)</span></div>
+        <div class="tarifa-result-amounts">
+          <div class="tarifa-amount-block" id="tf-s-bloque-trimestral" style="display:none"><span class="tarifa-amount-type">Trimestral</span><span class="tarifa-amount-value highlight" id="tf-s-trimestral">—</span><span class="tarifa-amount-period">€ / trimestre</span></div>
+          <div class="tarifa-amount-block" id="tf-s-bloque-semestral" style="display:none"><span class="tarifa-amount-type">Semestral</span><span class="tarifa-amount-value highlight" id="tf-s-semestral">—</span><span class="tarifa-amount-period">€ / 6 meses</span></div>
+          <div class="tarifa-amount-block" id="tf-s-bloque-anual" style="display:none"><span class="tarifa-amount-type">Anual</span><span class="tarifa-amount-value highlight" id="tf-s-anual">—</span><span class="tarifa-amount-period">€ / año</span></div>
+          <span id="tf-s-pago-pending" style="font-size:11px;color:#8C8070;font-style:italic">Selecciona forma de pago</span>
+        </div>
+      </div>
+    </div>
+    <div class="tarifa-nota">⚠️ <strong>Estimación orientativa.</strong> Tarifa SGAE 2026 · 1er año. No incluye IVA (21%).</div>
+  </div>
+
+  <div class="card-footer">
+    <div class="footer-left">
+      <span class="footer-note">Ficha SGAE · Hostales · Pensiones · Fondas</span>
+      <span class="footer-note"><strong>🖶 Tras enviar podrá guardar una copia en PDF o imprimir la ficha.</strong></span>
+      <span class="footer-err-list" id="ferr-sociedad"></span>
+      <span class="footer-warn-list" id="fwarn-sociedad"></span>
+    </div>
+    <button class="btn-send" onclick="enviarFormulario('sociedad')">&#128228; Enviar ficha</button>
+  </div>
+</div>
+
+<!-- ═══ COMUNIDAD ═══ -->
+<div class="form-card" id="card-comunidad">
+  <div class="card-header">
+    <span class="card-header-icon">🤝</span>
+    <div>
+      <div class="card-header-title">Comunidad de Bienes / C.B.</div>
+      <div class="card-header-sub">Hostal · Pensión · Fonda · SGAE 2026</div>
+    </div>
+  </div>
+  <div class="gold-bar"></div>
+  <div class="section-title">Datos de la comunidad</div>
+  <div class="legend"><span><span class="leg-block">*</span> Campo obligatorio</span><span><span class="leg-soft">°</span> Recomendado</span></div>
+
+  <div class="field-row" id="frow-c_nombre_cb">
+    <div class="field-label lbl-block"><span class="dot"></span>Nombre C.B.</div>
+    <div class="field-value"><input type="text" id="c_nombre_cb" placeholder="Nombre de la comunidad de bienes"><span class="inline-err" id="ierr-c_nombre_cb">Obligatorio</span></div>
+  </div>
+  <div class="field-row" id="frow-c_cif">
+    <div class="field-label lbl-block"><span class="dot"></span>CIF</div>
+    <div class="field-value"><input type="text" id="c_cif" placeholder="E12345678"><span class="inline-err" id="ierr-c_cif">Obligatorio</span></div>
+  </div>
+  <!-- Fecha de constitución (opcional) -->
+  <div class="field-row">
+    <div class="field-label"><span class="dot"></span>Fecha de constitución</div>
+    <div class="field-value"><input type="text" id="c_fecha_const" placeholder="dd/mm/aaaa — opcional"></div>
+  </div>
+  <!-- Nota informativa integrantes -->
+  <div class="integrantes-nota">
+    Se solicitan datos de un mínimo de 2 integrantes. Si hay más de 2, y aunque no es imprescindible, pueden añadirse a continuación. Es necesaria la firma posterior en el contrato de todos los integrantes facilitados.
+  </div>
+  <div class="field-row-split" id="frow-c_int1">
+    <div class="field-label lbl-block"><span class="dot"></span>Integrante 1</div>
+    <div class="field-value"><input type="text" id="c_nombre1" placeholder="Nombre completo"><span class="inline-err" id="ierr-c_nombre1">Obligatorio</span></div>
+    <div class="field-value"><input type="text" id="c_dni1" placeholder="D.N.I. · 00000000A"><span class="inline-err" id="ierr-c_dni1">Obligatorio</span></div>
+  </div>
+  <div class="field-row-split" id="frow-c_int2">
+    <div class="field-label lbl-block"><span class="dot"></span>Integrante 2</div>
+    <div class="field-value"><input type="text" id="c_nombre2" placeholder="Nombre completo"><span class="inline-err" id="ierr-c_nombre2">Obligatorio</span></div>
+    <div class="field-value"><input type="text" id="c_dni2" placeholder="D.N.I. · 00000000A"><span class="inline-err" id="ierr-c_dni2">Obligatorio</span></div>
+  </div>
+  <!-- Más integrantes (ocultos por defecto) -->
+  <div style="border-bottom: 1px solid var(--border);">
+    <button type="button" class="btn-mas-integrantes" id="btn-mas-int" onclick="toggleMasIntegrantes()">
+      <span class="btn-icon">＋</span> Añadir más integrantes
+    </button>
+    <div class="integrantes-extra" id="c_integrantes_extra">
+      <div class="field-row-split">
+        <div class="field-label"><span class="dot"></span>Integrante 3</div>
+        <div class="field-value"><input type="text" id="c_nombre3" placeholder="Nombre completo"></div>
+        <div class="field-value"><input type="text" id="c_dni3" placeholder="D.N.I. · 00000000A"></div>
+      </div>
+      <div class="field-row-split">
+        <div class="field-label"><span class="dot"></span>Integrante 4</div>
+        <div class="field-value"><input type="text" id="c_nombre4" placeholder="Nombre completo"></div>
+        <div class="field-value"><input type="text" id="c_dni4" placeholder="D.N.I. · 00000000A"></div>
+      </div>
+      <div class="field-row-split" style="border-bottom:none;">
+        <div class="field-label"><span class="dot"></span>Integrante 5</div>
+        <div class="field-value"><input type="text" id="c_nombre5" placeholder="Nombre completo"></div>
+        <div class="field-value"><input type="text" id="c_dni5" placeholder="D.N.I. · 00000000A"></div>
+      </div>
+    </div>
+  </div>
+  <div class="field-row" id="frow-c_movil">
+    <div class="field-label lbl-block"><span class="dot"></span>Móvil de contacto</div>
+    <div class="field-value"><input type="tel" id="c_movil" placeholder="6XX XXX XXX"><span class="inline-err" id="ierr-c_movil">Obligatorio</span></div>
+  </div>
+  <div class="field-row" id="frow-c_email">
+    <div class="field-label lbl-block"><span class="dot"></span>Email de contacto</div>
+    <div class="field-value"><input type="email" id="c_email" placeholder="correo@ejemplo.com"><span class="inline-err" id="ierr-c_email">Obligatorio</span></div>
+  </div>
+
+  <div class="section-title">Tipo de establecimiento</div>
+  <div class="field-row" id="frow-c_tipo" style="display:block;border-bottom:1px solid var(--border)">
+    <div class="tipo-group">
+      <label class="tipo-opt"><input type="radio" name="c_tipo" value="hostal_1" onchange="calcularTarifaHostal('c')"><span class="tipo-radio"></span><span class="tipo-label">Hostal o Pensión — 1 estrella</span><span class="tipo-tarifa">6,61 €/mes</span></label>
+      <label class="tipo-opt"><input type="radio" name="c_tipo" value="hostal_2" onchange="calcularTarifaHostal('c')"><span class="tipo-radio"></span><span class="tipo-label">Hostal o Pensión — 2 estrellas</span><span class="tipo-tarifa">8,35 €/mes</span></label>
+      <label class="tipo-opt"><input type="radio" name="c_tipo" value="hostal_3" onchange="calcularTarifaHostal('c')"><span class="tipo-radio"></span><span class="tipo-label">Hostal o Pensión — 3 estrellas</span><span class="tipo-tarifa">15,01 €/mes</span></label>
+      <label class="tipo-opt"><input type="radio" name="c_tipo" value="fonda" onchange="calcularTarifaHostal('c')"><span class="tipo-radio"></span><span class="tipo-label">Fonda</span><span class="tipo-tarifa">4,58 €/mes</span></label>
+    </div>
+    <p style="font-size:10.5px;color:var(--muted);font-style:italic;padding:0 18px 12px;line-height:1.5;">ℹ Tarifa mensual por amenización mediante TV y/o amenización musical en todo el ámbito del establecimiento.</p>
+    <span class="inline-err" id="ierr-c_tipo" style="padding:0 18px 10px;display:none">Selecciona el tipo de establecimiento</span>
+  </div>
+
+  <div class="section-title">Condiciones</div>
+  <div class="field-row" id="frow-c_asoc">
+    <div class="field-label lbl-soft"><span class="dot"></span>Asoc. de Hoteles</div>
+    <div class="field-value">
+      <div class="radio-group">
+        <label class="radio-opt"><input type="radio" name="c_asoc" value="Sí" onchange="calcularTarifaHostal('c')"><span class="radio-btn"></span><span class="radio-label">Sí <span class="desc-tag">descuento -5%</span></span></label>
+        <label class="radio-opt"><input type="radio" name="c_asoc" value="No" checked onchange="calcularTarifaHostal('c')"><span class="radio-btn"></span><span class="radio-label">No</span></label>
+      </div>
+    </div>
+  </div>
+  <div class="field-row" id="frow-c_pago">
+    <div class="field-label lbl-soft"><span class="dot"></span>Forma de pago</div>
+    <div class="field-value">
+      <div class="radio-group">
+        <label class="radio-opt"><input type="radio" name="c_pago" value="Trimestral" onchange="calcularTarifaHostal('c')"><span class="radio-btn"></span><span class="radio-label">Trimestral</span></label>
+        <label class="radio-opt"><input type="radio" name="c_pago" value="Semestral" onchange="calcularTarifaHostal('c')"><span class="radio-btn"></span><span class="radio-label">Semestral <span class="desc-tag">-2,5%</span></span></label>
+        <label class="radio-opt"><input type="radio" name="c_pago" value="Anual" onchange="calcularTarifaHostal('c')"><span class="radio-btn"></span><span class="radio-label">Anual <span class="desc-tag">-5%</span></span></label>
+      </div>
+      <span class="pago-nota">El descuento se aplica por pago anticipado en el primer mes del semestre o del año, según la modalidad elegida.</span>
+      <span class="inline-warn" id="iwarn-c_pago">Recomendado — selecciona una opción</span>
+    </div>
+  </div>
+  <div class="field-row">
+    <div class="field-label"><span class="dot"></span>IBAN domiciliación <span class="desc-tag" style="margin-left:4px">descuento -5%</span></div>
+    <div class="field-value"><input type="text" id="c_iban" placeholder="ES00 0000 0000 0000 0000 0000" oninput="calcularTarifaHostal('c')"></div>
+  </div>
+
+  <div id="tarifa-c" class="tarifa-panel inactive">
+    <div class="tarifa-header"><span class="tarifa-header-icon">🧮</span><span class="tarifa-header-title">Estimación tarifa SGAE 2026 · Hostales · Pensiones · Fondas</span></div>
+    <div id="tarifa-c-pending" class="tarifa-pending">Selecciona el tipo de establecimiento y la forma de pago para ver la estimación</div>
+    <div id="tarifa-c-content" style="display:none">
+      <div class="tarifa-body">
+        <div class="tarifa-item"><span class="tarifa-item-label">Tipo</span><span class="tarifa-item-value" id="tf-c-tipo">—</span></div>
+        <div class="tarifa-item"><span class="tarifa-item-label">Tarifa mensual</span><span class="tarifa-item-value" id="tf-c-mensual">—</span></div>
+      </div>
+      <div class="tarifa-descuentos">
+        <span class="tarifa-desc-label">Descuentos:</span>
+        <span class="tarifa-desc-tag off" id="tf-c-d-asoc">Asociación −5%</span>
+        <span class="tarifa-desc-tag off" id="tf-c-d-pago">Pago —</span>
+        <span class="tarifa-desc-tag off" id="tf-c-d-iban">Domiciliación −5%</span>
+      </div>
+      <div class="tarifa-result">
+        <div class="tarifa-result-label"><span>Cuota estimada</span><span>2026 (sin IVA)</span></div>
+        <div class="tarifa-result-amounts">
+          <div class="tarifa-amount-block" id="tf-c-bloque-trimestral" style="display:none"><span class="tarifa-amount-type">Trimestral</span><span class="tarifa-amount-value highlight" id="tf-c-trimestral">—</span><span class="tarifa-amount-period">€ / trimestre</span></div>
+          <div class="tarifa-amount-block" id="tf-c-bloque-semestral" style="display:none"><span class="tarifa-amount-type">Semestral</span><span class="tarifa-amount-value highlight" id="tf-c-semestral">—</span><span class="tarifa-amount-period">€ / 6 meses</span></div>
+          <div class="tarifa-amount-block" id="tf-c-bloque-anual" style="display:none"><span class="tarifa-amount-type">Anual</span><span class="tarifa-amount-value highlight" id="tf-c-anual">—</span><span class="tarifa-amount-period">€ / año</span></div>
+          <span id="tf-c-pago-pending" style="font-size:11px;color:#8C8070;font-style:italic">Selecciona forma de pago</span>
+        </div>
+      </div>
+    </div>
+    <div class="tarifa-nota">⚠️ <strong>Estimación orientativa.</strong> Tarifa SGAE 2026 · 1er año. No incluye IVA (21%).</div>
+  </div>
+
+  <div class="card-footer">
+    <div class="footer-left">
+      <span class="footer-note">Ficha SGAE · Hostales · Pensiones · Fondas</span>
+      <span class="footer-note"><strong>🖶 Tras enviar podrá guardar una copia en PDF o imprimir la ficha.</strong></span>
+      <span class="footer-err-list" id="ferr-comunidad"></span>
+      <span class="footer-warn-list" id="fwarn-comunidad"></span>
+    </div>
+    <button class="btn-send" onclick="enviarFormulario('comunidad')">&#128228; Enviar ficha</button>
+  </div>
+</div>
+
+</div><!-- card-container -->
+
+<div class="success-banner" id="success-banner">
+  <div class="sb-icon">✅</div>
+  <div class="sb-title">¡Ficha enviada correctamente!</div>
+  <div class="sb-sub" id="success-email-msg"></div>
+  <button class="btn-print" onclick="printFicha()">🖨 Guardar PDF / Imprimir ficha</button>
+</div>
+
+<div class="notice-card" id="notice-unknown">
+  <div style="font-size:13px;color:var(--text);line-height:1.7">
+    <strong>¿No sabes qué tipo de empresa tiene el cliente?</strong><br>
+    Autónomo o persona física → <em>Persona Física</em>.<br>
+    S.L., S.A. u otra mercantil → <em>Sociedad</em>.<br>
+    Dos o más personas que explotan juntas el negocio sin constituir sociedad → <em>Comunidad de Bienes</em>.
+  </div>
+</div>
+
+<div style="margin-top:18px;text-align:center">
+  <button onclick="document.getElementById('notice-unknown').classList.toggle('visible')" style="background:none;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:12px;color:var(--muted);text-decoration:underline;text-underline-offset:3px;">
+    ¿El cliente no sabe qué tipo de empresa tiene?
+  </button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  var em = ['zonaf23','representante.sgae.es'].join('@');
+  document.getElementById('email-display').textContent = em;
+  document.getElementById('success-email-msg').innerHTML = 'Los datos han llegado a <strong>' + em + '</strong>';
+
+  // ===== CALCULADORA HOSTALES / PENSIONES / FONDAS =====
+  var TARIFAS_H = {
+    hostal_1: { label: 'Hostal / Pensión 1★', mensual: 6.61 },
+    hostal_2: { label: 'Hostal / Pensión 2★', mensual: 8.35 },
+    hostal_3: { label: 'Hostal / Pensión 3★', mensual: 15.01 },
+    fonda:    { label: 'Fonda',                mensual: 4.58 }
+  };
+
+  function fmtH(n) { return n.toFixed(2).replace('.', ',') + ' €'; }
+
+  function calcularTarifaHostal(prefix) {
+    // Leer tipo de establecimiento
+    var tipoEl = null;
+    document.querySelectorAll('input[name="' + prefix + '_tipo"]').forEach(function(r) {
+      if (r.checked) tipoEl = r;
+    });
+    // Leer pago
+    var pagoEl = null;
+    document.querySelectorAll('input[name="' + prefix + '_pago"]').forEach(function(r) {
+      if (r.checked) pagoEl = r;
+    });
+    // Leer asoc
+    var asocEl = null;
+    document.querySelectorAll('input[name="' + prefix + '_asoc"]').forEach(function(r) {
+      if (r.checked) asocEl = r;
+    });
+
+    var ibanEl  = document.getElementById(prefix + '_iban');
+    var ibanOk  = ibanEl ? ibanEl.value.trim().length > 10 : false;
+    var descAsoc = asocEl && asocEl.value === 'Sí';
+
+    var panel      = document.getElementById('tarifa-' + prefix);
+    var pending    = document.getElementById('tarifa-' + prefix + '-pending');
+    var contentDiv = document.getElementById('tarifa-' + prefix + '-content');
+    if (!panel) return;
+
+    if (!tipoEl) {
+      panel.classList.add('inactive');
+      pending.style.display = ''; contentDiv.style.display = 'none'; return;
+    }
+
+    var datos    = TARIFAS_H[tipoEl.value];
+    var pagoVal  = pagoEl ? pagoEl.value : '';
+    var dAsoc    = descAsoc ? 0.05 : 0;
+    var dPago    = pagoVal === 'Anual' ? 0.05 : pagoVal === 'Semestral' ? 0.025 : 0;
+    var dIban    = ibanOk ? 0.05 : 0;
+    var mensual  = datos.mensual * (1 - dAsoc - dPago - dIban);
+
+    panel.classList.remove('inactive');
+    pending.style.display = 'none';
+    contentDiv.style.display = 'block';
+
+    var p = 'tf-' + prefix + '-';
+    document.getElementById(p + 'tipo').textContent    = datos.label;
+    document.getElementById(p + 'mensual').textContent = fmtH(datos.mensual) + '/mes';
+
+    document.getElementById(p + 'd-asoc').className = 'tarifa-desc-tag ' + (dAsoc > 0 ? 'on' : 'off');
+    document.getElementById(p + 'd-iban').className  = 'tarifa-desc-tag ' + (dIban > 0 ? 'on' : 'off');
+
+    var dp = document.getElementById(p + 'd-pago');
+    if (!pagoVal || pagoVal === 'Trimestral') {
+      dp.textContent = pagoVal ? 'Pago trimestral' : 'Pago —';
+      dp.className   = 'tarifa-desc-tag off';
+    } else if (pagoVal === 'Semestral') {
+      dp.textContent = 'Pago semestral −2,5%';
+      dp.className   = 'tarifa-desc-tag on';
+    } else {
+      dp.textContent = 'Pago anual −5%';
+      dp.className   = 'tarifa-desc-tag on';
+    }
+
+    ['trimestral','semestral','anual'].forEach(function(b) {
+      var el = document.getElementById(p + 'bloque-' + b);
+      if (el) el.style.display = 'none';
+    });
+    var pendingPago = document.getElementById(p + 'pago-pending');
+    if (pagoVal === 'Trimestral') {
+      document.getElementById(p + 'trimestral').textContent = fmtH(mensual * 3);
+      document.getElementById(p + 'bloque-trimestral').style.display = '';
+      if (pendingPago) pendingPago.style.display = 'none';
+    } else if (pagoVal === 'Semestral') {
+      document.getElementById(p + 'semestral').textContent = fmtH(mensual * 6);
+      document.getElementById(p + 'bloque-semestral').style.display = '';
+      if (pendingPago) pendingPago.style.display = 'none';
+    } else if (pagoVal === 'Anual') {
+      document.getElementById(p + 'anual').textContent = fmtH(mensual * 12);
+      document.getElementById(p + 'bloque-anual').style.display = '';
+      if (pendingPago) pendingPago.style.display = 'none';
+    } else {
+      if (pendingPago) pendingPago.style.display = '';
+    }
+  }
+
+  // Event listeners directos
+  ['f', 's', 'c'].forEach(function(prefix) {
+    ['tipo','asoc','pago'].forEach(function(nombre) {
+      document.querySelectorAll('input[name="' + prefix + '_' + nombre + '"]').forEach(function(r) {
+        r.addEventListener('change', function() { calcularTarifaHostal(prefix); });
+      });
+    });
+    var ibanEl = document.getElementById(prefix + '_iban');
+    if (ibanEl) ibanEl.addEventListener('input', function() { calcularTarifaHostal(prefix); });
+  });
+  // ===== FIN CALCULADORA =====
+
+  // ─── Navegación formularios ───
+  var tipoMap = { fisica:'f', sociedad:'s', comunidad:'c' };
+  function showForm(t) {
+    ['fisica','sociedad','comunidad'].forEach(function(x){
+      document.getElementById('card-'+x).classList.remove('visible');
+      document.getElementById('tab-'+x).classList.remove('active');
+    });
+    document.getElementById('card-'+t).classList.add('visible');
+    document.getElementById('tab-'+t).classList.add('active');
+    document.getElementById('notice-unknown').classList.remove('visible');
+    document.getElementById('card-'+t).scrollIntoView({behavior:'smooth',block:'start'});
+    calcularTarifaHostal(tipoMap[t]);
+  }
+
+  function toggleDomSocial() {
+    var chk = document.getElementById('s_dom_distinto');
+    var fields = document.getElementById('s_dom_social_fields');
+    if (chk.checked) {
+      fields.classList.add('open');
+    } else {
+      fields.classList.remove('open');
+      ['s_dom_calle','s_dom_municipio','s_dom_cp'].forEach(function(id){
+        var el = document.getElementById(id); if(el) el.value = '';
+      });
+    }
+  }
+
+  function toggleMasIntegrantes() {
+    var btn = document.getElementById('btn-mas-int');
+    var extra = document.getElementById('c_integrantes_extra');
+    var isOpen = extra.classList.contains('open');
+    if (isOpen) {
+      extra.classList.remove('open');
+      btn.classList.remove('open');
+      btn.innerHTML = '<span class="btn-icon">＋</span> Añadir más integrantes';
+      ['c_nombre3','c_dni3','c_nombre4','c_dni4','c_nombre5','c_dni5'].forEach(function(id){
+        var el = document.getElementById(id); if(el) el.value = '';
+      });
+    } else {
+      extra.classList.add('open');
+      btn.classList.add('open');
+      btn.innerHTML = '<span class="btn-icon">＋</span> Ocultar integrantes adicionales';
+    }
+  }
+
+  function showToast(msg, type) {
+    var t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'toast show' + (type?' '+type:'');
+    setTimeout(function(){ t.className='toast'; }, 5000);
+  }
+
+  function getVal(id){ var e=document.getElementById(id); return e?e.value.trim():''; }
+  function getRadio(name){ var s=document.querySelector('input[name="'+name+'"]:checked'); return s?s.value:''; }
+
+  function validarDNIoNIE(v){
+    v=v.trim().toUpperCase();
+    var letras='TRWAGMYFPDXBNJZSQVHLCKE';
+    if(/^\d{8}[A-Z]$/.test(v)) return letras[parseInt(v)%23]===v[8];
+    if(/^[XYZ]\d{7}[A-Z]$/.test(v)){var n=v.replace('X','0').replace('Y','1').replace('Z','2');return letras[parseInt(n)%23]===v[8];}
+    return false;
+  }
+  function validarCIF(v){
+    v=v.trim().toUpperCase();
+    if(!/^[ABCDEFGHJKLMNPQRSUVW]\d{7}[\dA-J]$/.test(v)) return false;
+    var s=0; for(var i=1;i<8;i++){var d=parseInt(v[i]);if(i%2===0)s+=d;else{var d2=d*2;s+=d2>9?d2-9:d2;}}
+    var ctrl=10-(s%10); if(ctrl===10)ctrl=0;
+    var last=v[8]; if(/\d/.test(last)) return parseInt(last)===ctrl;
+    return String.fromCharCode(64+ctrl)===last;
+  }
+  function validarIBAN(v){
+    v=v.trim().toUpperCase().replace(/\s/g,'');
+    if(!/^ES\d{22}$/.test(v)) return false;
+    var r=v.slice(4)+v.slice(0,4),num='';
+    for(var i=0;i<r.length;i++){var cc=r.charCodeAt(i);num+=cc>=65?String(cc-55):r[i];}
+    var mod=0; for(var j=0;j<num.length;j++) mod=(mod*10+parseInt(num[j]))%97;
+    return mod===1;
+  }
+  function validarMovil(v){ return /^[67]\d{8}$/.test(v.trim().replace(/[\s-]/g,'')); }
+  function validarEmail(v){ return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v.trim()); }
+
+  function setupVal(id, fn, msgOk, msgErr){
+    var el=document.getElementById(id); if(!el) return;
+    var mid='valmsg-'+id;
+    if(!document.getElementById(mid)){var sp=document.createElement('span');sp.id=mid;sp.className='val-msg';el.parentNode.appendChild(sp);}
+    function check(){
+      var msg=document.getElementById(mid); var v=el.value.trim();
+      if(!v){el.classList.remove('val-ok','val-err');msg.className='val-msg';return;}
+      if(fn(v)){el.classList.remove('val-err');el.classList.add('val-ok');msg.textContent='✓ '+msgOk;msg.className='val-msg show-ok';}
+      else{el.classList.remove('val-ok');el.classList.add('val-err');msg.textContent='✗ '+msgErr;msg.className='val-msg show-err';}
+    }
+    el.addEventListener('input',check); el.addEventListener('blur',check);
+  }
+
+  ['f_dni','s_adni','c_dni1','c_dni2','c_dni3','c_dni4','c_dni5'].forEach(function(id){
+    setupVal(id,validarDNIoNIE,'DNI/NIE correcto','Formato o letra incorrecta — ej: 12345678Z');
+  });
+  ['s_cif','c_cif'].forEach(function(id){
+    setupVal(id,validarCIF,'CIF correcto','Formato o dígito de control incorrecto — ej: B12345678');
+  });
+  ['f_iban','s_iban','c_iban'].forEach(function(id){
+    setupVal(id,validarIBAN,'IBAN correcto','IBAN inválido — debe ser ES + 22 dígitos');
+  });
+  ['f_movil','s_movil','c_movil'].forEach(function(id){
+    setupVal(id,validarMovil,'Móvil correcto','Debe tener 9 dígitos y empezar por 6 ó 7');
+  });
+  ['f_email','s_email','c_email'].forEach(function(id){
+    setupVal(id,validarEmail,'Email correcto','Formato de email no válido');
+  });
+
+  var tipoEnviado = null;
+  function printFicha(){
+    if(tipoEnviado) document.getElementById('card-'+tipoEnviado).classList.add('visible');
+    window.print();
+    if(tipoEnviado) document.getElementById('card-'+tipoEnviado).classList.remove('visible');
+  }
+
+  function toggleInfo() {
+    var toggle = document.getElementById('info-toggle');
+    var body   = document.getElementById('info-body');
+    if (toggle.classList.contains('collapsed')) {
+      toggle.classList.remove('collapsed'); body.classList.remove('hidden');
+    } else {
+      toggle.classList.add('collapsed'); body.classList.add('hidden');
+    }
+  }
+
+  function enviarFormulario(tipo) {
+    var errores=[], advertencias=[];
+    var localNombre = getVal('local-nombre');
+    if(!localNombre){document.getElementById('local-err').classList.add('show');errores.push('Nombre del establecimiento');}
+    else document.getElementById('local-err').classList.remove('show');
+
+    if(tipo==='fisica'){
+      if(!getVal('f_nombre')) errores.push('Nombre y apellidos');
+      if(!getVal('f_dni'))    errores.push('DNI/NIE');
+      if(!getVal('f_movil'))  errores.push('Móvil');
+      if(!getVal('f_email'))  errores.push('Email');
+      if(!getRadio('f_tipo')) errores.push('Tipo de establecimiento');
+      if(!getRadio('f_pago')) advertencias.push('Forma de pago no seleccionada');
+    } else if(tipo==='sociedad'){
+      if(!getVal('s_razon'))  errores.push('Razón social');
+      if(!getVal('s_cif'))    errores.push('CIF');
+      if(!getVal('s_admin'))  errores.push('Administrador');
+      if(!getVal('s_adni'))   errores.push('DNI del administrador');
+      if(!getVal('s_movil'))  errores.push('Móvil');
+      if(!getVal('s_email'))  errores.push('Email');
+      if(!getRadio('s_tipo')) errores.push('Tipo de establecimiento');
+      if(!getRadio('s_pago')) advertencias.push('Forma de pago no seleccionada');
+    } else {
+      if(!getVal('c_nombre_cb')) errores.push('Nombre C.B.');
+      if(!getVal('c_cif'))       errores.push('CIF');
+      if(!getVal('c_nombre1'))   errores.push('Nombre integrante 1');
+      if(!getVal('c_dni1'))      errores.push('DNI integrante 1');
+      if(!getVal('c_nombre2'))   errores.push('Nombre integrante 2');
+      if(!getVal('c_dni2'))      errores.push('DNI integrante 2');
+      if(!getVal('c_movil'))     errores.push('Móvil');
+      if(!getVal('c_email'))     errores.push('Email');
+      if(!getRadio('c_tipo'))    errores.push('Tipo de establecimiento');
+      if(!getRadio('c_pago'))    advertencias.push('Forma de pago no seleccionada');
+    }
+
+    var errId  = 'ferr-'  + tipo;
+    var warnId = 'fwarn-' + tipo;
+    var errEl  = document.getElementById(errId);
+    var warnEl = document.getElementById(warnId);
+
+    if(errores.length){
+      errEl.innerHTML = '⚠ Campos obligatorios pendientes: ' + errores.join(', ');
+      errEl.classList.add('show');
+      showToast('Completa los campos obligatorios','terror');
+      return;
+    }
+    errEl.classList.remove('show');
+    if(advertencias.length){ warnEl.innerHTML='ℹ '+advertencias.join(' · '); warnEl.classList.add('show'); }
+    else { warnEl.classList.remove('show'); }
+
+    // Recoger todos los datos
+    var tipoEl = document.querySelector('input[name="'+tipo+'_tipo"]:checked');
+    var datos = {
+      'Establecimiento': getVal('local-nombre'),
+      'Tipo de empresa': tipo==='fisica'?'Persona Física':tipo==='sociedad'?'Sociedad':'Comunidad/CB',
+      'Tipo establecimiento': tipoEl ? tipoEl.value.replace('hostal_1','Hostal/Pensión 1★').replace('hostal_2','Hostal/Pensión 2★').replace('hostal_3','Hostal/Pensión 3★').replace('fonda','Fonda') : '—',
+      'Forma de pago': getRadio(tipo+'_pago')||'No indicada',
+      'Asociación Hoteles': getRadio(tipo+'_asoc')||'No indicado',
+      'IBAN': getVal(tipo+'_iban')||'No indicado'
+    };
+    datos['Código cliente'] = (document.getElementById('codigo_sap') ? document.getElementById('codigo_sap').value.trim() : '') || 'No informado';
+    datos['Tipo vía local'] = (document.getElementById('tipo_via') ? document.getElementById('tipo_via').value.trim() : '') || 'No informado';
+    datos['Dirección local'] = (document.getElementById('direccion_local') ? document.getElementById('direccion_local').value.trim() : '') || 'No informada';
+    datos['Número local'] = (document.getElementById('num_edificio') ? document.getElementById('num_edificio').value.trim() : '') || 'No informado';
+    datos['Código postal local'] = (document.getElementById('cod_postal') ? document.getElementById('cod_postal').value.trim() : '') || 'No informado';
+    datos['Localidad'] = 'Salamanca';
+
+
+    if(tipo==='fisica'){
+      datos['Nombre y apellidos'] = getVal('f_nombre');
+      datos['DNI/NIE']            = getVal('f_dni');
+      datos['Móvil']              = getVal('f_movil');
+      datos['Email']              = getVal('f_email');
+    } else if(tipo==='sociedad'){
+      datos['Razón social']       = getVal('s_razon');
+      datos['CIF']                = getVal('s_cif');
+      datos['Administrador']      = getVal('s_admin');
+      datos['DNI administrador']  = getVal('s_adni');
+      var domDistinto = document.getElementById('s_dom_distinto');
+      if (domDistinto && domDistinto.checked) {
+        datos['Domicilio social (calle)']     = getVal('s_dom_calle')     || 'No facilitado';
+        datos['Domicilio social (municipio)'] = getVal('s_dom_municipio') || 'No facilitado';
+        datos['Domicilio social (C.P.)']      = getVal('s_dom_cp')        || 'No facilitado';
+      } else {
+        datos['Domicilio social'] = 'Igual al del local';
+      }
+      datos['Móvil']              = getVal('s_movil');
+      datos['Email']              = getVal('s_email');
+    } else {
+      datos['Nombre C.B.']        = getVal('c_nombre_cb');
+      datos['CIF']                = getVal('c_cif');
+      datos['Fecha de constitución'] = getVal('c_fecha_const') || 'No facilitada';
+      datos['Integrante 1']       = getVal('c_nombre1') + ' — ' + getVal('c_dni1');
+      datos['Integrante 2']       = getVal('c_nombre2') + ' — ' + getVal('c_dni2');
+      [3,4,5].forEach(function(n){
+        var nom = getVal('c_nombre'+n); var dni = getVal('c_dni'+n);
+        if (nom || dni) {
+          datos['Integrante '+n] = (nom||'—') + ' — ' + (dni||'—');
+        }
+      });
+      datos['Móvil']              = getVal('c_movil');
+      datos['Email']              = getVal('c_email');
+    }
+
+    var emailCliente = datos['Email'] || '';
+    var btnSend = document.querySelector('#card-'+tipo+' .btn-send');
+    if(btnSend){ btnSend.disabled=true; btnSend.textContent='Enviando...'; }
+
+    fetch('https://formspree.io/f/xbdqrovj', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(Object.assign({ '_replyto': emailCliente, '_subject': 'Ficha SGAE Hostales — ' + datos['Establecimiento'] }, datos))
+    })
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+      if(data.ok || data.next){
+        tipoEnviado = tipo;
+        document.getElementById('success-banner').classList.add('visible');
+        document.getElementById('card-'+tipo).classList.remove('visible');
+        document.getElementById('success-banner').scrollIntoView({behavior:'smooth',block:'center'});
+        showToast('¡Ficha enviada correctamente!');
+      } else {
+        throw new Error('Error Formspree');
+      }
+    })
+    .catch(function(){
+      if(btnSend){ btnSend.disabled=false; btnSend.textContent='📨 Enviar ficha'; }
+      showToast('Error al enviar. Comprueba la conexión e inténtalo de nuevo.','terror');
+    });
+  }
+
+  function toggleInfo() {
+    var toggle = document.getElementById("info-toggle");
+    var body   = document.getElementById("info-body");
+    if (toggle.classList.contains("collapsed")) {
+      toggle.classList.remove("collapsed");
+      body.classList.remove("hidden");
+    } else {
+      toggle.classList.add("collapsed");
+      body.classList.add("hidden");
+    }
+  }
+</script>
+</body>
+</html>
